@@ -1,0 +1,95 @@
+<!-- <li class="line dk"></li> -->
+<!-- list -->
+<ul class="nav" ng-show="isLoggedIn">
+  <li class="hidden-folded padder m-t m-b-sm text-muted text-xs">
+    <span translate="aside.nav.HEADER"> </span> 
+  </li>
+  <!-- DASHBOARD --> 
+  <li ui-sref-active="active">
+    <a ui-sref="app.dashboard">
+      <i class="glyphicon glyphicon-stats icon text-primary-dker"></i>
+      <span class="font-bold"> Dashboard </span>
+    </a>
+  </li>
+  <!-- SEGURIDAD -->
+  <li>
+    <a href class="auto">      
+      <span class="pull-right text-muted">
+        <i class="fa fa-fw fa-angle-right text"></i>
+        <i class="fa fa-fw fa-angle-down text-active"></i>
+      </span>
+      <i class="glyphicon glyphicon-user icon text-primary-dker"></i>
+      <span class="font-bold"> Seguridad </span>
+    </a>
+    <ul class="nav nav-sub dk">
+      <li class="nav-sub-header">
+        <a href>
+          <span> Seguridad</span>
+        </a>
+      </li>
+      <li ui-sref-active="active">
+        <a ui-sref="app.usuario"> 
+          <span>Usuarios</span>
+        </a>
+      </li>
+      <li ui-sref-active="active">
+        <a ui-sref="app.perfil"> 
+          <span>Perfiles</span>
+        </a>
+      </li>
+    </ul>
+  </li>
+  <li ui-sref-active="active">
+    <a ui-sref="app.paciente">
+      <i class="glyphicon glyphicon-stats icon text-primary-dker"></i>
+      <span class="font-bold"> Pacientes </span>
+    </a>
+  </li>
+  <li ui-sref-active="active">
+    <a ui-sref="app.producto">
+      <i class="glyphicon glyphicon-stats icon text-primary-dker"></i>
+      <span class="font-bold"> Productos </span>
+    </a>
+  </li>
+  <li ui-sref-active="active">
+    <a ui-sref="app.reserva-cita">
+      <i class="glyphicon glyphicon-stats icon text-primary-dker"></i>
+      <span class="font-bold"> Citas </span>
+    </a>
+  </li>
+  <li>
+    <a href class="auto">      
+      <span class="pull-right text-muted">
+        <i class="fa fa-fw fa-angle-right text"></i>
+        <i class="fa fa-fw fa-angle-down text-active"></i>
+      </span>
+      <i class="glyphicon glyphicon-user icon text-primary-dker"></i>
+      <span class="font-bold"> Historia Médica </span>
+    </a>
+    <ul class="nav nav-sub dk">
+      <li class="nav-sub-header">
+        <a href>
+          <span> Historia Médica</span>
+        </a>
+      </li>
+      <li ui-sref-active="active">
+        <a ui-sref="app.atencion-medica"> 
+          <span>Atención Médica</span>
+        </a>
+      </li>
+      <li ui-sref-active="active">
+        <a ui-sref="app.historial-atencion"> 
+          <span>Historial</span>
+        </a>
+      </li>
+    </ul>
+  </li>
+  <!-- CENTRAL DE REPORTES --> 
+  <li ui-sref-active="active">
+    <a ui-sref="app.central-reportes">
+      <i class="glyphicon glyphicon-stats icon text-primary-dker"></i>
+      <span class="font-bold"> Reportes </span> 
+    </a>
+  </li>
+  <li class="line dk hidden-folded"></li>
+</ul>
