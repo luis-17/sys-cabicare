@@ -160,14 +160,17 @@ form.edit-form input, form.edit-form select {
 }
 .page-login .panel-left{
   margin-top: -50px;
+  width: 150%;
 }
 .page-login .panel-right{
   margin: 4rem;
   width: 100%;
   margin-top: -50px;
 }
-.page-login .panel-left img{
+.page-login .panel-left .bg-image{
   height: 100vh;
+  background-image: url('../../img/left-banner.jpg');
+  background-size: cover;
 }
 .page-login .section-login{
   width: 400px;

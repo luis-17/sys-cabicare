@@ -81,14 +81,6 @@ class Model_usuario extends CI_Model {
 		);
 		return $this->db->insert('usuario', $data);
 	}
-	public function m_editar_foto($datos){
-		$data = array(
-			'nombre_foto' => $datos['nombre_foto'],
-			'updatedat' => date('Y-m-d H:i:s')
-		);
-		$this->db->where('idcolaborador',$datos['idcolaborador']);
-		return $this->db->update('colaborador', $data);
-	}
 	public function m_editar($datos){
 		// var_dump($datos);exit();
 		$data = array(

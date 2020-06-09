@@ -70,13 +70,14 @@ angular.module('app')
           //     'angular/controllers/PacienteCtrl.js'
           //   ])
           // })
-          // .state('app.producto', {
-          //   url: '/producto',
-          //   templateUrl: 'tpl/producto.html',
-          //   resolve: load([
-          //     'angular/controllers/ProductoCtrl.js'
-          //   ])
-          // })
+          .state('app.producto', {
+            url: '/producto',
+            templateUrl: 'tpl/producto.html',
+            resolve: load([
+              'angular/controllers/ProductoCtrl.js',
+              'angular/controllers/TipoProductoCtrl.js'
+            ])
+          })
           .state('app.reserva-cita', {
             url: '/reserva-cita',
             templateUrl: 'tpl/reserva-cita.html',

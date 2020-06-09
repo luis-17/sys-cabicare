@@ -321,5 +321,4 @@ app.factory("UsuarioFactory", function($uibModal, pinesNotifications, blockUI, U
     }
   }
   return interfaz;
-})
-
+});
