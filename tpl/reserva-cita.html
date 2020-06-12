@@ -1,4 +1,4 @@
-<div class="" ng-controller="ReservaCitaCtrl" style="background-color: rgba(255,255,255,0.85);">
+<div class="" ng-controller="CitaCtrl" style="background-color: rgba(255,255,255,0.85);">
 	<div class="bg-light lter b-b wrapper-md">
 	  <h1 class="m-n font-thin h3"> Reserva de Citas </h1>
 	</div>
@@ -17,7 +17,70 @@
       <div class="cell-inner">
         <div class="tab-content">
           <div class="tab-pane active" id="calendario">
-          	CALENDARIO
+
+
+            <div class="col-lg-12 col-md-12 mb-lg mt-lg">
+              <div class="row">
+                <div class="pull-left ml-md mr-sm" style="width: 120px;">
+                  <span style="font-size: 0.8em;">CITA POR CONFIRMAR</span>
+                  <div class="bg-warning" style="width:100%; height: 30px;"></div>
+                </div>
+
+                <div class="pull-left mr-sm" style="width: 120px;">
+                  <span style="font-size: 0.8em;">CITA CONFIRMADA</span>
+                  <div class="bg-primary" style="width:100%; height: 30px;"></div>
+                </div>
+
+                <div class="pull-left" style="width: 120px;">
+                  <span style="font-size: 0.8em;">CITA ATENDIDA</span>
+                  <div class="bg-success" style="width:100%; height: 30px;"></div>
+                </div>
+
+
+
+                <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 pull-right" style="text-align: right;">
+                  <button type="button" class="btn btn-sm btn-default" ng-click="today()">Hoy</button>
+                  <div class="btn-group">
+                    <button class="btn btn-default btn-sm" ng-click="changeView('agendaDay', 'calendarCitas')">Dia</button>
+                    <button class="btn btn-default btn-sm" ng-click="changeView('agendaWeek', 'calendarCitas')">Semana</button>
+                    <button class="btn btn-default btn-sm" ng-click="changeView('month', 'calendarCitas')">Mes</button>
+                  </div>
+                  <button type="button" class="btn btn-primary btn-sm"
+                    ng-click='btnAgregarCita(null,null)'
+                  >Agregar Cita
+                  </button>
+
+                  <button type="button" class="btn btn-info btn-sm" ng-click='actualizarCalendario(true);'>
+                    <i class="fa fa-refresh"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-12 col-md-12">
+              <div class="menu-dropdown" uib-dropdown style="position:absolute; top:{{event.posY}}px;left:{{event.posX}}px;"
+                ng-mouseleave="closeMenu();">
+                <div class="my-dropdown">
+                  <ul class="dropdown-menu dropdown-menu-custom" uib-dropdown-menu role="menu">
+                    <li role="menuitem" ng-click="changeViewCita(false);changeViewConsulta(false);changeViewFicha(true);">
+                      <a><i class="fa fa-user"></i>Ir al Paciente</a>
+                    </li>
+
+                    <li role="menuitem" ng-if="!event.atencion.idatencion" ng-click="btnEditCita(event)">
+                      <a><i class="fa fa-calendar"></i>Modificar Cita</a>
+                    </li>
+                    <li role="menuitem" ng-if="!event.atencion.idatencion" ng-click="btnAnular(event)">
+                      <a><i class="fa fa-remove"></i>Anular Cita</a>
+                    </li>
+
+                  </ul>
+                </div>
+              </div>
+
+              <div ui-calendar="uiConfig.calendar" ng-model="eventSources" class="calendar"  calendar="calendarCitas" ></div>
+            </div>
+
+
           </div>
           <div class="tab-pane" id="lista">
           	LISTA
