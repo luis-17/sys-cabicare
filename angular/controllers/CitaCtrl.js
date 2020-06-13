@@ -27,8 +27,17 @@ app.controller('CitaCtrl',
 		ReservaCitasFactory
 
 	) {
-		// var vm = this;
-		console.log('En citas');
+		$scope.metodos = {}; // contiene todas las funciones
+		$scope.fArr = {}; // contiene todos los arrays generados por las funciones
+
+		$scope.fArr.listaTipoCita = [
+			{ id: '1', descripcion: 'POR CONFIRMAR' },
+			{ id: '2', descripcion: 'CONFIRMADA' }
+		];
+
+		$scope.fArr.listaSedes = [
+			{ id: '1', descripcion: 'HIGUERETA' }
+		];
 
 		/* EVENTOS */
 		$scope.menu = angular.element('.menu-dropdown');
@@ -61,7 +70,6 @@ app.controller('CitaCtrl',
 		};
 
 		$scope.selectCell = function (date, end, jsEvent, view) {
-			console.log(angular.element('.calendar').fullCalendar('getView'), 'angular.element(.calendar).fullCalendar(getView)');
 			var typeView = angular.element('.calendar').fullCalendar('getView');
 			if (typeView.type == 'month') {
 				angular.element('.calendar').fullCalendar('gotoDate', date);
@@ -123,7 +131,8 @@ app.controller('CitaCtrl',
 			console.log('Agrega cita');
 			var arrParams = {
 				'start': start || null,
-				'end': end || null
+				'end': end || null,
+				'fArr': $scope.fArr
 			};
 			ReservaCitasFactory.agregarCitaModal(arrParams);
 		}
@@ -232,11 +241,170 @@ app.factory("ReservaCitasFactory", function ($uibModal, pinesNotifications, bloc
 				controller: function ($scope, $uibModalInstance, arrParams) {
 					blockUI.stop();
 					$scope.fData = {};
+					$scope.fData.temporal = {};
+					$scope.fArr = arrParams.fArr;
 					$scope.fData.accion = 'reg';
 					$scope.titleForm = 'Registro de Cita';
+					$scope.fArr.listaTipoCita.splice(0, 0, { id: '0', descripcion: '--Seleccione tipo cita--' });
+					$scope.fData.tipo_cita = $scope.fArr.listaTipoCita[0];
+
+					$scope.fData.sede = $scope.fArr.listaSedes[0];
 
 					$scope.cancel = function () {
 						$uibModalInstance.dismiss('cancel');
+					}
+
+					/* DATEPICKERS */
+					$scope.configDP = {};
+					$scope.configDP.today = function () {
+						if (arrParams.start) {
+							$scope.fData.fecha = arrParams.start.toDate();
+						} else {
+							$scope.fData.fecha = new Date();
+						}
+					};
+					$scope.configDP.today();
+
+					$scope.configDP.clear = function () {
+						$scope.fData.fecha = null;
+					};
+
+					$scope.configDP.dateOptions = {
+						formatYear: 'yy',
+						maxDate: new Date(2021, 5, 22),
+						minDate: new Date(),
+						startingDay: 1
+					};
+
+					$scope.configDP.open = function () {
+						$scope.configDP.popup.opened = true;
+					};
+
+					$scope.configDP.formats = ['dd-MM-yyyy', 'dd-MMMM-yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy', 'shortDate'];
+					$scope.configDP.format = $scope.configDP.formats[0];
+					$scope.configDP.altInputFormats = ['M!/d!/yyyy'];
+
+					$scope.configDP.popup = {
+						opened: false
+					};
+         			/* END DATEPICKERS */
+
+					/* TIMEPICKERS */
+					$scope.configTP = {};
+					$scope.configTP.tpHoraInicio = {};
+					$scope.configTP.tpHoraInicio.hstep = 1;
+					$scope.configTP.tpHoraInicio.mstep = 30;
+					$scope.configTP.tpHoraInicio.ismeridian = true;
+					$scope.configTP.tpHoraInicio.toggleMode = function () {
+						$scope.configTP.tpHoraInicio.ismeridian = !$scope.configTP.tpHoraInicio.ismeridian;
+					};
+					$scope.configTP.tpHoraFin = angular.copy($scope.configTP.tpHoraInicio);
+					if (arrParams.start) {
+						// console.log('arrParams.start.a',arrParams.start.format('a'));
+						var partes_hora1 = arrParams.start.format('hh:mm').split(':');
+						// console.log('partes_hora1',partes_hora1);
+						var d = new Date();
+						if (arrParams.start.format('a') == 'pm' && parseInt(partes_hora1[0]) != 12) {
+							d.setHours(parseInt(partes_hora1[0]) + 12);
+						} else {
+							d.setHours(parseInt(partes_hora1[0]));
+						}
+
+						d.setMinutes(parseInt(partes_hora1[1]));
+						$scope.fData.hora_desde = d;
+
+						if (arrParams.end) {
+							var partes_hora2 = arrParams.end.format('hh:mm').split(':');
+						} else {
+							var partes_hora2 = arrParams.start.add(30, 'minutes').format('hh:mm').split(':');
+						}
+						var c = new Date();
+						if (arrParams.start.format('a') == 'pm' && parseInt(partes_hora2[0]) != 12) {
+							c.setHours(parseInt(partes_hora2[0]) + 12);
+						} else {
+							c.setHours(parseInt(partes_hora2[0]));
+						}
+						c.setMinutes(parseInt(partes_hora2[1]));
+						$scope.fData.hora_hasta = c;
+					} else {
+						$scope.fData.hora_desde = new Date();
+						$scope.fData.hora_hasta = new Date();
+					}
+					$scope.actualizarHoraFin = function () {
+						$scope.fData.hora_hasta = moment($scope.fData.hora_desde).add(30, 'm').toDate();
+					}
+          			/* END TIMEPICKERS */
+
+					/* GRILLA DE PRODUCTOS */
+					$scope.gridOptions = {
+						rowHeight: 30,
+						enableGridMenu: false,
+						enableColumnMenus: false,
+						enableRowSelection: false,
+						enableSelectAll: false,
+						enableFiltering: false,
+						enableSorting: false,
+						enableFullRowSelection: false,
+						multiSelect: false,
+						data: [],
+						columnDefs: [
+							{ field: 'idproducto', name: 'id', displayName: 'ID', minWidth: 80, width: 80 },
+							{ field: 'producto', name: 'nombre', displayName: 'PRODUCTO', minWidth: 120 },
+
+							{ field: 'precio', name: 'precio', displayName: 'PRECIO', width: 120 },
+
+							{
+								field: 'eliminar', name: 'eliminar', displayName: '', width: 50,
+								cellTemplate: '<button class="btn btn-default btn-sm text-danger btn-action" ng-click="grid.appScope.btnAnular(row);$event.stopPropagation();"> <i class="fa fa-trash" tooltip-placement="left" uib-tooltip="ELIMINAR!"></i> </button>'
+							}
+						],
+						onRegisterApi: function (gridApi) {
+							$scope.gridApi = gridApi;
+						}
+					};
+
+					$scope.getTableHeight = function () {
+						var rowHeight = 30; // your row height
+						var headerHeight = 30; // your header height
+						var cant_filas = 4; // min 4
+						if ($scope.gridOptions.data.length > cant_filas) {
+							var cant_filas = $scope.gridOptions.data.length;
+						}
+						return {
+							height: (cant_filas * rowHeight + headerHeight) + "px"
+						};
+					}
+
+					$scope.agregarItemProducto = function(){
+						console.log('$scope.fData.temporal => ', $scope.fData.temporal);
+						var producto_repetido = false;
+
+						angular.forEach($scope.gridOptions.data, function (value, key) {
+							if (value.idproducto == $scope.fData.temporal.idproducto) {
+								producto_repetido = true;
+								pinesNotifications.notify({
+									title: 'Advertencia.',
+									text: 'Ya está cargado este producto en la cesta.',
+									type: 'warning',
+									delay: 5000
+								});
+								return;
+							}
+						});
+
+						if (producto_repetido === false) {
+							$scope.gridOptions.data.push({
+								idproducto: $scope.fData.temporal.idproducto,
+								producto: $scope.fData.temporal.producto,
+								precio: $scope.fData.temporal.precio,
+							});
+
+							// limpiamos
+							$scope.fData.temporal.idproducto = null;
+							$scope.fData.temporal.producto = null;
+							$scope.fData.temporal.precio = null;
+							// $scope.calcularTotales();
+						}
 					}
 
 
