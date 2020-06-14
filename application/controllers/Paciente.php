@@ -1,13 +1,13 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class ClientePersona extends CI_Controller {
+class Paciente extends CI_Controller {
 
 	public function __construct()
 	{
 		parent::__construct();
 		$this->load->helper(array('security','imagen_helper','otros_helper','fechas_helper'));
-		$this->load->model(array('model_cliente_persona','model_categoria_cliente'));
+		$this->load->model(array('model_paciente'));
 		//cache
 		$this->output->set_header("Cache-Control: no-store, no-cache, must-revalidate, no-transform, max-age=0, post-check=0, pre-check=0");
 		$this->output->set_header("Pragma: no-cache");
@@ -16,12 +16,12 @@ class ClientePersona extends CI_Controller {
 		//if(!@$this->user) redirect ('inicio/login');
 		//$permisos = cargar_permisos_del_usuario($this->user->idusuario);
 	}
-	public function listar_cliente_persona()
+	public function listar_paciente()
 	{ 
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
 		$paramPaginate = $allInputs['paginate'];
-		$lista = $this->model_cliente_persona->m_cargar_cliente_persona($paramPaginate);
-		$fCount = $this->model_cliente_persona->m_count_cliente_persona($paramPaginate);
+		$lista = $this->model_paciente->m_cargar_paciente($paramPaginate);
+		$fCount = $this->model_paciente->m_count_paciente($paramPaginate);
 		$arrListado = array();
 		foreach ($lista as $row) { 
 			$row['desc_sexo'] = NULL; 
@@ -31,30 +31,49 @@ class ClientePersona extends CI_Controller {
 			if( @$row['sexo'] == 'F' ){
 				$row['desc_sexo'] = 'FEMENINO';
 			}
+			switch ($row['tipoDocumento']) {
+				case 'DNI':
+					$strTipoDoc = 'DOCUMENTO NACIONAL DE IDENTIDAD';
+					break;
+				case 'PAS':
+					$strTipoDoc = 'PASAPORTE';
+					break;
+				case 'CEX':
+					$strTipoDoc = 'CARNET DE EXTRANJERIA';
+					break;
+				case 'PTP':
+					$strTipoDoc = 'PERMISO TEMPORAL DE PERMANENCIA';
+					break;
+				default:
+					$strTipoDoc = NULL;
+					break;
+			}
 			array_push($arrListado,
 				array(
-					'id' => trim($row['idclientepersona']),
+					'idpaciente' => trim($row['pacienteId']),
 					'nombres' => strtoupper($row['nombres']),
-					'apellidos' => strtoupper($row['apellidos']),
-					'num_documento' => $row['num_documento'],
-					'categoria_cliente' => array(
-						'id'=> $row['idcategoriacliente'],
-						'descripcion'=> $row['descripcion_cc']
+					'apellido_paterno' => strtoupper($row['apellidoPaterno']),
+					'apellido_materno' => strtoupper($row['apellidoMaterno']),
+					'tipo_documento'=> array(
+						'id'=> $row['tipoDocumento'],
+						'descripcion'=> $strTipoDoc
 					),
-					'colaborador' => array(
-						'id'=> $row['idcolaborador'],
-						'descripcion'=> $row['colaborador']
-					),
+					'num_documento' => $row['numeroDocumento'],
 					'sexo'=> array(
 						'id'=> $row['sexo'],
 						'descripcion'=> $row['desc_sexo'] 
 					),
-					'edad' => devolverEdad($row['fecha_nacimiento']),
-					'fecha_nacimiento' => darFormatoDMY($row['fecha_nacimiento']),
-					'fecha_nacimiento_str' => formatoFechaReporte3($row['fecha_nacimiento']),
-					'telefono_fijo' => $row['telefono_fijo'],
-					'telefono_movil' => $row['telefono_movil'],
-					'email' => strtoupper($row['email'])
+					'edad' => devolverEdad($row['fechaNacimiento']),
+					'fecha_nacimiento' => darFormatoDMY($row['fechaNacimiento']),
+					'fecha_nacimiento_str' => formatoFechaReporte3($row['fechaNacimiento']),
+					'operador' => array(
+						'id'=> $row['operador'],
+						'descripcion'=> $row['operador']
+					),
+					'celular' => $row['celular'],
+					'email' => strtoupper($row['email']),
+					'alergias' => $row['alergias'],
+					'antecedentes' => $row['antecedentes']
 				)
 			);
 		}
@@ -71,7 +90,7 @@ class ClientePersona extends CI_Controller {
 	}
 	public function ver_popup_formulario()
 	{
-		$this->load->view('cliente-persona/mant_clientePersona');
+		$this->load->view('paciente/mant_paciente');
 	}
 	public function registrar()
 	{
@@ -96,9 +115,9 @@ class ClientePersona extends CI_Controller {
 		    return;
     	}
 	    /* VALIDAR SI EL DNI YA EXISTE */ 
-    	$fCliente = $this->model_cliente_persona->m_validar_cliente_persona_num_documento($allInputs['num_documento']); 
+    	$fCliente = $this->model_paciente->m_validar_paciente_num_documento($allInputs['num_documento']); 
     	if( !empty($fCliente) ) {
-    		$arrData['message'] = 'El Documento de Identidad ingresado, ya existe.';
+    		$arrData['message'] = 'El documento de identidad ingresado ya existe.';
 			$arrData['flag'] = 0;
 			$this->output
 			    ->set_content_type('application/json')
@@ -106,7 +125,7 @@ class ClientePersona extends CI_Controller {
 			return;
    		}
     	$this->db->trans_start();
-		if($this->model_cliente_persona->m_registrar($allInputs)) { // registro de cliente empresa 
+		if($this->model_paciente->m_registrar($allInputs)) { // registro de cliente empresa 
 			$arrData['message'] = 'Se registraron los datos correctamente';
 			$arrData['flag'] = 1;
 		}
@@ -138,7 +157,7 @@ class ClientePersona extends CI_Controller {
 		    return;
     	}
 		/* VALIDAR SI EL RUC YA EXISTE */
-    	$fCliente = $this->model_cliente_persona->m_validar_cliente_persona_num_documento($allInputs['num_documento'],TRUE,$allInputs['id']);
+    	$fCliente = $this->model_paciente->m_validar_paciente_num_documento($allInputs['num_documento'],TRUE,$allInputs['idpaciente']);
     	if( $fCliente ) {
     		$arrData['message'] = 'El RUC ingresado, ya existe.';
 			$arrData['flag'] = 0;
@@ -147,7 +166,7 @@ class ClientePersona extends CI_Controller {
 			    ->set_output(json_encode($arrData));
 			return;
    		}
-		if($this->model_cliente_persona->m_editar($allInputs)){
+		if($this->model_paciente->m_editar($allInputs)){
 			$arrData['message'] = 'Se editaron los datos correctamente';
 			$arrData['flag'] = 1;
 		}
@@ -161,7 +180,7 @@ class ClientePersona extends CI_Controller {
 
 		$arrData['message'] = 'No se pudo anular los datos';
     	$arrData['flag'] = 0;
-		if( $this->model_cliente_persona->m_anular($allInputs) ){ 
+		if( $this->model_paciente->m_anular($allInputs) ){ 
 			$arrData['message'] = 'Se anularon los datos correctamente';
     		$arrData['flag'] = 1;
 		}

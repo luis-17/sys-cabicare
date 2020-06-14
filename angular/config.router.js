@@ -63,13 +63,13 @@ angular.module('app')
               'angular/controllers/PerfilCtrl.js'
             ])
           })
-          // .state('app.paciente', {
-          //   url: '/paciente',
-          //   templateUrl: 'tpl/paciente.html',
-          //   resolve: load([
-          //     'angular/controllers/PacienteCtrl.js'
-          //   ])
-          // })
+          .state('app.paciente', {
+            url: '/paciente',
+            templateUrl: 'tpl/paciente.html',
+            resolve: load([
+              'angular/controllers/PacienteCtrl.js'
+            ])
+          })
           .state('app.producto', {
             url: '/producto',
             templateUrl: 'tpl/producto.html',
