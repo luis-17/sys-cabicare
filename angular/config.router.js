@@ -5,17 +5,17 @@
  */
 angular.module('app')
   .run(
-    [          
+    [
       '$rootScope', '$state', '$stateParams',
       function ($rootScope,   $state,   $stateParams) {
           $rootScope.$state = $state;
-          $rootScope.$stateParams = $stateParams;        
+          $rootScope.$stateParams = $stateParams;
       }
     ]
   )
   .config(
     [
-      '$stateProvider', '$urlRouterProvider', 'JQ_CONFIG', 'MODULE_CONFIG', 
+      '$stateProvider', '$urlRouterProvider', 'JQ_CONFIG', 'MODULE_CONFIG',
       function ($stateProvider, $urlRouterProvider, JQ_CONFIG, MODULE_CONFIG) {
         var layout = "tpl/app.html";
         if(window.location.href.indexOf("material") > 0){
@@ -54,7 +54,7 @@ angular.module('app')
               'angular/controllers/UsuarioCtrl.js',
               'angular/controllers/PerfilCtrl.js'
               // 'angular/controllers/ColaboradorCtrl.js'
-            ]) 
+            ])
           })
           .state('app.perfil', {
             url: '/perfil',
@@ -81,8 +81,10 @@ angular.module('app')
           .state('app.reserva-cita', {
             url: '/reserva-cita',
             templateUrl: 'tpl/reserva-cita.html',
+
             resolve: load([
-              'angular/controllers/ReservaCitaCtrl.js'
+              // 'angular/controllers/ReservaCitaCtrl.js'
+              'angular/controllers/CitaCtrl.js'
             ])
           })
           ;
