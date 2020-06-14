@@ -37,10 +37,10 @@
 	            </div>
 
 				<div class="form-group col-md-3">
-					<label for="name" class="control-label minotaur-label">Tipo de Cita : </label>
+					<label for="name" class="control-label minotaur-label">Tipo de Cita <span class="text-danger">*</span>: </label>
 					<select
 						class="form-control input-sm"
-						ng-model="fData.tipo_cita"
+						ng-model="fData.tipoCita"
 						ng-options="item as item.descripcion for item in fArr.listaTipoCita"
 						required
 					></select>
@@ -63,6 +63,7 @@
 						class="form-control input-sm"
 						ng-model="fData.peso"
 						placeholder="kg"
+						ng-change="calcularIMC()"
 					>
 	            </div>
 
@@ -73,6 +74,7 @@
 						class="form-control input-sm"
 						ng-model="fData.talla"
 						placeholder="cm"
+						ng-change="calcularIMC()"
 					>
 	            </div>
 
@@ -168,8 +170,8 @@
 								ng-model="fData.temporal.idproducto"
 								class="form-control input-sm"
 								style="width:40px;margin-right:4px;"
-								ng-disabled="false"
 								placeholder="ID"
+								ng-disabled="true"
 							/>
 						</span>
 						<input
@@ -184,6 +186,7 @@
 							typeahead-on-select="getSelectedProducto($item, $model, $label)"
 							typeahead-min-length="2"
 							autocomplete="off"
+							ng-change = "fData.temporal.idproducto = null; fData.temporal.precio = null"
 						/>
 						<i ng-show="loadingLocations" class="fa fa-refresh"></i>
 						<div ng-show="noResultsLPSC">
@@ -204,9 +207,11 @@
 				</div>
 
 				<div class="form-group col-md-3 mb-md  mt-xs">
-					<button class="btn btn-success btn-sm mt-md"
-						ng-click="agregarItemProducto()"
+					<button
+						class="btn btn-success btn-sm mt-md"
 						style="width: 100%;"
+						ng-click="agregarItemProducto()"
+						ng-disabled="fData.temporal.idproducto == null && (fData.temporal.precio == null || fData.temporal.precio == '')"
 					>AGREGAR</button>
 				</div>
 
@@ -214,6 +219,16 @@
 					<div ui-grid="gridOptions" ui-grid-auto-resize ui-grid-resize-columns class="grid table-responsive fs-mini-grid" ng-style="getTableHeight();"></div>
 				</div>
 
+			</div>
+			<div class="row">
+				<div class="col-md-6 col-xs-12 pl-n pull-right">
+					<div class="row">
+						<div class="form-inline mt-xs col-xs-12 text-right">
+							<label class="control-label minotaur-label mr-xs mt-sm text-success f-14"> TOTAL A PAGAR (S/): </label>
+							<input type="text" class="form-control pull-right text-center" disabled ng-model="fData.total_a_pagar" placeholder="0.00" style="width: 160px; font-size: 17px; font-weight: bolder;"/>
+						</div>
+					</div>
+				</div>
 			</div>
 
 
@@ -225,7 +240,7 @@
   		<i class="fa fa-arrow-left"></i> Cancelar
   	</button>
   	<button class="btn btn-success btn-ef btn-ef-3 btn-ef-3c"
-  		ng-disabled="formCita.$invalid" ng-click="ok();">
+  		ng-disabled="formCita.$invalid" ng-click="registrarCita();">
   		<i class="fa fa-arrow-right"></i> Guardar
   	</button>
 </div>

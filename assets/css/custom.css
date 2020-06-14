@@ -53,14 +53,19 @@
     width: 900px;
 }
 /*FONT SIZE*/
-.f-10{
-    font-size: 10px;
-    margin: 0;
-}
 .f-9{
     font-size: 9px;
     margin: 0;
 }
+.f-10{
+    font-size: 10px;
+    margin: 0;
+}
+.f-12{font-size: 12px !important;}
+.f-14{font-size: 14px !important;}
+.f-16{font-size: 16px !important;}
+.f-18{font-size: 18px !important;}
+.f-20{font-size: 20px !important;}
 .input-normal-border{
     border-color: #cfdadd;
 }
@@ -116,7 +121,19 @@ form.edit-form input, form.edit-form select {
     border-radius: 3px;
 }
 .text-danger {
-    color: #f05050 !important;
+  color: #f05050 !important;
+}
+.text-success{
+  color: #5cb85c !important;
+}
+.text-info{
+  color: #5bc0de !important;
+}
+.text-warning{
+  color: #f0ad4e !important;
+}
+.text-primary{
+  color: #428bca !important;
 }
 
 /* bug CSS grid */

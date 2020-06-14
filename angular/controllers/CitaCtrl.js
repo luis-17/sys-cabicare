@@ -3,7 +3,7 @@ app.controller('CitaCtrl',
 	'$filter',
 	'$state',
 	'$stateParams',
-	'$uibModal',
+
 	'$bootbox',
 	'$log',
 	'$timeout',
@@ -17,7 +17,7 @@ app.controller('CitaCtrl',
 		$filter,
 		$state,
 		$stateParams,
-		$uibModal,
+
 		$bootbox,
 		$log,
 		$timeout,
@@ -229,7 +229,7 @@ app.controller('CitaCtrl',
 	}
 ]);
 
-app.factory("ReservaCitasFactory", function ($uibModal, pinesNotifications, blockUI, $timeout) {
+app.factory("ReservaCitasFactory", function ($uibModal, pinesNotifications, blockUI, $timeout, ProductoServices) {
 	var interfaz = {
 		agregarCitaModal: function (arrParams) {
 			blockUI.start('Abriendo formulario...');
@@ -245,14 +245,12 @@ app.factory("ReservaCitasFactory", function ($uibModal, pinesNotifications, bloc
 					$scope.fArr = arrParams.fArr;
 					$scope.fData.accion = 'reg';
 					$scope.titleForm = 'Registro de Cita';
-					$scope.fArr.listaTipoCita.splice(0, 0, { id: '0', descripcion: '--Seleccione tipo cita--' });
-					$scope.fData.tipo_cita = $scope.fArr.listaTipoCita[0];
+					$scope.fArr.listaTipoCita.splice(0, 0, { id: null, descripcion: '--Seleccione tipo cita--' });
+					$scope.fData.tipoCita = $scope.fArr.listaTipoCita[0];
 
 					$scope.fData.sede = $scope.fArr.listaSedes[0];
 
-					$scope.cancel = function () {
-						$uibModalInstance.dismiss('cancel');
-					}
+
 
 					/* DATEPICKERS */
 					$scope.configDP = {};
@@ -335,6 +333,29 @@ app.factory("ReservaCitasFactory", function ($uibModal, pinesNotifications, bloc
 					}
           			/* END TIMEPICKERS */
 
+					/* AUTOCOMPLETADO */
+
+					$scope.getProductoAutocomplete = function (value) {
+						var params = {
+							searchText: value,
+						}
+						return ProductoServices.sListarProductoAutocomplete(params).then(function (rpta) {
+							$scope.noResultsCT = false;
+							if (rpta.flag === 0) {
+								$scope.noResultsCT = true;
+							}
+							console.log('datos producto', rpta.datos);
+							return rpta.datos;
+						});
+					}
+
+					$scope.getSelectedProducto = function (item, model) {
+						$scope.fData.temporal.idproducto = model.idproducto;
+						$scope.fData.temporal.producto = model.producto;
+						$scope.fData.temporal.tipoProducto = model.tipo_producto.descripcion;
+						$scope.fData.temporal.precio = model.precio;
+					}
+
 					/* GRILLA DE PRODUCTOS */
 					$scope.gridOptions = {
 						rowHeight: 30,
@@ -350,12 +371,13 @@ app.factory("ReservaCitasFactory", function ($uibModal, pinesNotifications, bloc
 						columnDefs: [
 							{ field: 'idproducto', name: 'id', displayName: 'ID', minWidth: 80, width: 80 },
 							{ field: 'producto', name: 'nombre', displayName: 'PRODUCTO', minWidth: 120 },
+							{ field: 'tipoProducto', name: 'tipoProducto', displayName: 'Tipo Producto', minWidth: 120 },
 
 							{ field: 'precio', name: 'precio', displayName: 'PRECIO', width: 120 },
 
 							{
 								field: 'eliminar', name: 'eliminar', displayName: '', width: 50,
-								cellTemplate: '<button class="btn btn-default btn-sm text-danger btn-action" ng-click="grid.appScope.btnAnular(row);$event.stopPropagation();"> <i class="fa fa-trash" tooltip-placement="left" uib-tooltip="ELIMINAR!"></i> </button>'
+								cellTemplate: '<button class="btn btn-default btn-sm text-danger btn-action" ng-click="grid.appScope.btnQuitarDeLaCesta(row);$event.stopPropagation();"> <i class="fa fa-trash" tooltip-placement="left" uib-tooltip="ELIMINAR!"></i> </button>'
 							}
 						],
 						onRegisterApi: function (gridApi) {
@@ -376,9 +398,30 @@ app.factory("ReservaCitasFactory", function ($uibModal, pinesNotifications, bloc
 					}
 
 					$scope.agregarItemProducto = function(){
-						console.log('$scope.fData.temporal => ', $scope.fData.temporal);
-						var producto_repetido = false;
+						if ($scope.fData.temporal.idproducto == null ){
+							pinesNotifications.notify({
+								title: 'Advertencia.',
+								text: 'Debe seleccionar un producto.',
+								type: 'warning',
+								delay: 5000
+							});
+							return;
+						}
 
+						if ($scope.fData.temporal.precio == null ||
+							$scope.fData.temporal.precio == "" ||
+							$scope.fData.temporal.precio < 0)
+						{
+							pinesNotifications.notify({
+								title: 'Advertencia.',
+								text: 'El precio no es válido.',
+								type: 'warning',
+								delay: 5000
+							});
+							return;
+						}
+
+						var producto_repetido = false;
 						angular.forEach($scope.gridOptions.data, function (value, key) {
 							if (value.idproducto == $scope.fData.temporal.idproducto) {
 								producto_repetido = true;
@@ -396,6 +439,7 @@ app.factory("ReservaCitasFactory", function ($uibModal, pinesNotifications, bloc
 							$scope.gridOptions.data.push({
 								idproducto: $scope.fData.temporal.idproducto,
 								producto: $scope.fData.temporal.producto,
+								tipoProducto: $scope.fData.temporal.tipoProducto,
 								precio: $scope.fData.temporal.precio,
 							});
 
@@ -403,8 +447,71 @@ app.factory("ReservaCitasFactory", function ($uibModal, pinesNotifications, bloc
 							$scope.fData.temporal.idproducto = null;
 							$scope.fData.temporal.producto = null;
 							$scope.fData.temporal.precio = null;
-							// $scope.calcularTotales();
+							$scope.calcularTotales();
 						}
+					}
+
+					$scope.calcularTotales = function () {
+						var totales = 0;
+						angular.forEach($scope.gridOptions.data, function (value, key) {
+							totales += parseFloat($scope.gridOptions.data[key].precio);
+						});
+						$scope.fData.total_a_pagar = totales.toFixed(2);
+					}
+
+					$scope.btnQuitarDeLaCesta = function (row) {
+						var index = $scope.gridOptions.data.indexOf(row.entity);
+						$scope.gridOptions.data.splice(index, 1);
+						$scope.calcularTotales();
+					}
+
+					/* CALCULO DE IMC */
+					$scope.calcularIMC = function(){
+						$scope.fData.imc = null;
+						if ($scope.fData.peso == null || $scope.fData.talla == null){
+							return;
+						}
+						console.log('calculo imc');
+
+						if($scope.fData.peso <= 0 || $scope.fData.talla <= 0){
+							pinesNotifications.notify({
+								title: 'Advertencia.',
+								text: 'Peso y Talla deben ser numericos mayores de cero',
+								type: 'warning',
+								delay: 5000
+							});
+							return;
+						}
+						var talla = parseInt($scope.fData.talla) / 100;
+						$scope.fData.imc = (parseFloat($scope.fData.peso) / (parseFloat(talla*talla))).toFixed(2);
+					}
+
+					/* BOTONES FINALES */
+					$scope.cancel = function () {
+						$uibModalInstance.dismiss('cancel');
+					}
+
+					$scope.registrarCita = function(){
+						if($scope.fData.tipoCita.id == null){
+							pinesNotifications.notify({
+								title: 'Advertencia.',
+								text: 'Debe seleccionar un Tipo de Cita.',
+								type: 'warning',
+								delay: 5000
+							});
+							return;
+						}
+
+						if ($scope.gridOptions.data.length <= 0){
+							pinesNotifications.notify({
+								title: 'Advertencia.',
+								text: 'Debe agregar al menos un producto.',
+								type: 'warning',
+								delay: 5000
+							});
+							return;
+						}
+						console.log('fData', $scope.fData);
 					}
 
 

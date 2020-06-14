@@ -84,7 +84,8 @@ angular.module('app')
 
             resolve: load([
               // 'angular/controllers/ReservaCitaCtrl.js'
-              'angular/controllers/CitaCtrl.js'
+              'angular/controllers/CitaCtrl.js',
+              'angular/controllers/ProductoCtrl.js',
             ])
           })
           ;
