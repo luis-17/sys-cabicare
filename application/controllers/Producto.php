@@ -44,6 +44,14 @@ class Producto extends CI_Controller {
       ->set_output(json_encode($arrData));
 	}
 
+	/**
+	 * Carga de producto mediante un autocompletado
+	 * Utilizado en el registro de una cita
+	 *
+	 * @Creado 13-06-2020
+	 * @author Ing. Ruben Guevara <rguevarac@hotmail.es>
+	 * @return void
+	 */
 	public function listar_autocompletado_producto()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);

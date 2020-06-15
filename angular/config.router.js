@@ -86,6 +86,7 @@ angular.module('app')
               // 'angular/controllers/ReservaCitaCtrl.js'
               'angular/controllers/CitaCtrl.js',
               'angular/controllers/ProductoCtrl.js',
+              'angular/controllers/PacienteCtrl.js',
             ])
           })
           ;

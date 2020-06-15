@@ -1,32 +1,32 @@
-app.controller('PacienteCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$log', '$timeout', 'pinesNotifications', 'uiGridConstants', 'blockUI', 
+app.controller('PacienteCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$log', '$timeout', 'pinesNotifications', 'uiGridConstants', 'blockUI',
   'PacienteFactory',
   'PacienteServices',
-  function($scope, $filter, $uibModal, $bootbox, $log, $timeout, pinesNotifications, uiGridConstants, blockUI, 
+  function($scope, $filter, $uibModal, $bootbox, $log, $timeout, pinesNotifications, uiGridConstants, blockUI,
   PacienteFactory,
   PacienteServices
   ) {
-    $scope.metodos = {}; // contiene todas las funciones 
-    $scope.fArr = {}; // contiene todos los arrays generados por las funciones 
+    $scope.metodos = {}; // contiene todas las funciones
+    $scope.fArr = {}; // contiene todos los arrays generados por las funciones
     $scope.mySelectionGrid = [];
-    $scope.btnBuscar = function(){ 
+    $scope.btnBuscar = function(){
       $scope.gridOptions.enableFiltering = !$scope.gridOptions.enableFiltering;
       $scope.gridApi.core.notifyDataChange( uiGridConstants.dataChange.COLUMN );
     };
     $scope.fArr.listaTipoDocumento = [
       {id : '0', descripcion:'--Seleccione tipo--'},
-      {id: 'DNI', descripcion: 'DOCUMENTO NACIONAL DE IDENTIDAD'}, 
+      {id: 'DNI', descripcion: 'DOCUMENTO NACIONAL DE IDENTIDAD'},
       {id: 'CEX', descripcion: 'CARNET DE EXTRANJERIA' },
       {id: 'PAS', descripcion: 'PASAPORTE' },
       {id: 'PTP', descripcion: 'PERMISO TEMPORAL DE PERMANENCIA' }
     ];
     $scope.fArr.listaSexo = [
       {id : '0', descripcion:'--Seleccione sexo--'},
-      {id: 'M', descripcion: 'MASCULINO'}, 
+      {id: 'M', descripcion: 'MASCULINO'},
       {id: 'F', descripcion: 'FEMENINO' }
     ];
     $scope.fArr.listaOperadores = [
       {id : '0', descripcion:'--Seleccione operador--'},
-      {id: 'CLARO', descripcion: 'CLARO'}, 
+      {id: 'CLARO', descripcion: 'CLARO'},
       {id: 'MOVISTAR', descripcion: 'MOVISTAR' },
       {id: 'ENTEL', descripcion: 'ENTEL' },
       {id: 'BITEL', descripcion: 'BITEL' }
@@ -52,9 +52,9 @@ app.controller('PacienteCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$
       enableRowSelection: true,
       enableFullRowSelection: true,
       multiSelect: false,
-      columnDefs: [ 
+      columnDefs: [
         { field: 'idpaciente', name: 'pa.id', displayName: 'ID', width: '75',  sort: { direction: uiGridConstants.DESC} },
-        { field: 'tipo_documento', name: 'pa.tipoDocumento', width: 160, 
+        { field: 'tipo_documento', name: 'pa.tipoDocumento', width: 160,
           cellTemplate:'<div class="ui-grid-cell-contents text-left ">'+ '{{ COL_FIELD.descripcion }}</div>',  displayName: 'Tipo Documento' },
         { field: 'num_documento', name: 'pa.numeroDocumento', displayName: 'Documento', minWidth: 90 },
         { field: 'nombres', name: 'pa.nombres', displayName: 'Nombres', minWidth: 100 },
@@ -64,7 +64,7 @@ app.controller('PacienteCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$
         { field: 'email', name: 'pa.email', displayName: 'E-mail', minWidth: 100 },
         { field: 'celular', name: 'pa.celular', displayName: 'Celular', minWidth: 100 }
       ],
-      onRegisterApi: function(gridApi) { 
+      onRegisterApi: function(gridApi) {
         $scope.gridApi = gridApi;
         gridApi.selection.on.rowSelectionChanged($scope,function(row){
           $scope.mySelectionGrid = gridApi.selection.getSelectedRows();
@@ -72,7 +72,7 @@ app.controller('PacienteCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$
         gridApi.selection.on.rowSelectionChangedBatch($scope,function(rows){
           $scope.mySelectionGrid = gridApi.selection.getSelectedRows();
         });
-        $scope.gridApi.core.on.sortChanged($scope, function(grid, sortColumns) { 
+        $scope.gridApi.core.on.sortChanged($scope, function(grid, sortColumns) {
           if (sortColumns.length == 0) {
             paginationOptions.sort = null;
             paginationOptions.sortName = null;
@@ -90,7 +90,7 @@ app.controller('PacienteCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$
         });
         $scope.gridApi.core.on.filterChanged( $scope, function(grid, searchColumns) {
           var grid = this.grid;
-          paginationOptions.search = true; 
+          paginationOptions.search = true;
           paginationOptions.searchColumn = {
             'pa.id' : grid.columns[1].filters[0].term,
             'pa.tipoDocumento' : grid.columns[2].filters[0].term,
@@ -106,7 +106,7 @@ app.controller('PacienteCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$
         });
       }
     };
-    paginationOptions.sortName = $scope.gridOptions.columnDefs[0].name; 
+    paginationOptions.sortName = $scope.gridOptions.columnDefs[0].name;
     $scope.metodos.getPaginationServerSide = function(loader) {
       if( loader ){
         blockUI.start('Procesando información...');
@@ -114,26 +114,26 @@ app.controller('PacienteCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$
       var arrParams = {
         paginate : paginationOptions
       };
-      PacienteServices.sListar(arrParams).then(function (rpta) { 
+      PacienteServices.sListar(arrParams).then(function (rpta) {
         if( rpta.datos.length == 0 ){
           rpta.paginate = { totalRows: 0 };
         }
         $scope.gridOptions.totalItems = rpta.paginate.totalRows;
-        $scope.gridOptions.data = rpta.datos; 
+        $scope.gridOptions.data = rpta.datos;
         if( loader ){
-          blockUI.stop(); 
+          blockUI.stop();
         }
       });
       $scope.mySelectionGrid = [];
     };
-    $scope.metodos.getPaginationServerSide(true); 
+    $scope.metodos.getPaginationServerSide(true);
     // MAS ACCIONES
-    $scope.btnNuevo = function() { 
+    $scope.btnNuevo = function() {
       var arrParams = {
         'metodos': $scope.metodos,
         'fArr': $scope.fArr ,
-        callback: function() {      
-        }        
+        callback: function() {
+        }
       }
       PacienteFactory.regPacienteModal(arrParams);
     }
@@ -142,17 +142,17 @@ app.controller('PacienteCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$
         'metodos': $scope.metodos,
         'mySelectionGrid': $scope.mySelectionGrid,
         'fArr': $scope.fArr,
-        callback: function() {      
-        }     
+        callback: function() {
+        }
       }
       PacienteFactory.editPacienteModal(arrParams);
     }
-    $scope.btnAnular = function() { 
+    $scope.btnAnular = function() {
       var pMensaje = '¿Realmente desea anular el registro?';
       $bootbox.confirm(pMensaje, function(result) {
         if (result) {
           var arrParams = {
-            idpaciente: $scope.mySelectionGrid[0].idpaciente 
+            idpaciente: $scope.mySelectionGrid[0].idpaciente
           };
           blockUI.start('Procesando información...');
           PacienteServices.sAnular(arrParams).then(function (rpta) {
@@ -167,7 +167,7 @@ app.controller('PacienteCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$
               alert('Error inesperado');
             }
             pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 2500 });
-            blockUI.stop(); 
+            blockUI.stop();
           });
         }
       });
@@ -176,12 +176,13 @@ app.controller('PacienteCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$
 
 app.service("PacienteServices",function($http, $q, handleBehavior) {
     return({
-        sListar: sListar,
-        sRegistrar: sRegistrar,
-        sEditar: sEditar,
-        sAnular: sAnular,
-        sBuscarPacientes: sBuscarPacientes,
-        sListarPacientesBusqueda: sListarPacientesBusqueda 
+      sListar: sListar,
+      sRegistrar: sRegistrar,
+      sEditar: sEditar,
+      sAnular: sAnular,
+      sBuscarPacientes: sBuscarPacientes,
+      sListarPacientesBusqueda: sListarPacientesBusqueda,
+      sListarPacientePorNumDoc: sListarPacientePorNumDoc
     });
     function sListar(datos) {
       var request = $http({
@@ -231,19 +232,27 @@ app.service("PacienteServices",function($http, $q, handleBehavior) {
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
     }
+  function sListarPacientePorNumDoc(datos) {
+      var request = $http({
+            method : "post",
+            url : angular.patchURLCI+"Paciente/buscar_paciente_por_num_documento",
+            data : datos
+      });
+      return (request.then(handleBehavior.success,handleBehavior.error));
+    }
 });
 
-app.factory("PacienteFactory", function($uibModal, pinesNotifications, blockUI, PacienteServices) { 
+app.factory("PacienteFactory", function($uibModal, pinesNotifications, blockUI, PacienteServices) {
   var interfaz = {
     regPacienteModal: function (arrParams) {
       blockUI.start('Abriendo formulario...');
-      $uibModal.open({ 
+      $uibModal.open({
         templateUrl: angular.patchURLCI+'Paciente/ver_popup_formulario',
         size: 'md',
         backdrop: 'static',
         keyboard:false,
-        controller: function ($scope, $uibModalInstance, arrParams) { 
-          blockUI.stop(); 
+        controller: function ($scope, $uibModalInstance, arrParams) {
+          blockUI.stop();
           $scope.fData = {};
           console.log($scope.fData,'$scope.fData');
           $scope.metodos = arrParams.metodos;
@@ -258,21 +267,21 @@ app.factory("PacienteFactory", function($uibModal, pinesNotifications, blockUI, 
           $scope.fData.sexo = $scope.fArr.listaSexo[0];
           // $scope.fArr.listaTipoDocumento.splice(0,0,{ id : '0', descripcion:'--Seleccione tipo documento--'});
           $scope.fData.operador = $scope.fArr.listaOperadores[0];
-          // var myCallBackCC = function() { 
-          //   $scope.fArr.listaTipoPaciente.splice(0,0,{ id : '0', descripcion:'--Seleccione tipo paciente--'}); 
+          // var myCallBackCC = function() {
+          //   $scope.fArr.listaTipoPaciente.splice(0,0,{ id : '0', descripcion:'--Seleccione tipo paciente--'});
           //   $scope.fData.tipo_paciente = $scope.fArr.listaTipoProducto[0];
           // }
-          // $scope.metodos.listaTipoProducto(myCallBackCC); 
+          // $scope.metodos.listaTipoProducto(myCallBackCC);
           $scope.modoEdit = true;
-          $scope.aceptar = function () { 
+          $scope.aceptar = function () {
             blockUI.start('Procesando información...');
             console.log('aqui');
-            PacienteServices.sRegistrar($scope.fData).then(function (rpta) {    
+            PacienteServices.sRegistrar($scope.fData).then(function (rpta) {
               if(rpta.flag == 1){
                 var pTitle = 'OK!';
                 var pType = 'success';
                 $uibModalInstance.dismiss('cancel');
-                if(typeof $scope.metodos.getPaginationServerSide == 'function'){ 
+                if(typeof $scope.metodos.getPaginationServerSide == 'function'){
                   $scope.metodos.getPaginationServerSide(true);
                 }
               }else if(rpta.flag == 0){
@@ -282,10 +291,10 @@ app.factory("PacienteFactory", function($uibModal, pinesNotifications, blockUI, 
                 alert('Error inesperado');
               }
               arrParams.callback($scope.fData, rpta);
-              blockUI.stop(); 
+              blockUI.stop();
               pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 2500 });
             });
-          } 
+          }
         },
         resolve: {
           arrParams: function() {
@@ -297,18 +306,18 @@ app.factory("PacienteFactory", function($uibModal, pinesNotifications, blockUI, 
     editPacienteModal: function (arrParams) {
       console.log(arrParams,'arrParams');
       blockUI.start('Abriendo formulario...');
-      $uibModal.open({ 
+      $uibModal.open({
         templateUrl: angular.patchURLCI+'Paciente/ver_popup_formulario',
         size: 'md',
         backdrop: 'static',
         keyboard:false,
-        controller: function ($scope, $uibModalInstance, arrParams) { 
-          blockUI.stop(); 
+        controller: function ($scope, $uibModalInstance, arrParams) {
+          blockUI.stop();
           $scope.fData = {};
           $scope.metodos = arrParams.metodos;
-          $scope.fArr = arrParams.fArr; 
+          $scope.fArr = arrParams.fArr;
           console.log(arrParams,'arrParams.mySelectionGrid');
-          if( arrParams.mySelectionGrid.length == 1 ){ 
+          if( arrParams.mySelectionGrid.length == 1 ){
             $scope.fData = arrParams.mySelectionGrid[0];
             console.log($scope.fData ,'$scope.fData ');
           }else{
@@ -334,15 +343,15 @@ app.factory("PacienteFactory", function($uibModal, pinesNotifications, blockUI, 
             return obj.id == $scope.fData.sexo.id;
           }).shift();
           $scope.fData.sexo = objIndexSx;
-          // var myCallBackCC = function() { 
+          // var myCallBackCC = function() {
           //   var objIndex = $scope.fArr.listaTipoProducto.filter(function(obj) {
           //     return obj.id == $scope.fData.tipo_producto.id;
-          //   }).shift(); 
-          //   $scope.fData.tipo_producto = objIndex; 
+          //   }).shift();
+          //   $scope.fData.tipo_producto = objIndex;
           // }
-          // $scope.metodos.listaTipoProducto(myCallBackCC); 
+          // $scope.metodos.listaTipoProducto(myCallBackCC);
           $scope.modoEdit = false;
-          $scope.aceptar = function () { 
+          $scope.aceptar = function () {
             blockUI.start('Procesando información...');
             PacienteServices.sEditar($scope.fData).then(function (rpta) {
               if(rpta.flag == 1){
@@ -359,10 +368,10 @@ app.factory("PacienteFactory", function($uibModal, pinesNotifications, blockUI, 
                 alert('Error inesperado');
               }
               arrParams.callback($scope.fData);
-              blockUI.stop(); 
+              blockUI.stop();
               pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 2500 });
             });
-          } 
+          }
         },
         resolve: {
           arrParams: function() {

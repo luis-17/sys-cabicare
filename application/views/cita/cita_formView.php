@@ -7,43 +7,54 @@
 			<div class="row">
 
 				<div class="form-group col-md-6">
-	              <label for="name" class="control-label minotaur-label" style="width: 100%;">Paciente
-	              	<span class="text-danger">*</span>:
-	              	<!-- <span ng-controller="PacienteController as pac" ng-click="pac.btnNuevo(true,callback);"
-	              			ng-if="fData.accion == 'reg'"
-	              			style="float: right;font-size: 10px;font-weight: 500;">¿Nuevo paciente?
-	              	</span> -->
-	              </label>
-	              	<input type="text"
-						ng-if="fData.accion == 'reg'"
-						ng-model="fData.cliente"
-						class="form-control input-sm"
-						placeholder="Digite el Paciente..."
-						typeahead-loading="loadingLocations"
-						uib-typeahead="item as item.paciente for item in getPacienteAutocomplete($viewValue)"
-						typeahead-min-length="2"
-						typeahead-on-select="getSelectedPaciente($item, $model, $label)"
-						autocomplete="off"
-						required
-					>
+	              	<label for="name" class="control-label minotaur-label" style="width: 100%;">Paciente
+	              		<span class="text-danger">*</span>:
+						<!-- <span ng-controller="PacienteController as pac" ng-click="pac.btnNuevo(true,callback);"
+								ng-if="fData.accion == 'reg'"
+								style="float: right;font-size: 10px;font-weight: 500;">¿Nuevo paciente?
+						</span> -->
+	              	</label>
+					<div class="input-group">
+						<span class="input-group-btn">
+							<input
+								type="text"
+								ng-model="fData.numeroDocumento"
+								class="form-control input-sm"
+								style="width:80px;margin-right:4px;"
+								placeholder="DNI"
+								ng-disabled="fData.accion != 'reg'"
+								ng-enter="obtenerDatosPaciente();"
+								ng-change="fData.paciente = null; fData.pacienteId = null;"
+							/>
+						</span>
 
-                  	<input type="text"
-						ng-if="fData.accion != 'reg'"
-					  	ng-model="fData.cliente.paciente"
-						class="form-control "
-						autocomplete="off"
-                  		disabled
-					>
+
+						<input type="text"
+							ng-model="fData.paciente"
+							class="form-control input-sm"
+							placeholder="Paciente"
+							required
+							disabled
+						>
+	            	</div>
 	            </div>
 
-				<div class="form-group col-md-3">
-					<label for="name" class="control-label minotaur-label">Tipo de Cita <span class="text-danger">*</span>: </label>
-					<select
+				<div class="form-group col-md-3" ng-class="{'has-error': Form.formCita.tipoCita.$invalid}">
+					<label for="tipoCita" class="control-label minotaur-label">Tipo de Cita <span class="text-danger">*</span>: </label>
+					<!-- <select
+						name="tipoCita"
 						class="form-control input-sm"
 						ng-model="fData.tipoCita"
 						ng-options="item as item.descripcion for item in fArr.listaTipoCita"
+
 						required
-					></select>
+					></select> -->
+
+					<select name="tipoCita" ng-model="fData.tipoCita" required>
+						<option value="">--Seleccione tipo cita--</option>
+						<option ng-repeat="item in fArr.listaTipoCita" value="{{item.id}}">{{item.descripcion}}</option>
+					</select>
+
 	            </div>
 
 				<div class="form-group col-md-3">

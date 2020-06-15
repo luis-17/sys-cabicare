@@ -4,7 +4,7 @@ class Model_paciente extends CI_Model {
 	{
 		parent::__construct();
 	}
-	public function m_cargar_paciente($paramPaginate){ 
+	public function m_cargar_paciente($paramPaginate){
 		$this->db->select("id AS pacienteId, pa.nombres, pa.apellidoPaterno, pa.apellidoMaterno, pa.tipoDocumento, pa.numeroDocumento,
 		pa.sexo, pa.fechaNacimiento, pa.celular, pa.email, pa.alergias, pa.operador, pa.antecedentes, pa.createdAt", FALSE);
 		$this->db->from('paciente pa');
@@ -40,8 +40,31 @@ class Model_paciente extends CI_Model {
 		$fData = $this->db->get()->row_array();
 		return $fData;
 	}
+
+	public function m_cargar_paciente_por_numero_documento($datos)
+	{
+		$this->db->select("
+			id AS pacienteId,
+			pa.nombres,
+			pa.apellidoPaterno,
+			pa.apellidoMaterno,
+			pa.tipoDocumento,
+			pa.numeroDocumento,
+			pa.sexo,
+			pa.fechaNacimiento,
+			pa.celular,
+			pa.email,
+			pa.alergias,
+			pa.operador,
+			pa.antecedentes
+		", FALSE);
+		$this->db->from('paciente pa');
+		$this->db->where('pa.numeroDocumento', $datos['numeroDocumento']);
+		$this->db->limit('1');
+		return $this->db->get()->row_array();
+	}
 	// VALIDACIONES
-	public function m_validar_paciente_num_documento($numDocumento,$excepcion = FALSE,$idpaciente=NULL) 
+	public function m_validar_paciente_num_documento($numDocumento,$excepcion = FALSE,$idpaciente=NULL)
 	{
 		$this->db->select('pa.id');
 		$this->db->from('paciente pa');
@@ -58,7 +81,7 @@ class Model_paciente extends CI_Model {
 		$data = array(
 			'tipoDocumento' => $datos['tipo_documento']['id'],
 			'numeroDocumento' => $datos['num_documento'],
-			'nombres' => strtoupper($datos['nombres']), 
+			'nombres' => strtoupper($datos['nombres']),
 			'apellidoPaterno' => empty($datos['apellido_paterno']) ? NULL : strtoupper($datos['apellido_paterno']),
 			'apellidoMaterno' => empty($datos['apellido_materno']) ? NULL : strtoupper($datos['apellido_materno']),
 			'email' => empty($datos['email']) ? NULL : strtoupper($datos['email']),
@@ -100,10 +123,10 @@ class Model_paciente extends CI_Model {
 	{
 		$data = array(
 			'estado' => 0,
-			'updatedat' => date('Y-m-d H:i:s') 
+			'updatedat' => date('Y-m-d H:i:s')
 		);
 		$this->db->where('id',$datos['idpaciente']);
 		return $this->db->update('paciente', $data);
-	}	
+	}
 }
 ?>

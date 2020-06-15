@@ -229,7 +229,30 @@ app.controller('CitaCtrl',
 	}
 ]);
 
-app.factory("ReservaCitasFactory", function ($uibModal, pinesNotifications, blockUI, $timeout, ProductoServices) {
+app.service("CitaServices", function ($http, $q, handleBehavior) {
+	return({
+		sRegistrar: sRegistrar
+	});
+
+	function sRegistrar(datos) {
+		var request = $http({
+			method: "post",
+			url: angular.patchURLCI + "Cita/registrar",
+			data: datos
+		});
+		return (request.then(handleBehavior.success, handleBehavior.error));
+	}
+});
+
+app.factory("ReservaCitasFactory",
+	function (
+		$uibModal,
+		pinesNotifications,
+		blockUI,
+		ProductoServices,
+		PacienteServices,
+		CitaServices
+	) {
 	var interfaz = {
 		agregarCitaModal: function (arrParams) {
 			blockUI.start('Abriendo formulario...');
@@ -241,16 +264,42 @@ app.factory("ReservaCitasFactory", function ($uibModal, pinesNotifications, bloc
 				controller: function ($scope, $uibModalInstance, arrParams) {
 					blockUI.stop();
 					$scope.fData = {};
+					$scope.Form = {}
 					$scope.fData.temporal = {};
 					$scope.fArr = arrParams.fArr;
 					$scope.fData.accion = 'reg';
 					$scope.titleForm = 'Registro de Cita';
-					$scope.fArr.listaTipoCita.splice(0, 0, { id: null, descripcion: '--Seleccione tipo cita--' });
-					$scope.fData.tipoCita = $scope.fArr.listaTipoCita[0];
+					// $scope.fArr.listaTipoCita.splice(0, 0, { id: "", descripcion: '--Seleccione tipo cita--' });
+					// $scope.fData.tipoCita = $scope.fArr.listaTipoCita[0];
 
 					$scope.fData.sede = $scope.fArr.listaSedes[0];
 
+					/* PACIENTE */
+					$scope.obtenerDatosPaciente = function () {
+						if ($scope.fData.numeroDocumento) {
+							PacienteServices.sListarPacientePorNumDoc($scope.fData).then(function (rpta) {
+								if (rpta.flag === 1) {
+									$scope.fData.paciente = rpta.datos.paciente;
+									$scope.fData.pacienteId = rpta.datos.pacienteId;
 
+									pinesNotifications.notify({
+										title: 'OK.',
+										text: rpta.message,
+										type: 'success',
+										delay: 5000
+									});
+								}else{
+									pinesNotifications.notify({
+										title: 'Advertencia.',
+										text: rpta.message,
+										type: 'warning',
+										delay: 5000
+									});
+
+								}
+							});
+						}
+					}
 
 					/* DATEPICKERS */
 					$scope.configDP = {};
@@ -444,9 +493,10 @@ app.factory("ReservaCitasFactory", function ($uibModal, pinesNotifications, bloc
 							});
 
 							// limpiamos
-							$scope.fData.temporal.idproducto = null;
-							$scope.fData.temporal.producto = null;
-							$scope.fData.temporal.precio = null;
+							// $scope.fData.temporal.idproducto = null;
+							// $scope.fData.temporal.producto = null;
+							// $scope.fData.temporal.precio = null;
+							$scope.fData.temporal = {}
 							$scope.calcularTotales();
 						}
 					}
@@ -492,7 +542,8 @@ app.factory("ReservaCitasFactory", function ($uibModal, pinesNotifications, bloc
 					}
 
 					$scope.registrarCita = function(){
-						if($scope.fData.tipoCita.id == null){
+
+						if ($scope.fData.tipoCita == null || $scope.fData.tipoCita == ""){
 							pinesNotifications.notify({
 								title: 'Advertencia.',
 								text: 'Debe seleccionar un Tipo de Cita.',
@@ -511,7 +562,24 @@ app.factory("ReservaCitasFactory", function ($uibModal, pinesNotifications, bloc
 							});
 							return;
 						}
-						console.log('fData', $scope.fData);
+						blockUI.start("Registrando cita");
+						CitaServices.sRegistrar($scope.fData).then(function(rpta){
+							if (rpta.flag === 1) {
+
+								$uibModalInstance.dismiss($scope.fData);
+							} else {
+								var pTitle = 'Advertencia!';
+								var pType = 'warning';
+
+							}
+							blockUI.stop();
+							pinesNotifications.notify({
+								title: pTitle,
+								text: rpta.message,
+								type: pType,
+								delay: 5000
+							});
+						});
 					}
 
 
