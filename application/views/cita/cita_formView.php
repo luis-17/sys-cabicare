@@ -152,7 +152,7 @@
 	              	</label>
 	              	<div uib-timepicker required
 		              	ng-model="fData.hora_desde"
-		              	ng-change="updateHoraFin();"
+		              	ng-change="actualizarHoraFin();"
 		              	hour-step="configTP.tpHoraInicio.hstep"
 		              	minute-step="configTP.tpHoraInicio.mstep"
 		              	show-meridian="configTP.tpHoraInicio.ismeridian">

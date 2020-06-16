@@ -3,7 +3,6 @@ app.controller('CitaCtrl',
 	'$filter',
 	'$state',
 	'$stateParams',
-
 	'$bootbox',
 	'$log',
 	'$timeout',
@@ -11,24 +10,26 @@ app.controller('CitaCtrl',
 	'uiGridConstants',
 	'blockUI',
 	'ReservaCitasFactory',
+	'CitaServices',
 
 	function (
 		$scope,
 		$filter,
 		$state,
 		$stateParams,
-
 		$bootbox,
 		$log,
 		$timeout,
 		pinesNotifications,
 		uiGridConstants,
 		blockUI,
-		ReservaCitasFactory
+		ReservaCitasFactory,
+		CitaServices
 
 	) {
 		$scope.metodos = {}; // contiene todas las funciones
 		$scope.fArr = {}; // contiene todos los arrays generados por las funciones
+		$scope.fBusqueda = {};
 
 		$scope.fArr.listaTipoCita = [
 			{ id: '1', descripcion: 'POR CONFIRMAR' },
@@ -38,6 +39,8 @@ app.controller('CitaCtrl',
 		$scope.fArr.listaSedes = [
 			{ id: '1', descripcion: 'HIGUERETA' }
 		];
+
+
 
 		/* EVENTOS */
 		$scope.menu = angular.element('.menu-dropdown');
@@ -84,7 +87,7 @@ app.controller('CitaCtrl',
 				event: event,
 				delta: delta,
 			};
-			ReservaCitasServices.sMoverCita(datos).then(function (rpta) {
+			CitaServices.sMoverCita(datos).then(function (rpta) {
 				if (rpta.flag == 1) {
 					var pTitle = 'OK!';
 					var pType = 'success';
@@ -141,13 +144,17 @@ app.controller('CitaCtrl',
 		/* CARGA DE DATOS */
 		$scope.eventsF = function (start, end, timezone, callback) {
 			var events = [];
-			// blockUI.start('Actualizando calendario...');
+			blockUI.start('Actualizando calendario...');
 			//console.log(start, end,'start, end');
 			//console.log(start.toLocaleTimeString(), end.toLocaleTimeString(),'start.toLocaleTimeString(), end.toLocaleTimeString()');
-			//console.log(start,end,'moment(start).tz("America/Lima").format(YYYY-MM-DD)');
-			/* $scope.fBusqueda.desde = moment(start).tz('America/Lima').format('YYYY-MM-DD');
-			$scope.fBusqueda.hasta = moment(end).tz('America/Lima').format('YYYY-MM-DD');
-			ReservaCitasServices.sListarCitaCalendario($scope.fBusqueda).then(function (rpta) {
+			// $scope.fBusqueda.desde = moment(start).tz('America/Lima').format('YYYY-MM-DD');
+			// $scope.fBusqueda.hasta = moment(end).tz('America/Lima').format('YYYY-MM-DD');
+			$scope.fBusqueda.desde = moment(start).format('YYYY-MM-DD');
+			$scope.fBusqueda.hasta = moment(end).format('YYYY-MM-DD');
+			console.log(start,end);
+			console.log('desde', $scope.fBusqueda.desde);
+			console.log('hasta', $scope.fBusqueda.hasta);
+			CitaServices.sListarCitaCalendario($scope.fBusqueda).then(function (rpta) {
 				if (rpta.flag == 1) {
 					angular.forEach(rpta.datos, function (row, key) {
 						row.start = moment(row.start);
@@ -157,7 +164,7 @@ app.controller('CitaCtrl',
 					callback(events);
 				}
 				blockUI.stop();
-			}); */
+			});
 		}
 		$scope.eventSources = [$scope.eventsF];
 		/* Change View */
@@ -231,9 +238,18 @@ app.controller('CitaCtrl',
 
 app.service("CitaServices", function ($http, $q, handleBehavior) {
 	return({
+		sListarCitaCalendario: sListarCitaCalendario,
 		sRegistrar: sRegistrar
 	});
 
+	function sListarCitaCalendario(datos) {
+		var request = $http({
+			method: "post",
+			url: angular.patchURLCI + "Cita/listar_citas",
+			data: datos
+		});
+		return (request.then(handleBehavior.success, handleBehavior.error));
+	}
 	function sRegistrar(datos) {
 		var request = $http({
 			method: "post",
@@ -562,10 +578,20 @@ app.factory("ReservaCitasFactory",
 							});
 							return;
 						}
+						if ($scope.fData.hora_desde) {
+							$scope.fData.hora_desde_str = $scope.fData.hora_desde.toLocaleTimeString();
+						}
+
+						if ($scope.fData.hora_hasta) {
+							$scope.fData.hora_hasta_str = $scope.fData.hora_hasta.toLocaleTimeString();
+						}
+						$scope.fData.detalle = $scope.gridOptions.data;
+
 						blockUI.start("Registrando cita");
 						CitaServices.sRegistrar($scope.fData).then(function(rpta){
 							if (rpta.flag === 1) {
-
+								var pTitle = 'OK!';
+								var pType = 'success';
 								$uibModalInstance.dismiss($scope.fData);
 							} else {
 								var pTitle = 'Advertencia!';
