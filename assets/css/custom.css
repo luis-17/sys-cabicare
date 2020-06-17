@@ -368,6 +368,31 @@ fieldset[disabled] a.btn {
   border-radius: 50%;
 }
 
+.fc-event.b-warning {
+    background-color: #fad733 !important;
+   color: #7266ba !important;
+}
+.fc-event.b-primary {
+    background-color: #7266ba !important;
+    color: #fff !important;
+}
+.fc-event.b-success {
+    background-color: #5cb85c !important;
+   color: #fff !important;
+}
+
+
+.tooltip-event{
+    width:auto;
+    height:auto;
+    background:#000;
+    color:#fff;
+    position:absolute;
+    z-index:10001;
+    padding:4px;
+    border-radius: 8px;
+    font-size: 11px;
+}
 /* Efecto botones */
 .btn-ef {
   border: none;

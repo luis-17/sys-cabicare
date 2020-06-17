@@ -19,7 +19,6 @@ class Cita extends CI_Controller {
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
 		$lista = $this->model_cita->m_cargar_citas($allInputs);
-
 		$arrListado = array();
 		if(empty($lista)){
 			$arrData['flag'] = 0;
@@ -31,8 +30,17 @@ class Cita extends CI_Controller {
 			return;
 		}
 
-
 		foreach ($lista as $row) {
+
+			if ( $row['estado'] == 1 ){
+				$clases = 'b-warning';
+			}elseif ( $row['estado'] == 2 ){
+				$clases = 'b-primary';
+			}elseif ( $row['estado'] == 3 ) {
+				$clases = 'b-success';
+			}else {
+				$clases = '';
+			}
 			array_push(
 				$arrListado,
 				array(
@@ -40,10 +48,13 @@ class Cita extends CI_Controller {
 					'horaDesde' => $row['horaDesde'],
 					'horaHasta' => $row['horaHasta'],
 					'fecha' => $row['fechaCita'],
-
+					'paciente' =>  $row['paciente'],
+					'className' => $clases,
 					'start' => $row['fechaCita'] .' '. $row['horaDesde'],
 					'end' => $row['fechaCita'] .' '. $row['horaHasta'],
-
+					'title' => darFormatoHora($row['horaDesde']). ' - ' . darFormatoHora($row['horaHasta']) . ' | '.$row['paciente'],
+					'allDay' => FALSE,
+					'durationEditable' => FALSE,
 					'estado' => $row['estado']
 
 				)

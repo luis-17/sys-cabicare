@@ -25,9 +25,11 @@ class Model_cita extends CI_Model {
 			ci.temperaturaCorporal,
 			ci.perimetroAbdominal,
 			ci.observaciones,
-			ci.estado
+			ci.estado,
+			concat_ws(' ', pa.nombres, pa.apellidoPaterno, pa.apellidoMaterno) AS paciente
 		", FALSE);
 		$this->db->from('cita ci');
+		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
 		return $this->db->get()->result_array();
 	}
 	public function m_registrar($data)

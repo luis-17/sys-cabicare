@@ -45,28 +45,9 @@ app.controller('CitaCtrl',
 		/* EVENTOS */
 		$scope.menu = angular.element('.menu-dropdown');
 		$scope.alertOnClick = function (event, jsEvent, view) {
-			$scope.event = event;
-			//console.log(event,jsEvent,'event,jsEvent');
-			$scope.menu.addClass('open');
-			$scope.menu.removeClass('left right');
-			var wrap = angular.element(jsEvent.target).closest('.fc-event');
-			var cal = wrap.closest('.calendar');
-			var left = wrap.offset().left - cal.offset().left;
-			var right = cal.width() - (wrap.offset().left - cal.offset().left + wrap.width());
-			if (right > $scope.menu.width()) {
-				$scope.menu.addClass('left');
-			} else if (left > $scope.menu.width()) {
-				$scope.menu.addClass('right');
-			}
-			$scope.event.posX = jsEvent.pageX - cal.offset().left;
-			if ($scope.event.posX < 140) {
-				$scope.event.posX = 140;
-			}
+			console.log('event', event);
+			$scope.btnEditarCita(null, null, event);
 
-			$scope.event.posY = jsEvent.pageY - cal.offset().top;
-			if ($scope.event.posY > 620) {
-				$scope.event.posY = 620;
-			}
 		}
 		$scope.alertOnResize = function (event, delta) {
 			angular.element('.calendar').fullCalendar('refetchEvents');
@@ -139,6 +120,15 @@ app.controller('CitaCtrl',
 			};
 			ReservaCitasFactory.agregarCitaModal(arrParams);
 		}
+		$scope.btnEditarCita = function (start, end, cita) {
+			console.log('Edita cita');
+			// var arrParams = {
+			// 	'start': start || null,
+			// 	'end': end || null,
+			// 	'fArr': $scope.fArr
+			// };
+			// ReservaCitasFactory.editarCitaModal(arrParams);
+		}
 
 
 		/* CARGA DE DATOS */
@@ -196,8 +186,8 @@ app.controller('CitaCtrl',
 				eventDrop: $scope.alertOnDrop,
 				eventResize: $scope.alertOnResize,
 				eventClick: $scope.alertOnClick,
+
 				eventMouseover: function (data, event, view) {
-					// console.log( event, $('.tooltip-event') );
 					var tooltip = '<div class="tooltip-event"' +
 						'style="">'
 						+ 'Paciente: ' + data.paciente + '<br />'
