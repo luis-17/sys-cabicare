@@ -342,8 +342,8 @@ app.factory("ReservaCitasFactory",
 
 					$scope.configDP.dateOptions = {
 						formatYear: 'yy',
-						maxDate: new Date(2021, 5, 22),
-						minDate: new Date(),
+						// maxDate: new Date(2031, 5, 22),
+						// minDate: new Date(),
 						startingDay: 1
 					};
 

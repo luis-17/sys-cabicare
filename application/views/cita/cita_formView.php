@@ -20,12 +20,11 @@
 								type="text"
 								ng-model="fData.numeroDocumento"
 								class="form-control input-sm"
-								style="width:80px;margin-right:4px;"
+								style="width:140px;margin-right:4px;"
 								placeholder="DNI"
 								ng-disabled="fData.accion != 'reg'"
 								ng-enter="obtenerDatosPaciente();"
-								ng-change="fData.paciente = null; fData.pacienteId = null;"
-							/>
+								ng-change="fData.paciente = null; fData.pacienteId = null;"/>
 						</span>
 
 
@@ -34,8 +33,7 @@
 							class="form-control input-sm"
 							placeholder="Paciente"
 							required
-							disabled
-						>
+							disabled>
 	            	</div>
 	            </div>
 
@@ -50,7 +48,7 @@
 						required
 					></select> -->
 
-					<select name="tipoCita" ng-model="fData.tipoCita" required>
+					<select class="form-control input-sm" name="tipoCita" ng-model="fData.tipoCita" required>
 						<option value="">--Seleccione tipo cita--</option>
 						<option ng-repeat="item in fArr.listaTipoCita" value="{{item.id}}">{{item.descripcion}}</option>
 					</select>
