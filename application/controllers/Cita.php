@@ -4,7 +4,6 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Cita extends CI_Controller {
 	public function __construct(){
         parent::__construct();
-        // Se le asigna a la informacion a la variable $sessionVP.
         $this->load->helper(array('fechas_helper', 'otros_helper'));
         $this->load->model(array('model_cita'));
 
@@ -48,13 +47,23 @@ class Cita extends CI_Controller {
 					'horaDesde' => $row['horaDesde'],
 					'horaHasta' => $row['horaHasta'],
 					'fecha' => $row['fechaCita'],
+					'numeroDocumento' =>  $row['numeroDocumento'],
 					'paciente' =>  $row['paciente'],
+					'peso' =>  $row['peso'],
+					'talla' =>  $row['talla'],
+					'imc' =>  $row['imc'],
+					'apuntesCita' =>  $row['apuntesCita'],
+					'frecuenciaCardiaca' =>  $row['frecuenciaCardiaca'],
+					'temperaturaCorporal' =>  $row['temperaturaCorporal'],
+
 					'className' => $clases,
 					'start' => $row['fechaCita'] .' '. $row['horaDesde'],
 					'end' => $row['fechaCita'] .' '. $row['horaHasta'],
+
 					'title' => darFormatoHora($row['horaDesde']). ' - ' . darFormatoHora($row['horaHasta']) . ' | '.$row['paciente'],
 					'allDay' => FALSE,
 					'durationEditable' => FALSE,
+					'tipoCita' => $row['estado'],
 					'estado' => $row['estado']
 
 				)
@@ -63,6 +72,26 @@ class Cita extends CI_Controller {
 		$arrData['datos'] = $arrListado;
     	$arrData['message'] = '';
     	$arrData['flag'] = 1;
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+	}
+
+	/**
+	 * Método que lista los productos de una cita.
+	 * Vista Calendario
+	 *
+	 * @Creado: 17-06-2020
+	 * @author Ing. Ruben Guevara <rguevarac@hotmail.es>
+	 * @return void
+	 */
+	public function listar_detalle_cita()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+
+		$arrData['datos'] = $this->model_cita->m_cargar_detalle_cita($allInputs['datos']);
+
+
 		$this->output
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
@@ -181,7 +210,112 @@ class Cita extends CI_Controller {
 				);
 				$this->model_cita->m_registrar_detalle($data_det);
 			}
-			$arrData['message'] = 'Se registraron los datos correctamente. id '. $citaId;
+			$arrData['message'] = 'Se registraron los datos correctamente';
+			$arrData['flag'] = 1;
+		}
+		$this->db->trans_complete();
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+	}
+
+	public function editar()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$arrData['message'] = 'Error al editar los datos, inténtelo nuevamente';
+    	$arrData['flag'] = 0;
+
+		if(empty($allInputs['fecha'])){
+			$arrData['flag'] = 0;
+			$arrData['message'] = 'Debe seleccionar una fecha.';
+			$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+		    return;
+		}
+
+		if(empty($allInputs['hora_desde']) || empty($allInputs['hora_hasta'])){
+			$arrData['flag'] = 0;
+			$arrData['message'] = 'Debe seleccionar horas validas.';
+			$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+		    return;
+		}
+
+		if(strtotime($allInputs['hora_desde_str']) >= strtotime($allInputs['hora_hasta_str'])){
+			$arrData['flag'] = 0;
+			$arrData['message'] = 'Debe seleccionar un rango de horas valido.';
+			$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+		    return;
+		}
+
+		$hora_inicio_calendar = strtotime('07:00:00');
+		$hora_fin_calendar = strtotime('23:00:00');
+
+		if(strlen($allInputs['hora_desde_str']) == 7){
+			$horadesde = '0' . strtotime(substr($allInputs['hora_desde_str'], 0,4) . ':00');
+		}else{
+			$horadesde = strtotime(substr($allInputs['hora_desde_str'], 0,5) . ':00');
+		}
+
+		if(strlen($allInputs['hora_hasta_str']) == 7){
+			$horahasta = '0' . strtotime(substr($allInputs['hora_hasta_str'], 0,4) . ':00');
+		}else{
+			$horahasta = strtotime(substr($allInputs['hora_hasta_str'], 0,5) . ':00');
+		}
+
+		if(!($horadesde  >= $hora_inicio_calendar &&  $horahasta <= $hora_fin_calendar)){
+			$arrData['flag'] = 0;
+			$arrData['message'] = 'Debe seleccionar un rango de horas permitido.';
+			$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+		    return;
+		}
+
+		$data = array(
+			'sedeId'				=> $allInputs['sede']['id'],
+			'fechaCita'				=> Date('Y-m-d',strtotime($allInputs['fecha'])),
+			'horaDesde' 			=> Date('H:i:s',$horadesde),
+			'horaHasta' 			=> Date('H:i:s',$horahasta),
+			'apuntesCita'			=> empty($allInputs['apuntesCita'])? NULL : $allInputs['apuntesCita'],
+			'total'					=> $allInputs['total_a_pagar'],
+			'peso'					=> empty($allInputs['peso']) ? NULL : $allInputs['peso'],
+			'talla'					=> empty($allInputs['talla']) ? NULL : $allInputs['talla'],
+			'imc'					=> empty($allInputs['imc']) ? NULL : $allInputs['imc'],
+			'frecuenciaCardiaca'	=> empty($allInputs['frecuenciaCardiaca']) ? NULL : $allInputs['frecuenciaCardiaca'],
+			'temperaturaCorporal'	=> empty($allInputs['temperaturaCorporal']) ? NULL : $allInputs['temperaturaCorporal'],
+			'perimetroAbdominal'	=> empty($allInputs['perimetroAbdominal']) ? NULL : $allInputs['perimetroAbdominal'],
+			'observaciones'			=> empty($allInputs['observaciones']) ? NULL : $allInputs['observaciones'],
+			'estado'				=> $allInputs['tipoCita'],
+			'updatedAt'				=> date('Y-m-d H:i:s')
+		);
+
+
+		$this->db->trans_start();
+		if($this->model_cita->m_editar($data, $allInputs['id'])) {
+			foreach ($allInputs['detalle'] as $row) {
+				if( empty($row['id']) ){ //si es nuevo se registra
+
+					$data_det = array(
+						'productoId' 	=> $row['idproducto'],
+						'citaId' 		=> $allInputs['id'],
+						'precioReal' 	=> $row['precio'],
+						'estado' 		=> 1,
+						'createdAt'		=> date('Y-m-d H:i:s'),
+						'updatedAt'		=> date('Y-m-d H:i:s')
+					);
+					$this->model_cita->m_registrar_detalle($data_det);
+				}
+			}
+
+			foreach ($allInputs['eliminados'] as $row_el) {
+				$this->model_cita->m_eliminar_detalle($row_el);
+			}
+			$arrData['message'] = 'Se registraron los datos correctamente.';
 			$arrData['flag'] = 1;
 		}
 		$this->db->trans_complete();

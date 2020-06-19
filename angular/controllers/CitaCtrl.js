@@ -46,7 +46,7 @@ app.controller('CitaCtrl',
 		$scope.menu = angular.element('.menu-dropdown');
 		$scope.alertOnClick = function (event, jsEvent, view) {
 			console.log('event', event);
-			$scope.btnEditarCita(null, null, event);
+			$scope.btnEditarCita(event);
 
 		}
 		$scope.alertOnResize = function (event, delta) {
@@ -120,14 +120,14 @@ app.controller('CitaCtrl',
 			};
 			ReservaCitasFactory.agregarCitaModal(arrParams);
 		}
-		$scope.btnEditarCita = function (start, end, cita) {
+		$scope.btnEditarCita = function (cita) {
 			console.log('Edita cita');
-			// var arrParams = {
-			// 	'start': start || null,
-			// 	'end': end || null,
-			// 	'fArr': $scope.fArr
-			// };
-			// ReservaCitasFactory.editarCitaModal(arrParams);
+			var arrParams = {
+				// 'start': start,
+				'cita': cita,
+				'fArr': $scope.fArr
+			};
+			ReservaCitasFactory.editarCitaModal(arrParams);
 		}
 
 
@@ -229,7 +229,9 @@ app.controller('CitaCtrl',
 app.service("CitaServices", function ($http, $q, handleBehavior) {
 	return({
 		sListarCitaCalendario: sListarCitaCalendario,
-		sRegistrar: sRegistrar
+		sListarDetalleCita: sListarDetalleCita,
+		sRegistrar: sRegistrar,
+		sEditar: sEditar,
 	});
 
 	function sListarCitaCalendario(datos) {
@@ -240,10 +242,26 @@ app.service("CitaServices", function ($http, $q, handleBehavior) {
 		});
 		return (request.then(handleBehavior.success, handleBehavior.error));
 	}
+	function sListarDetalleCita(datos) {
+		var request = $http({
+			method: "post",
+			url: angular.patchURLCI + "Cita/listar_detalle_cita",
+			data: datos
+		});
+		return (request.then(handleBehavior.success, handleBehavior.error));
+	}
 	function sRegistrar(datos) {
 		var request = $http({
 			method: "post",
 			url: angular.patchURLCI + "Cita/registrar",
+			data: datos
+		});
+		return (request.then(handleBehavior.success, handleBehavior.error));
+	}
+	function sEditar(datos) {
+		var request = $http({
+			method: "post",
+			url: angular.patchURLCI + "Cita/editar",
 			data: datos
 		});
 		return (request.then(handleBehavior.success, handleBehavior.error));
@@ -498,10 +516,6 @@ app.factory("ReservaCitasFactory",
 								precio: $scope.fData.temporal.precio,
 							});
 
-							// limpiamos
-							// $scope.fData.temporal.idproducto = null;
-							// $scope.fData.temporal.producto = null;
-							// $scope.fData.temporal.precio = null;
 							$scope.fData.temporal = {}
 							$scope.calcularTotales();
 						}
@@ -579,6 +593,336 @@ app.factory("ReservaCitasFactory",
 
 						blockUI.start("Registrando cita");
 						CitaServices.sRegistrar($scope.fData).then(function(rpta){
+							if (rpta.flag === 1) {
+								var pTitle = 'OK!';
+								var pType = 'success';
+								$uibModalInstance.dismiss($scope.fData);
+							} else {
+								var pTitle = 'Advertencia!';
+								var pType = 'warning';
+
+							}
+							blockUI.stop();
+							pinesNotifications.notify({
+								title: pTitle,
+								text: rpta.message,
+								type: pType,
+								delay: 5000
+							});
+						});
+					}
+
+
+				},
+				resolve: {
+					arrParams: function () {
+						return arrParams;
+					}
+				}
+			});
+		},
+		editarCitaModal: function (arrParams) {
+			blockUI.start('Abriendo formulario...');
+			$uibModal.open({
+				templateUrl: angular.patchURLCI + 'Cita/ver_popup_form_cita',
+				size: 'lg',
+				backdrop: 'static',
+				keyboard: false,
+				controller: function ($scope, $uibModalInstance, arrParams) {
+					blockUI.stop();
+					$scope.fData = arrParams.cita;
+					$scope.Form = {}
+					$scope.fData.temporal = {};
+					$scope.fArr = arrParams.fArr;
+					$scope.fData.eliminados = [];
+					$scope.fData.accion = 'edit';
+					$scope.titleForm = 'Edición de Cita';
+
+					$scope.fData.sede = $scope.fArr.listaSedes[0];
+
+
+					/* DATEPICKERS */
+					$scope.configDP = {};
+					// $scope.configDP.today = function () {
+						// if (arrParams.start) {
+						// 	$scope.fData.fecha = arrParams.start.toDate();
+						// } else {
+						// 	$scope.fData.fecha = new Date();
+						// }
+					// };
+					// $scope.configDP.today();
+
+					$scope.configDP.clear = function () {
+						$scope.fData.fecha = null;
+					};
+
+					$scope.configDP.dateOptions = {
+						formatYear: 'yy',
+						maxDate: new Date(2021, 5, 22),
+						minDate: new Date(),
+						startingDay: 1
+					};
+
+					$scope.configDP.open = function () {
+						$scope.configDP.popup.opened = true;
+					};
+
+					$scope.configDP.formats = ['dd-MM-yyyy', 'dd-MMMM-yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy', 'shortDate'];
+					$scope.configDP.format = $scope.configDP.formats[0];
+					$scope.configDP.altInputFormats = ['M!/d!/yyyy'];
+
+					$scope.configDP.popup = {
+						opened: false
+					};
+					arrParams.start = moment($scope.fData.fecha);
+					$scope.fData.fecha = arrParams.start.toDate();
+					/* END DATEPICKERS */
+
+					/* TIMEPICKERS */
+					$scope.configTP = {};
+					$scope.configTP.tpHoraInicio = {};
+					$scope.configTP.tpHoraInicio.hstep = 1;
+					$scope.configTP.tpHoraInicio.mstep = 30;
+					$scope.configTP.tpHoraInicio.ismeridian = true;
+					$scope.configTP.tpHoraInicio.toggleMode = function () {
+						$scope.configTP.tpHoraInicio.ismeridian = !$scope.configTP.tpHoraInicio.ismeridian;
+					};
+					$scope.configTP.tpHoraFin = angular.copy($scope.configTP.tpHoraInicio);
+
+					var partes_hora1 = $scope.fData.horaDesde.split(':');
+					var d = new Date();
+					d.setHours(parseInt(partes_hora1[0]));
+					d.setMinutes(parseInt(partes_hora1[1]));
+					$scope.fData.hora_desde = d;
+
+					var partes_hora2 = $scope.fData.horaHasta.split(':');
+					//console.log(partes_hora2);
+					var c = new Date();
+					c.setHours(parseInt(partes_hora2[0]));
+					c.setMinutes(parseInt(partes_hora2[1]));
+					$scope.fData.hora_hasta = c;
+
+					$scope.actualizarHoraFin = function () {
+						$scope.fData.hora_hasta = moment($scope.fData.hora_desde).add(30, 'm').toDate();
+					}
+					/* END TIMEPICKERS */
+
+					/* AUTOCOMPLETADO */
+
+					$scope.getProductoAutocomplete = function (value) {
+						var params = {
+							searchText: value,
+						}
+						return ProductoServices.sListarProductoAutocomplete(params).then(function (rpta) {
+							$scope.noResultsCT = false;
+							if (rpta.flag === 0) {
+								$scope.noResultsCT = true;
+							}
+							console.log('datos producto', rpta.datos);
+							return rpta.datos;
+						});
+					}
+
+					$scope.getSelectedProducto = function (item, model) {
+						$scope.fData.temporal.idproducto = model.idproducto;
+						$scope.fData.temporal.producto = model.producto;
+						$scope.fData.temporal.tipoProducto = model.tipo_producto.descripcion;
+						$scope.fData.temporal.precio = model.precio;
+					}
+
+					/* GRILLA DE PRODUCTOS */
+					$scope.gridOptions = {
+						rowHeight: 30,
+						enableGridMenu: false,
+						enableColumnMenus: false,
+						enableRowSelection: false,
+						enableSelectAll: false,
+						enableFiltering: false,
+						enableSorting: false,
+						enableFullRowSelection: false,
+						multiSelect: false,
+						data: [],
+						columnDefs: [
+							{ field: 'idproducto', name: 'id', displayName: 'ID', minWidth: 80, width: 80 },
+							{ field: 'producto', name: 'nombre', displayName: 'PRODUCTO', minWidth: 120 },
+							{ field: 'tipoProducto', name: 'tipoProducto', displayName: 'Tipo Producto', minWidth: 120 },
+
+							{ field: 'precio', name: 'precio', displayName: 'PRECIO', width: 120 },
+
+							{
+								field: 'eliminar', name: 'eliminar', displayName: '', width: 50,
+								cellTemplate: '<button class="btn btn-default btn-sm text-danger btn-action" ng-click="grid.appScope.btnQuitarDeLaCesta(row);$event.stopPropagation();"> <i class="fa fa-trash" tooltip-placement="left" uib-tooltip="ELIMINAR!"></i> </button>'
+							}
+						],
+						onRegisterApi: function (gridApi) {
+							$scope.gridApi = gridApi;
+						}
+					};
+
+					$scope.getTableHeight = function () {
+						var rowHeight = 30; // your row height
+						var headerHeight = 30; // your header height
+						var cant_filas = 4; // min 4
+						if ($scope.gridOptions.data.length > cant_filas) {
+							var cant_filas = $scope.gridOptions.data.length;
+						}
+						return {
+							height: (cant_filas * rowHeight + headerHeight) + "px"
+						};
+					}
+
+					$scope.getPaginationServerSideDet = function (loader) {
+						if (loader) {
+							blockUI.start('Procesando información...');
+						}
+						var arrParams = {
+							datos: $scope.fData
+						};
+						CitaServices.sListarDetalleCita(arrParams).then(function (rpta) {
+							if (rpta.datos.length == 0) {
+								rpta.paginate = { totalRows: 0 };
+							}
+							// $scope.gridOptions.totalItems = rpta.paginate.totalRows;
+							$scope.gridOptions.data = rpta.datos;
+							$scope.calcularTotales();
+							if (loader) {
+								blockUI.stop();
+							}
+						});
+					};
+					$scope.getPaginationServerSideDet(true);
+
+					$scope.agregarItemProducto = function () {
+						if ($scope.fData.temporal.idproducto == null) {
+							pinesNotifications.notify({
+								title: 'Advertencia.',
+								text: 'Debe seleccionar un producto.',
+								type: 'warning',
+								delay: 5000
+							});
+							return;
+						}
+
+						if ($scope.fData.temporal.precio == null ||
+							$scope.fData.temporal.precio == "" ||
+							$scope.fData.temporal.precio < 0) {
+							pinesNotifications.notify({
+								title: 'Advertencia.',
+								text: 'El precio no es válido.',
+								type: 'warning',
+								delay: 5000
+							});
+							return;
+						}
+
+						var producto_repetido = false;
+						angular.forEach($scope.gridOptions.data, function (value, key) {
+							if (value.idproducto == $scope.fData.temporal.idproducto) {
+								producto_repetido = true;
+								pinesNotifications.notify({
+									title: 'Advertencia.',
+									text: 'Ya está cargado este producto en la cesta.',
+									type: 'warning',
+									delay: 5000
+								});
+								return;
+							}
+						});
+
+						if (producto_repetido === false) {
+							$scope.gridOptions.data.push({
+								id:null,
+								citaId: $scope.fData.id,
+								idproducto: $scope.fData.temporal.idproducto,
+								producto: $scope.fData.temporal.producto,
+								tipoProducto: $scope.fData.temporal.tipoProducto,
+								precio: $scope.fData.temporal.precio,
+								estado: 1
+							});
+
+							$scope.fData.temporal = {}
+							$scope.calcularTotales();
+						}
+					}
+
+					$scope.calcularTotales = function () {
+						var totales = 0;
+						angular.forEach($scope.gridOptions.data, function (value, key) {
+							totales += parseFloat($scope.gridOptions.data[key].precio);
+						});
+						$scope.fData.total_a_pagar = totales.toFixed(2);
+					}
+
+					$scope.btnQuitarDeLaCesta = function (row) {
+						if( row.entity.id > 0 ){
+							row.entity.estado = 0;
+							$scope.fData.eliminados.push(row.entity)
+						}
+						console.log('eliminados', $scope.fData.eliminados);
+						var index = $scope.gridOptions.data.indexOf(row.entity);
+						console.log('elimina', index);
+						$scope.gridOptions.data.splice(index, 1);
+						$scope.calcularTotales();
+					}
+
+					/* CALCULO DE IMC */
+					$scope.calcularIMC = function () {
+						$scope.fData.imc = null;
+						if ($scope.fData.peso == null || $scope.fData.talla == null) {
+							return;
+						}
+						console.log('calculo imc');
+
+						if ($scope.fData.peso <= 0 || $scope.fData.talla <= 0) {
+							pinesNotifications.notify({
+								title: 'Advertencia.',
+								text: 'Peso y Talla deben ser numericos mayores de cero',
+								type: 'warning',
+								delay: 5000
+							});
+							return;
+						}
+						var talla = parseInt($scope.fData.talla) / 100;
+						$scope.fData.imc = (parseFloat($scope.fData.peso) / (parseFloat(talla * talla))).toFixed(2);
+					}
+
+					/* BOTONES FINALES */
+					$scope.cancel = function () {
+						$uibModalInstance.dismiss('cancel');
+					}
+
+					$scope.registrarCita = function () {
+
+						if ($scope.fData.tipoCita == null || $scope.fData.tipoCita == "") {
+							pinesNotifications.notify({
+								title: 'Advertencia.',
+								text: 'Debe seleccionar un Tipo de Cita.',
+								type: 'warning',
+								delay: 5000
+							});
+							return;
+						}
+
+						if ($scope.gridOptions.data.length <= 0) {
+							pinesNotifications.notify({
+								title: 'Advertencia.',
+								text: 'Debe agregar al menos un producto.',
+								type: 'warning',
+								delay: 5000
+							});
+							return;
+						}
+						if ($scope.fData.hora_desde) {
+							$scope.fData.hora_desde_str = $scope.fData.hora_desde.toLocaleTimeString();
+						}
+
+						if ($scope.fData.hora_hasta) {
+							$scope.fData.hora_hasta_str = $scope.fData.hora_hasta.toLocaleTimeString();
+						}
+						$scope.fData.detalle = $scope.gridOptions.data;
+
+						blockUI.start("Actualizando cita");
+						CitaServices.sEditar($scope.fData).then(function (rpta) {
 							if (rpta.flag === 1) {
 								var pTitle = 'OK!';
 								var pType = 'success';

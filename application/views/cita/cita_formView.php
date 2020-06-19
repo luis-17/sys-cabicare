@@ -114,7 +114,6 @@
 	            	<label for="name" class="control-label minotaur-label">Médico : </label>
 					<input
 						type="text"
-						ng-if="fData.accion == 'reg'"
 						class="form-control input-sm"
 						ng-model="fData.medico"
                         placeholder="Digite el Médico..."
