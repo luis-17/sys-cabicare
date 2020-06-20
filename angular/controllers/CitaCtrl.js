@@ -102,11 +102,12 @@ app.controller('CitaCtrl',
 			}
 			(wrap.find('.fc-overlay').length == 0) && wrap.append($scope.overlay);
 		}
-		$scope.actualizarCalendario = function (block) {
+		$scope.metodos.actualizarCalendario = function (block) {
 			blockUI.start('Actualizando calendario...');
 			angular.element('.calendar').fullCalendar('refetchEvents');
 			blockUI.stop();
 		}
+
 		$scope.closeMenu = function () {
 			$scope.menu.removeClass('open');
 		}
@@ -116,7 +117,8 @@ app.controller('CitaCtrl',
 			var arrParams = {
 				'start': start || null,
 				'end': end || null,
-				'fArr': $scope.fArr
+				'fArr': $scope.fArr,
+				'metodos': $scope.metodos
 			};
 			ReservaCitasFactory.agregarCitaModal(arrParams);
 		}
@@ -125,7 +127,8 @@ app.controller('CitaCtrl',
 			var arrParams = {
 				// 'start': start,
 				'cita': cita,
-				'fArr': $scope.fArr
+				'fArr': $scope.fArr,
+				'metodos': $scope.metodos
 			};
 			ReservaCitasFactory.editarCitaModal(arrParams);
 		}
@@ -292,6 +295,7 @@ app.factory("ReservaCitasFactory",
 					$scope.Form = {}
 					$scope.fData.temporal = {};
 					$scope.fArr = arrParams.fArr;
+					$scope.metodos = arrParams.metodos;
 					$scope.fData.accion = 'reg';
 					$scope.titleForm = 'Registro de Cita';
 					// $scope.fArr.listaTipoCita.splice(0, 0, { id: "", descripcion: '--Seleccione tipo cita--' });
@@ -581,7 +585,7 @@ app.factory("ReservaCitasFactory",
 						$uibModalInstance.dismiss('cancel');
 					}
 
-					$scope.registrarCita = function(){
+					$scope.aceptar = function(){
 
 						if ($scope.fData.tipoCita == null || $scope.fData.tipoCita == ""){
 							pinesNotifications.notify({
@@ -617,7 +621,7 @@ app.factory("ReservaCitasFactory",
 								var pTitle = 'OK!';
 								var pType = 'success';
 								$uibModalInstance.dismiss($scope.fData);
-								// $scope.actualizarCalendario(true);
+								$scope.metodos.actualizarCalendario(true);
 							} else {
 								var pTitle = 'Advertencia!';
 								var pType = 'warning';
@@ -655,6 +659,7 @@ app.factory("ReservaCitasFactory",
 					$scope.Form = {}
 					$scope.fData.temporal = {};
 					$scope.fArr = arrParams.fArr;
+					$scope.metodos = arrParams.metodos;
 					$scope.fData.eliminados = [];
 					$scope.fData.accion = 'edit';
 					$scope.titleForm = 'Edición de Cita';
@@ -729,6 +734,24 @@ app.factory("ReservaCitasFactory",
 					/* END TIMEPICKERS */
 
 					/* AUTOCOMPLETADO */
+					/* MEDICOS */
+					$scope.getMedicoAutocomplete = function (value) {
+						var params = {
+							searchText: value,
+						}
+						return UsuarioServices.sListarMedicoAutocomplete(params).then(function (rpta) {
+							$scope.noResultsMe = false;
+							if (rpta.flag === 0) {
+								$scope.noResultsMe = true;
+							}
+							return rpta.datos;
+						});
+					}
+
+					$scope.getSelectedMedico = function (item, model) {
+						$scope.fData.idmedico = model.id;
+
+					}
 
 					$scope.getProductoAutocomplete = function (value) {
 						var params = {
@@ -912,7 +935,7 @@ app.factory("ReservaCitasFactory",
 						$uibModalInstance.dismiss('cancel');
 					}
 
-					$scope.registrarCita = function () {
+					$scope.aceptar = function () {
 
 						if ($scope.fData.tipoCita == null || $scope.fData.tipoCita == "") {
 							pinesNotifications.notify({
@@ -948,6 +971,7 @@ app.factory("ReservaCitasFactory",
 								var pTitle = 'OK!';
 								var pType = 'success';
 								$uibModalInstance.dismiss($scope.fData);
+								$scope.metodos.actualizarCalendario(true);
 							} else {
 								var pTitle = 'Advertencia!';
 								var pType = 'warning';

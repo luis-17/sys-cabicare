@@ -259,12 +259,8 @@
 		</form>
 	</section>
 </div>
+
 <div class="modal-footer">
-  	<button class="btn btn-lightred btn-ef btn-ef-4 btn-ef-4c" ng-click="cancel()">
-  		<i class="fa fa-arrow-left"></i> Cancelar
-  	</button>
-  	<button class="btn btn-success btn-ef btn-ef-3 btn-ef-3c"
-  		ng-disabled="formCita.$invalid" ng-click="registrarCita();">
-  		<i class="fa fa-arrow-right"></i> Guardar
-  	</button>
+    <button class="btn btn-primary" ng-click="aceptar(); $event.preventDefault();" ng-disabled="formCita.$invalid">Aceptar</button>
+    <button class="btn btn-warning" ng-click="cancel()">Cerrar</button>
 </div>
