@@ -65,49 +65,6 @@
 					></select>
 	            </div>
 
-				<div class="form-group col-md-2">
-					<label for="name" class="control-label minotaur-label">Peso(kg) : </label>
-					<input
-						type="text"
-						class="form-control input-sm"
-						ng-model="fData.peso"
-						placeholder="kg"
-						ng-change="calcularIMC()"
-					>
-	            </div>
-
-				<div class="form-group col-md-2">
-					<label for="name" class="control-label minotaur-label">Talla(cm) : </label>
-					<input
-						type="text"
-						class="form-control input-sm"
-						ng-model="fData.talla"
-						placeholder="cm"
-						ng-change="calcularIMC()"
-					>
-	            </div>
-
-				<div class="form-group col-md-2">
-					<label for="name" class="control-label minotaur-label">IMC : </label>
-					<input
-						type="text"
-						class="form-control input-sm"
-						ng-model="fData.imc"
-						placeholder="IMC"
-						disabled
-					>
-	            </div>
-
-				<div class="form-group col-md-6">
-					<label for="name" class="control-label minotaur-label">Frecuencia Cardiaca: </label>
-					<input
-						type="text"
-						class="form-control input-sm"
-						ng-model="fData.frecuenciaCardiaca"
-						placeholder="Frecuencia Cardiaca"
-					>
-	            </div>
-
 				<div class="form-group col-md-6">
 	            	<label for="name" class="control-label minotaur-label">Médico : </label>
 					<input
@@ -115,12 +72,18 @@
 						class="form-control input-sm"
 						ng-model="fData.medico"
                         placeholder="Digite el Médico..."
-						typeahead-loading="loadingLocations"
+						typeahead-loading="loadingLocations1"
 						uib-typeahead="item as item.medico for item in getMedicoAutocomplete($viewValue)"
 						typeahead-min-length="2"
 						typeahead-on-select="getSelectedMedico($item, $model, $label)"
 						autocomplete="off"
+						ng-change="fData.idmedico = null;"
 					>
+					<i ng-show="loadingLocations1" class="fa fa-refresh" style="position: absolute;"></i>
+					<div ng-show="noResultsMe" style="position: absolute;" class="text-danger">
+						<i class="fa fa-remove"></i>
+						No se encontró resultados
+					</div>
 				</div>
 
 				<div class="form-group col-md-6">
@@ -167,7 +130,60 @@
 	              		show-meridian="configTP.tpHoraFin.ismeridian">
 	              	</div>
 	            </div>
+
+				<div class="form-group col-md-2">
+					<label for="name" class="control-label minotaur-label">Peso(kg) : </label>
+					<input
+						type="text"
+						class="form-control input-sm"
+						ng-model="fData.peso"
+						placeholder="kg"
+						ng-change="calcularIMC()"
+					>
+	            </div>
+
+				<div class="form-group col-md-2">
+					<label for="name" class="control-label minotaur-label">Talla(cm) : </label>
+					<input
+						type="text"
+						class="form-control input-sm"
+						ng-model="fData.talla"
+						placeholder="cm"
+						ng-change="calcularIMC()"
+					>
+	            </div>
+
+				<div class="form-group col-md-2">
+					<label for="name" class="control-label minotaur-label">IMC : </label>
+					<input
+						type="text"
+						class="form-control input-sm"
+						ng-model="fData.imc"
+						placeholder="IMC"
+						disabled
+					>
+	            </div>
+
+				<div class="form-group col-md-3">
+					<label for="name" class="control-label minotaur-label">Temperatura: </label>
+					<input
+						type="text"
+						class="form-control input-sm"
+						ng-model="fData.temperaturaCorporal"
+						placeholder="Temperatura Corporal"
+					>
+	            </div>
+				<div class="form-group col-md-3">
+					<label for="name" class="control-label minotaur-label">Frecuencia Cardiaca: </label>
+					<input
+						type="text"
+						class="form-control input-sm"
+						ng-model="fData.frecuenciaCardiaca"
+						placeholder="Frecuencia Cardiaca"
+					>
+	            </div>
 			</div>
+			<hr>
 			<div class="row">
 				<div class="form-group mb-md col-md-6 col-sm-6">
 					<label class="control-label minotaur-label mb-xs"> Productos </label>
@@ -188,19 +204,19 @@
 							ng-model="fData.temporal.producto"
 							class="form-control input-sm"
 							placeholder="Busque Producto"
-							typeahead-loading="loadingLocations"
+							typeahead-loading="loadingLocations2"
 							typeahead-wait-ms="500"
 							uib-typeahead="item as item.descripcion for item in getProductoAutocomplete($viewValue)"
 							typeahead-on-select="getSelectedProducto($item, $model, $label)"
 							typeahead-min-length="2"
 							autocomplete="off"
-							ng-change = "fData.temporal.idproducto = null; fData.temporal.precio = null"
+							ng-change = "fData.temporal.idproducto = null; fData.temporal.precio = null;"
 						/>
-						<i ng-show="loadingLocations" class="fa fa-refresh"></i>
-						<div ng-show="noResultsLPSC">
-							<i class="fa fa-remove"></i>
-							No se encontró resultados
-						</div>
+					</div>
+					<i ng-show="loadingLocations2" class="fa fa-refresh" style="position: absolute;"></i>
+					<div ng-show="noResultsPr" style="position: absolute;" class="text-danger">
+						<i class="fa fa-remove"></i>
+						No se encontró resultados
 					</div>
 				</div>
 

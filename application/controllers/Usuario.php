@@ -5,13 +5,13 @@ class Usuario extends CI_Controller {
 	public function __construct()
   {
       parent::__construct();
-      // Se le asigna a la informacion a la variable $sessionVP. 
-      $this->load->helper(array('fechas','otros')); 
-      $this->load->model(array('model_usuario')); 
+      // Se le asigna a la informacion a la variable $sessionVP.
+      $this->load->helper(array('fechas','otros'));
+      $this->load->model(array('model_usuario'));
       $this->sessionFactur = @$this->session->userdata('sess_cabi_'.substr(base_url(),-20,7));
   }
 
-	public function listar_usuario(){ 
+	public function listar_usuario(){
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
 		$paramPaginate = $allInputs['paginate'];
 
@@ -48,6 +48,46 @@ class Usuario extends CI_Controller {
 		    ->set_output(json_encode($arrData));
 	}
 
+	/**
+	 * Carga de medicos mediante un autocompletado
+	 * Utilizado en el registro de una cita
+	 *
+	 * @Creado 18-06-2020
+	 * @author Ing. Ruben Guevara <rguevarac@hotmail.es>
+	 * @return void
+	 */
+	public function listar_medico_autocomplete()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+
+		$arrListado = array();
+		$lista = $this->model_usuario->m_listar_medico_autocomplete($allInputs);
+
+		if(empty($lista)){
+			$arrData['datos'] = $arrListado;
+			$arrData['flag'] = 0;
+			$arrData['message'] = 'No se encontraron resultados';
+			$this->output
+				->set_content_type('application/json')
+				->set_output(json_encode($arrData));
+			return;
+		}
+		foreach ($lista as $row) {
+			array_push($arrListado,
+				array(
+					'id'		 	=> $row['id'],
+					'medico' 	=> strtoupper($row['nombres'] . ' ' . $row['apellidos']),
+				)
+			);
+		}
+		$arrData['datos'] = $arrListado;
+		$arrData['message'] = '';
+		$arrData['flag'] = 1;
+		$this->output
+			->set_content_type('application/json')
+			->set_output(json_encode($arrData));
+	}
+
 	public function ver_popup_formulario()
 	{
 		$this->load->view('usuario/mant_usuario');
@@ -59,10 +99,10 @@ class Usuario extends CI_Controller {
 		$arrData['message'] = 'Error al registrar los datos, inténtelo nuevamente';
     $arrData['flag'] = 0;
 
-    	// VALIDACIONES  
+    	// VALIDACIONES
 
     	/* VALIDAR QUE SE HAYA REGISTRADO CLAVE */
-		if( empty($allInputs['password']) || empty($allInputs['passwordView']) ){ 
+		if( empty($allInputs['password']) || empty($allInputs['passwordView']) ){
 			$arrData['message'] = 'Los campos de contraseña están vacios.';
 	    	$arrData['flag'] = 0;
 				$this->output
@@ -80,7 +120,7 @@ class Usuario extends CI_Controller {
 				    ->set_output(json_encode($arrData));
 				return;
 		}
-		/* VALIDAR SI EL USUARIO YA EXISTE */	
+		/* VALIDAR SI EL USUARIO YA EXISTE */
     	$fUsuario = $this->model_usuario->m_validar_usuario_username($allInputs['username']);
     	if( !empty($fUsuario) ) {
     		$arrData['message'] = 'El usuario ingresado ya existe.';
@@ -89,14 +129,14 @@ class Usuario extends CI_Controller {
 			    ->set_content_type('application/json')
 			    ->set_output(json_encode($arrData));
 			return;
-   		}   	
+   		}
 
 		$this->db->trans_start();
-		if($this->model_usuario->m_registrar($allInputs)) { // registro de usuario 
+		if($this->model_usuario->m_registrar($allInputs)) { // registro de usuario
 			$arrData['idusuario'] = GetLastId('id','usuario');
 			$arrData['message'] = 'Se registraron los datos correctamente';
-			$arrData['flag'] = 1; 
-		} 
+			$arrData['flag'] = 1;
+		}
 		$this->db->trans_complete();
 
 		$this->output
@@ -109,7 +149,7 @@ class Usuario extends CI_Controller {
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
 		$arrData['message'] = 'Error al editar los datos, inténtelo nuevamente';
     $arrData['flag'] = 0;
-    // VALIDACIONES    	
+    // VALIDACIONES
 		/* VALIDAR SI EL USUARIO YA EXISTE */
   	$fUsuario = $this->model_usuario->m_validar_usuario_username($allInputs['username'],TRUE,$allInputs['idusuario']);
   	if( $fUsuario ) {
@@ -137,7 +177,7 @@ class Usuario extends CI_Controller {
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
 		$arrData['message'] = 'No se pudo anular los datos';
     	$arrData['flag'] = 0;
-		if( $this->model_usuario->m_anular($allInputs) ){ 
+		if( $this->model_usuario->m_anular($allInputs) ){
 			$arrData['message'] = 'Se anularon los datos correctamente';
     		$arrData['flag'] = 1;
 		}

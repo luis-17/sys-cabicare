@@ -87,6 +87,7 @@ angular.module('app')
               'angular/controllers/CitaCtrl.js',
               'angular/controllers/ProductoCtrl.js',
               'angular/controllers/PacienteCtrl.js',
+              'angular/controllers/UsuarioCtrl.js',
             ])
           })
           ;

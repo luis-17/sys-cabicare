@@ -275,6 +275,7 @@ app.factory("ReservaCitasFactory",
 		blockUI,
 		ProductoServices,
 		PacienteServices,
+		UsuarioServices,
 		CitaServices
 	) {
 	var interfaz = {
@@ -407,15 +408,34 @@ app.factory("ReservaCitasFactory",
           			/* END TIMEPICKERS */
 
 					/* AUTOCOMPLETADO */
+					/* MEDICOS */
+					$scope.getMedicoAutocomplete = function (value) {
+						var params = {
+							searchText: value,
+						}
+						return UsuarioServices.sListarMedicoAutocomplete(params).then(function (rpta) {
+							$scope.noResultsMe = false;
+							if (rpta.flag === 0) {
+								$scope.noResultsMe = true;
+							}
+							return rpta.datos;
+						});
+					}
 
+					$scope.getSelectedMedico = function (item, model) {
+						$scope.fData.idmedico = model.id;
+
+					}
+
+					/* PRODUCTO */
 					$scope.getProductoAutocomplete = function (value) {
 						var params = {
 							searchText: value,
 						}
 						return ProductoServices.sListarProductoAutocomplete(params).then(function (rpta) {
-							$scope.noResultsCT = false;
+							$scope.noResultsPr = false;
 							if (rpta.flag === 0) {
-								$scope.noResultsCT = true;
+								$scope.noResultsPr = true;
 							}
 							console.log('datos producto', rpta.datos);
 							return rpta.datos;
@@ -597,6 +617,7 @@ app.factory("ReservaCitasFactory",
 								var pTitle = 'OK!';
 								var pType = 'success';
 								$uibModalInstance.dismiss($scope.fData);
+								// $scope.actualizarCalendario(true);
 							} else {
 								var pTitle = 'Advertencia!';
 								var pType = 'warning';
@@ -714,9 +735,9 @@ app.factory("ReservaCitasFactory",
 							searchText: value,
 						}
 						return ProductoServices.sListarProductoAutocomplete(params).then(function (rpta) {
-							$scope.noResultsCT = false;
+							$scope.noResultsPr = false;
 							if (rpta.flag === 0) {
-								$scope.noResultsCT = true;
+								$scope.noResultsPr = true;
 							}
 							console.log('datos producto', rpta.datos);
 							return rpta.datos;

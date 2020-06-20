@@ -27,10 +27,13 @@ class Model_cita extends CI_Model {
 			ci.observaciones,
 			ci.estado,
 			concat_ws(' ', pa.nombres, pa.apellidoPaterno, pa.apellidoMaterno) AS paciente,
-			pa.numeroDocumento
+			pa.numeroDocumento,
+			ci.medicoId,
+			concat_ws(' ', us.nombres, us.apellidos) AS medico,
 		", FALSE);
 		$this->db->from('cita ci');
 		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
+		$this->db->join('usuario us', 'ci.medicoId = us.id','left');
 		return $this->db->get()->result_array();
 	}
 	public function m_cargar_detalle_cita($datos)

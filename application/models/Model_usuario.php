@@ -5,17 +5,17 @@ class Model_usuario extends CI_Model {
 		parent::__construct();
 	}
 
-	public function m_cargar_usuario($paramPaginate){ 
-		$this->db->select("u.id AS usuarioId, u.username, u.lastConnection, u.perfilId, 
+	public function m_cargar_usuario($paramPaginate){
+		$this->db->select("u.id AS usuarioId, u.username, u.lastConnection, u.perfilId,
 			u.nombres, u.apellidos, u.correo, u.cmp, u.rne, pe.nombre AS perfil, pe.keyPerfil", FALSE);
 		$this->db->from('usuario u');
 		$this->db->join('perfil pe', 'u.perfilId = pe.id');
 		$this->db->where('u.estado', 1);
 		// var_dump($this->sessionFactur); exit();
-		if( $this->sessionFactur['keyPerfil'] != 'key_root' ){ 
+		if( $this->sessionFactur['keyPerfil'] != 'key_root' ){
 			$this->db->where_not_in('pe.keyPerfil', array('key_root'));
 		}
-		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){ 
+		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
 			foreach ($paramPaginate['searchColumn'] as $key => $value) {
 				if(! empty($value)){
 					$this->db->like($key ,strtoupper_total($value) ,FALSE);
@@ -36,7 +36,7 @@ class Model_usuario extends CI_Model {
 		$this->db->from('usuario u');
 		$this->db->join('perfil pe', 'u.perfilId = pe.id');
 		$this->db->where('u.estado', 1);
-		if( $this->sessionFactur['keyPerfil'] != 'key_root' ){ 
+		if( $this->sessionFactur['keyPerfil'] != 'key_root' ){
 			$this->db->where_not_in('pe.keyPerfil', array('key_root'));
 		}
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
@@ -49,8 +49,23 @@ class Model_usuario extends CI_Model {
 		$fData = $this->db->get()->row_array();
 		return $fData;
 	}
-	// VALIDACIONES 
-	public function m_validar_usuario_username($username, $excepcion = FALSE, $idusuario=NULL) 
+
+	public function m_listar_medico_autocomplete($datos)
+	{
+		$this->db->select("
+			us.id,
+			us.nombres,
+			us.apellidos
+		", FALSE);
+		$this->db->from('usuario us');
+		$this->db->where('us.estado', 1);
+		$this->db->where('perfilId', 3); // solo perfil médico
+		$this->db->like("CONCAT_WS(' ',us.nombres, us.apellidos)", $datos['searchText']);
+		$this->db->limit('10');
+		return $this->db->get()->result_array();
+	}
+	// VALIDACIONES
+	public function m_validar_usuario_username($username, $excepcion = FALSE, $idusuario=NULL)
 	{
 		$this->db->select('u.id');
 		$this->db->from('usuario u');
@@ -68,7 +83,7 @@ class Model_usuario extends CI_Model {
 		$data = array(
 			'perfilId' => $datos['perfil']['id'],
 			'username' => $datos['username'],
-			'password'=> md5($datos['passwordView']),			
+			'password'=> md5($datos['passwordView']),
 			'passwordView'=>strtoupper_total($datos['passwordView']),
 			'nombres' => $datos['nombres'],
 			'apellidos' => $datos['apellidos'],
@@ -84,8 +99,8 @@ class Model_usuario extends CI_Model {
 	public function m_editar($datos){
 		// var_dump($datos);exit();
 		$data = array(
-			'perfilId' => $datos['perfil']['id'], 
-			'username' => $datos['username'], 
+			'perfilId' => $datos['perfil']['id'],
+			'username' => $datos['username'],
 			'nombres' => $datos['nombres'],
 			'apellidos' => $datos['apellidos'],
 			'correo' => $datos['correo'],

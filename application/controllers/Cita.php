@@ -55,6 +55,10 @@ class Cita extends CI_Controller {
 					'apuntesCita' =>  $row['apuntesCita'],
 					'frecuenciaCardiaca' =>  $row['frecuenciaCardiaca'],
 					'temperaturaCorporal' =>  $row['temperaturaCorporal'],
+					'medico' => array(
+						'id' => $row['medicoId'],
+						'medico' => $row['medico']
+					),
 
 					'className' => $clases,
 					'start' => $row['fechaCita'] .' '. $row['horaDesde'],
@@ -183,6 +187,7 @@ class Cita extends CI_Controller {
 			'horaDesde' 			=> Date('H:i:s',$horadesde),
 			'horaHasta' 			=> Date('H:i:s',$horahasta),
 			'apuntesCita'			=> empty($allInputs['apuntesCita'])? NULL : $allInputs['apuntesCita'],
+			'medicoId'				=> empty($allInputs['medico']) ? NULL : $allInputs['medico']['id'],
 			'total'					=> $allInputs['total_a_pagar'],
 			'peso'					=> empty($allInputs['peso']) ? NULL : $allInputs['peso'],
 			'talla'					=> empty($allInputs['talla']) ? NULL : $allInputs['talla'],
@@ -282,6 +287,7 @@ class Cita extends CI_Controller {
 			'horaDesde' 			=> Date('H:i:s',$horadesde),
 			'horaHasta' 			=> Date('H:i:s',$horahasta),
 			'apuntesCita'			=> empty($allInputs['apuntesCita'])? NULL : $allInputs['apuntesCita'],
+			'medicoId'				=> empty($allInputs['medico']) ? NULL : $allInputs['medico']['id'],
 			'total'					=> $allInputs['total_a_pagar'],
 			'peso'					=> empty($allInputs['peso']) ? NULL : $allInputs['peso'],
 			'talla'					=> empty($allInputs['talla']) ? NULL : $allInputs['talla'],
