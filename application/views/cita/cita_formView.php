@@ -9,10 +9,10 @@
 				<div class="form-group col-md-6">
 	              	<label for="name" class="control-label minotaur-label" style="width: 100%;">Paciente
 	              		<span class="text-danger">*</span>:
-						<!-- <span ng-controller="PacienteController as pac" ng-click="pac.btnNuevo(true,callback);"
+						<span ng-click="btnNuevo();"
 								ng-if="fData.accion == 'reg'"
 								style="float: right;font-size: 10px;font-weight: 500;">¿Nuevo paciente?
-						</span> -->
+						</span>
 	              	</label>
 					<div class="input-group">
 						<span class="input-group-btn">
@@ -89,10 +89,10 @@
 				<div class="form-group col-md-6">
 	              <label for="name" class="control-label minotaur-label">Fecha <span class="text-danger">*</span>: </label>
 	              <div class="input-group">
-	                <input type="text" required class="form-control" uib-datepicker-popup ng-model="fData.fecha" is-open="configDP.popup.opened"
+	                <input type="text" required class="form-control input-sm" uib-datepicker-popup ng-model="fData.fecha" is-open="configDP.popup.opened"
 	                		datepicker-options="configDP.dateOptions" close-text="Cerrar" />
 	                <span class="input-group-btn">
-	                	<button type="button" class="btn btn-default" ng-click="configDP.open()"><i class="fa fa-calendar"></i></button>
+	                	<button type="button" class="btn btn-default btn-sm" ng-click="configDP.open()"><i class="fa fa-calendar"></i></button>
 	              	</span>
 	              </div>
 	            </div>

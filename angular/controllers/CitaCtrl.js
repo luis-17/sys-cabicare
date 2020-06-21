@@ -40,6 +40,25 @@ app.controller('CitaCtrl',
 			{ id: '1', descripcion: 'HIGUERETA' }
 		];
 
+		$scope.fArr.listaTipoDocumento = [
+			{ id: '0', descripcion: '--Seleccione tipo--' },
+			{ id: 'DNI', descripcion: 'DOCUMENTO NACIONAL DE IDENTIDAD' },
+			{ id: 'CEX', descripcion: 'CARNET DE EXTRANJERIA' },
+			{ id: 'PAS', descripcion: 'PASAPORTE' },
+			{ id: 'PTP', descripcion: 'PERMISO TEMPORAL DE PERMANENCIA' }
+		];
+		$scope.fArr.listaSexo = [
+			{ id: '0', descripcion: '--Seleccione sexo--' },
+			{ id: 'M', descripcion: 'MASCULINO' },
+			{ id: 'F', descripcion: 'FEMENINO' }
+		];
+		$scope.fArr.listaOperadores = [
+			{ id: '0', descripcion: '--Seleccione operador--' },
+			{ id: 'CLARO', descripcion: 'CLARO' },
+			{ id: 'MOVISTAR', descripcion: 'MOVISTAR' },
+			{ id: 'ENTEL', descripcion: 'ENTEL' },
+			{ id: 'BITEL', descripcion: 'BITEL' }
+		];
 
 
 		/* EVENTOS */
@@ -279,7 +298,8 @@ app.factory("ReservaCitasFactory",
 		ProductoServices,
 		PacienteServices,
 		UsuarioServices,
-		CitaServices
+		CitaServices,
+		PacienteFactory
 	) {
 	var interfaz = {
 		agregarCitaModal: function (arrParams) {
@@ -297,6 +317,23 @@ app.factory("ReservaCitasFactory",
 					$scope.fArr = arrParams.fArr;
 					$scope.metodos = arrParams.metodos;
 					$scope.fData.accion = 'reg';
+					var arrP = {
+						'data': $scope.fData
+					}
+					$scope.btnNuevo = function(){
+						var arrP = {
+							'metodos': $scope.metodos,
+							'fArr': $scope.fArr,
+							callback: function (e,rpta) {
+								console.log('rpta', rpta);
+								$scope.fData.paciente = e.nombres + ' ' + e.apellido_paterno + ' ' + e.apellido_materno;
+								$scope.fData.numeroDocumento = e.num_documento;
+								$scope.fData.pacienteId = rpta.datos;
+							}
+						}
+						PacienteFactory.regPacienteModal(arrP);
+
+					}
 					$scope.titleForm = 'Registro de Cita';
 					// $scope.fArr.listaTipoCita.splice(0, 0, { id: "", descripcion: '--Seleccione tipo cita--' });
 					// $scope.fData.tipoCita = $scope.fArr.listaTipoCita[0];
@@ -318,6 +355,7 @@ app.factory("ReservaCitasFactory",
 										delay: 5000
 									});
 								}else{
+									$scope.btnNuevo();
 									pinesNotifications.notify({
 										title: 'Advertencia.',
 										text: rpta.message,

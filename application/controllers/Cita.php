@@ -146,7 +146,8 @@ class Cita extends CI_Controller {
 		    return;
 		}
 
-		if(strtotime($allInputs['hora_desde_str']) >= strtotime($allInputs['hora_hasta_str'])){
+		if(strtotime($allInputs['hora_desde']) >= strtotime($allInputs['hora_hasta'])){
+		// if(strtotime($allInputs['hora_desde_str']) >= strtotime($allInputs['hora_hasta_str'])){
 			$arrData['flag'] = 0;
 			$arrData['message'] = 'Debe seleccionar un rango de horas valido.';
 			$this->output
@@ -158,17 +159,19 @@ class Cita extends CI_Controller {
 		$hora_inicio_calendar = strtotime('07:00:00');
 		$hora_fin_calendar = strtotime('23:00:00');
 
-		if(strlen($allInputs['hora_desde_str']) == 7){
-			$horadesde = '0' . strtotime(substr($allInputs['hora_desde_str'], 0,4) . ':00');
-		}else{
-			$horadesde = strtotime(substr($allInputs['hora_desde_str'], 0,5) . ':00');
-		}
+		$horadesde = strtotime($allInputs['hora_desde']);
+		$horahasta = strtotime($allInputs['hora_hasta']);
+		// if(strlen($allInputs['hora_desde_str']) == 7){
+		// 	$horadesde = '0' . strtotime(substr($allInputs['hora_desde_str'], 0,4) . ':00');
+		// }else{
+		// 	$horadesde = strtotime(substr($allInputs['hora_desde_str'], 0,5) . ':00');
+		// }
 
-		if(strlen($allInputs['hora_hasta_str']) == 7){
-			$horahasta = '0' . strtotime(substr($allInputs['hora_hasta_str'], 0,4) . ':00');
-		}else{
-			$horahasta = strtotime(substr($allInputs['hora_hasta_str'], 0,5) . ':00');
-		}
+		// if(strlen($allInputs['hora_hasta_str']) == 7){
+		// 	$horahasta = '0' . strtotime(substr($allInputs['hora_hasta_str'], 0,4) . ':00');
+		// }else{
+		// 	$horahasta = strtotime(substr($allInputs['hora_hasta_str'], 0,5) . ':00');
+		// }
 
 		if(!($horadesde  >= $hora_inicio_calendar &&  $horahasta <= $hora_fin_calendar)){
 			$arrData['flag'] = 0;
@@ -179,13 +182,14 @@ class Cita extends CI_Controller {
 		    return;
 		}
 
+
 		$data = array(
 			'pacienteId'			=> $allInputs['pacienteId'],
 			'usuarioId'				=> $this->sessionFactur['usuarioId'],
 			'sedeId'				=> $allInputs['sede']['id'],
 			'fechaCita'				=> Date('Y-m-d',strtotime($allInputs['fecha'])),
-			'horaDesde' 			=> Date('H:i:s',$horadesde),
-			'horaHasta' 			=> Date('H:i:s',$horahasta),
+			'horaDesde' 			=> Date('H:i',$horadesde),
+			'horaHasta' 			=> Date('H:i',$horahasta),
 			'apuntesCita'			=> empty($allInputs['apuntesCita'])? NULL : $allInputs['apuntesCita'],
 			'medicoId'				=> empty($allInputs['medico']) ? NULL : $allInputs['medico']['id'],
 			'total'					=> $allInputs['total_a_pagar'],

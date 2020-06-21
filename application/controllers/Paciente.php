@@ -151,9 +151,11 @@ class Paciente extends CI_Controller {
 			return;
    		}
     	$this->db->trans_start();
-		if($this->model_paciente->m_registrar($allInputs)) { // registro de cliente empresa
+		$pacienteId = $this->model_paciente->m_registrar($allInputs);
+		if($pacienteId) { // registro de cliente empresa
 			$arrData['message'] = 'Se registraron los datos correctamente';
 			$arrData['flag'] = 1;
+			$arrData['datos'] = $pacienteId;
 		}
 		$this->db->trans_complete();
 		$this->output

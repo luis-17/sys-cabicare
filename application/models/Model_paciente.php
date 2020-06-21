@@ -96,7 +96,8 @@ class Model_paciente extends CI_Model {
 			'createdat' => date('Y-m-d H:i:s'),
 			'updatedat' => date('Y-m-d H:i:s')
 		);
-		return $this->db->insert('paciente', $data);
+		$this->db->insert('paciente', $data);
+		return $this->db->insert_id();
 	}
 	public function m_editar($datos){
 		$data = array(

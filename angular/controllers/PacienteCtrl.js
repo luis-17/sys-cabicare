@@ -254,7 +254,6 @@ app.factory("PacienteFactory", function($uibModal, pinesNotifications, blockUI, 
         controller: function ($scope, $uibModalInstance, arrParams) {
           blockUI.stop();
           $scope.fData = {};
-          console.log($scope.fData,'$scope.fData');
           $scope.metodos = arrParams.metodos;
           $scope.fArr = arrParams.fArr;
           $scope.titleForm = 'Registro de Paciente';
