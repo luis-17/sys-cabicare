@@ -31,6 +31,8 @@ app.controller('CitaCtrl',
 		$scope.fArr = {}; // contiene todos los arrays generados por las funciones
 		$scope.fBusqueda = {};
 
+		moment.tz.add('America/Lima|LMT -05 -04|58.A 50 40|0121212121212121|-2tyGP.o 1bDzP.o zX0 1aN0 1cL0 1cN0 1cL0 1PrB0 zX0 1O10 zX0 6Gp0 zX0 98p0 zX0|11e6');
+
 		$scope.fArr.listaTipoCita = [
 			{ id: '1', descripcion: 'POR CONFIRMAR' },
 			{ id: '2', descripcion: 'CONFIRMADA' }
@@ -62,7 +64,6 @@ app.controller('CitaCtrl',
 
 
 		/* EVENTOS */
-		$scope.menu = angular.element('.menu-dropdown');
 		$scope.alertOnClick = function (event, jsEvent, view) {
 			console.log('event', event);
 			$scope.btnEditarCita(event);
@@ -127,10 +128,6 @@ app.controller('CitaCtrl',
 			blockUI.stop();
 		}
 
-		$scope.closeMenu = function () {
-			$scope.menu.removeClass('open');
-		}
-
 		$scope.btnAgregarCita = function (start, end) {
 			console.log('Agrega cita');
 			var arrParams = {
@@ -155,17 +152,13 @@ app.controller('CitaCtrl',
 
 		/* CARGA DE DATOS */
 		$scope.eventsF = function (start, end, timezone, callback) {
+
 			var events = [];
 			blockUI.start('Actualizando calendario...');
-			//console.log(start, end,'start, end');
-			//console.log(start.toLocaleTimeString(), end.toLocaleTimeString(),'start.toLocaleTimeString(), end.toLocaleTimeString()');
-			// $scope.fBusqueda.desde = moment(start).tz('America/Lima').format('YYYY-MM-DD');
-			// $scope.fBusqueda.hasta = moment(end).tz('America/Lima').format('YYYY-MM-DD');
-			$scope.fBusqueda.desde = moment(start).format('YYYY-MM-DD');
-			$scope.fBusqueda.hasta = moment(end).format('YYYY-MM-DD');
-			console.log(start,end);
-			console.log('desde', $scope.fBusqueda.desde);
-			console.log('hasta', $scope.fBusqueda.hasta);
+
+			$scope.fBusqueda.desde = moment(start).tz('America/Lima').format('YYYY-MM-DD');
+			$scope.fBusqueda.hasta = moment(end).tz('America/Lima').format('YYYY-MM-DD');
+
 			CitaServices.sListarCitaCalendario($scope.fBusqueda).then(function (rpta) {
 				if (rpta.flag == 1) {
 					angular.forEach(rpta.datos, function (row, key) {
@@ -254,6 +247,7 @@ app.service("CitaServices", function ($http, $q, handleBehavior) {
 		sListarDetalleCita: sListarDetalleCita,
 		sRegistrar: sRegistrar,
 		sEditar: sEditar,
+		sMoverCita: sMoverCita
 	});
 
 	function sListarCitaCalendario(datos) {
@@ -284,6 +278,14 @@ app.service("CitaServices", function ($http, $q, handleBehavior) {
 		var request = $http({
 			method: "post",
 			url: angular.patchURLCI + "Cita/editar",
+			data: datos
+		});
+		return (request.then(handleBehavior.success, handleBehavior.error));
+	}
+	function sMoverCita(datos) {
+		var request = $http({
+			method: "post",
+			url: angular.patchURLCI + "Cita/mover_cita",
 			data: datos
 		});
 		return (request.then(handleBehavior.success, handleBehavior.error));

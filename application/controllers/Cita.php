@@ -333,4 +333,29 @@ class Cita extends CI_Controller {
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 	}
+
+	public function mover_cita(){
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$arrData['flag'] = 0;
+		$arrData['message'] = 'Ha ocurrido un error actualizando la cita';
+
+
+		$data = array(
+			'horaDesde' => date('H:i:s',strtotime($allInputs['event']['start'])),
+			'horaHasta' => date('H:i:s',strtotime($allInputs['event']['end'])),
+			'fechaCita' => date('Y-m-d',strtotime($allInputs['event']['start'])),
+			'updatedAt' => date('Y-m-d H:i:s')
+		);
+
+		$this->db->trans_start();
+		if($this->model_cita->m_editar($data, $allInputs['event']['id'])){
+			$arrData['flag'] = 1;
+			$arrData['message'] = 'Cita actualizada.';
+		}
+		$this->db->trans_complete();
+
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+	}
 }
