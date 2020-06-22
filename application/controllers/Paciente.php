@@ -118,6 +118,10 @@ class Paciente extends CI_Controller {
 	{
 		$this->load->view('paciente/mant_paciente');
 	}
+	public function ver_popup_busqueda_paciente()
+	{
+		$this->load->view('paciente/busq_paciente_popup');
+	}
 	public function registrar()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);

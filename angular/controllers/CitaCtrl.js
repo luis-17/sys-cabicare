@@ -319,9 +319,7 @@ app.factory("ReservaCitasFactory",
 					$scope.fArr = arrParams.fArr;
 					$scope.metodos = arrParams.metodos;
 					$scope.fData.accion = 'reg';
-					var arrP = {
-						'data': $scope.fData
-					}
+
 					$scope.btnNuevo = function(){
 						var arrP = {
 							'metodos': $scope.metodos,
@@ -334,8 +332,139 @@ app.factory("ReservaCitasFactory",
 							}
 						}
 						PacienteFactory.regPacienteModal(arrP);
-
 					}
+
+					$scope.btnBuscarPaciente = function(){
+
+						$uibModal.open({
+							templateUrl: angular.patchURLCI + 'Paciente/ver_popup_busqueda_paciente',
+							size: 'lg',
+							backdrop: 'static',
+							keyboard: false,
+							controller: function ($scope, $uibModalInstance, uiGridConstants, arrToModal) {
+								$scope.titleForm = 'Búsqueda de Paciente';
+
+								$scope.fData = arrToModal.fData;
+								$scope.cancel = function () {
+									$uibModalInstance.dismiss('cancel');
+								}
+
+								var paginationOptions = {
+									pageNumber: 1,
+									firstRow: 0,
+									pageSize: 100,
+									sort: uiGridConstants.DESC,
+									sortName: null,
+									search: null
+								};
+								$scope.gridOptionsBC = {
+									rowHeight: 30,
+									paginationPageSizes: [100, 500, 1000],
+									paginationPageSize: 100,
+									useExternalPagination: true,
+									useExternalSorting: true,
+									useExternalFiltering: true,
+									enableGridMenu: true,
+									enableSelectAll: true,
+									enableFiltering: true,
+									enableRowSelection: true,
+									enableFullRowSelection: true,
+									multiSelect: false,
+									columnDefs: [
+										{ field: 'idpaciente', name: 'pa.id', displayName: 'ID', width: '75', sort: { direction: uiGridConstants.DESC } },
+										{
+											field: 'tipo_documento', name: 'pa.tipoDocumento', width: 160,
+											cellTemplate: '<div class="ui-grid-cell-contents text-left ">' + '{{ COL_FIELD.descripcion }}</div>', displayName: 'Tipo Documento'
+										},
+										{ field: 'num_documento', name: 'pa.numeroDocumento', displayName: 'Documento', minWidth: 90 },
+										{ field: 'nombres', name: 'pa.nombres', displayName: 'Nombres', minWidth: 100 },
+										{ field: 'apellido_paterno', name: 'pa.apellidoPaterno', displayName: 'Ap. Paterno', minWidth: 100 },
+										{ field: 'apellido_materno', name: 'pa.apellidoMaterno', displayName: 'Ap. Materno', minWidth: 100 },
+										{ field: 'fecha_nacimiento', name: 'pa.fechaNacimiento', displayName: 'Fecha Nac.', minWidth: 120 },
+										{ field: 'email', name: 'pa.email', displayName: 'E-mail', minWidth: 100 },
+										{ field: 'celular', name: 'pa.celular', displayName: 'Celular', minWidth: 100 }
+									],
+									onRegisterApi: function (gridApi) {
+										$scope.gridApi = gridApi;
+										gridApi.selection.on.rowSelectionChanged($scope, function (row) {
+											$scope.mySelectionGrid = gridApi.selection.getSelectedRows();
+										});
+										gridApi.selection.on.rowSelectionChangedBatch($scope, function (rows) {
+											$scope.mySelectionGrid = gridApi.selection.getSelectedRows();
+										});
+										$scope.gridApi.core.on.sortChanged($scope, function (grid, sortColumns) {
+											if (sortColumns.length == 0) {
+												paginationOptions.sort = null;
+												paginationOptions.sortName = null;
+											} else {
+												paginationOptions.sort = sortColumns[0].sort.direction;
+												paginationOptions.sortName = sortColumns[0].name;
+											}
+											$scope.metodos.getPaginationServerSide(true);
+										});
+										gridApi.pagination.on.paginationChanged($scope, function (newPage, pageSize) {
+											paginationOptions.pageNumber = newPage;
+											paginationOptions.pageSize = pageSize;
+											paginationOptions.firstRow = (paginationOptions.pageNumber - 1) * paginationOptions.pageSize;
+											$scope.metodos.getPaginationServerSide(true);
+										});
+										$scope.gridApi.core.on.filterChanged($scope, function (grid, searchColumns) {
+											var grid = this.grid;
+											paginationOptions.search = true;
+											paginationOptions.searchColumn = {
+												'pa.id': grid.columns[1].filters[0].term,
+												'pa.tipoDocumento': grid.columns[2].filters[0].term,
+												'pa.numeroDocumento': grid.columns[3].filters[0].term,
+												'pa.nombres': grid.columns[4].filters[0].term,
+												'pa.apellidoPaterno': grid.columns[5].filters[0].term,
+												'pa.apellidoMaterno': grid.columns[6].filters[0].term,
+												'pa.fechaNacimiento': grid.columns[7].filters[0].term,
+												'pa.email': grid.columns[8].filters[0].term,
+												'pa.celular': grid.columns[9].filters[0].term,
+											};
+											$scope.getPaginationServerSide();
+										});
+									}
+								};
+								paginationOptions.sortName = $scope.gridOptionsBC.columnDefs[0].name;
+								$scope.getPaginationServerSide = function (loader) {
+									if (loader) {
+										blockUI.start('Procesando información...');
+									}
+									var arrParams = {
+										paginate: paginationOptions
+									};
+									PacienteServices.sListar(arrParams).then(function (rpta) {
+										if (rpta.datos.length == 0) {
+											rpta.paginate = { totalRows: 0 };
+										}
+										$scope.gridOptionsBC.totalItems = rpta.paginate.totalRows;
+										$scope.gridOptionsBC.data = rpta.datos;
+										if (loader) {
+											blockUI.stop();
+										}
+									});
+									$scope.mySelectionGrid = [];
+								};
+								$scope.getPaginationServerSide(true);
+
+								$scope.aceptar = function(){
+									$scope.fData.paciente = $scope.mySelectionGrid[0].nombres;
+									$scope.fData.pacienteId = $scope.mySelectionGrid[0].idpaciente;
+									$scope.fData.numeroDocumento = $scope.mySelectionGrid[0].num_documento;
+									$uibModalInstance.dismiss('cancel');
+								}
+							},
+							resolve: {
+								arrToModal: function () {
+									return {
+										fData: $scope.fData
+									}
+								}
+							}
+						});
+					}
+
 					$scope.titleForm = 'Registro de Cita';
 					// $scope.fArr.listaTipoCita.splice(0, 0, { id: "", descripcion: '--Seleccione tipo cita--' });
 					// $scope.fData.tipoCita = $scope.fArr.listaTipoCita[0];

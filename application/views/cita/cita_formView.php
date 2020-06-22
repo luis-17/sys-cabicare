@@ -34,6 +34,10 @@
 							placeholder="Paciente"
 							required
 							disabled>
+
+						<span class="input-group-btn" ng-if="fData.accion == 'reg'">
+							<button class="btn btn-default btn-sm" type="button" ng-click="btnBuscarPaciente()"><i class="fa fa-search"></i> </button>
+						</span>
 	            	</div>
 	            </div>
 
