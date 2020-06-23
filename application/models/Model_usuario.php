@@ -86,7 +86,7 @@ class Model_usuario extends CI_Model {
 			'password'=> md5($datos['passwordView']),
 			'passwordView'=>$datos['passwordView'],
 			'nombres' => strtoupper_total($datos['nombres']),
-			'apellidos' => strtoupper_total(($datos['apellidos']),
+			'apellidos' => strtoupper_total($datos['apellidos']),
 			'correo' => $datos['correo'],
 			'cmp' => $datos['cmp'],
 			'rne' => $datos['rne'],
