@@ -319,6 +319,12 @@ class Cita extends CI_Controller {
 						'updatedAt'		=> date('Y-m-d H:i:s')
 					);
 					$this->model_cita->m_registrar_detalle($data_det);
+				}else{
+					$data_det = array(
+						'precioReal' 	=> $row['precio'],
+						'updatedAt'		=> date('Y-m-d H:i:s')
+					);
+					$this->model_cita->m_editar_detalle($data_det, $row['id']);
 				}
 			}
 
