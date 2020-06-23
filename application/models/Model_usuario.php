@@ -88,8 +88,8 @@ class Model_usuario extends CI_Model {
 			'nombres' => strtoupper_total($datos['nombres']),
 			'apellidos' => strtoupper_total($datos['apellidos']),
 			'correo' => $datos['correo'],
-			'cmp' => $datos['cmp'],
-			'rne' => $datos['rne'],
+			'cmp' => empty($datos['cmp']) ? NULL : $datos['cmp'],
+			'rne' => empty($datos['rne']) ? NULL : $datos['rne'],
 			'estado'=> 1,
 			'createdat' => date('Y-m-d H:i:s'),
 			'updatedat' => date('Y-m-d H:i:s')
@@ -104,8 +104,8 @@ class Model_usuario extends CI_Model {
 			'nombres' => $datos['nombres'],
 			'apellidos' => $datos['apellidos'],
 			'correo' => $datos['correo'],
-			'cmp' => $datos['cmp'],
-			'rne' => $datos['rne'],
+			'cmp' => empty($datos['cmp']) ? NULL : $datos['cmp'],
+			'rne' => empty($datos['rne']) ? NULL : $datos['rne'],
 			'updatedat' => date('Y-m-d H:i:s')
 		);
 		$this->db->where('id',$datos['idusuario']);
