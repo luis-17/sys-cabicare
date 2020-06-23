@@ -217,6 +217,15 @@ class Cita extends CI_Controller {
 		    ->set_output(json_encode($arrData));
 	}
 
+	/**
+	 * Método para editar una reserva de Cita
+	 * Tambien se registra o edita el detalle, depediendo si se agrega nuevos items,
+	 * se cambia de precio o se eliminan items
+	 *
+	 * @Creado 19-06-2020
+	 * @author Ing. Ruben Guevara <rguevarac@hotmail.es>
+	 * @return void
+	 */
 	public function editar()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
@@ -320,7 +329,14 @@ class Cita extends CI_Controller {
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 	}
-
+	/**
+	 * Método para editar la fecha y/o hora de la cita.
+	 * Proviene de arrastar y soltar una cita en el calendario
+	 *
+	 * @Creado 21-06-2020
+	 * @author Ing. Ruben Guevara <rguevarac@hotmail.es>
+	 * @return void
+	 */
 	public function mover_cita(){
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
 		$arrData['flag'] = 0;
