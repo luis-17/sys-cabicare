@@ -20,8 +20,8 @@
  			<input type="text" class="form-control input-sm" autocomplete="off" ng-model="fData.rne" placeholder="Ingrese RNE" tabindex="100" /> 
 		</div>
 		<div class="form-group col-md-6 mb-md">
-			<label class="control-label mb-n"> Correo Electrónico: </label>
- 			<input type="email" class="form-control input-sm" autocomplete="off" ng-model="fData.correo" placeholder="Ingrese correo" tabindex="100" /> 
+			<label class="control-label mb-n"> Correo Electrónico: <small class="text-danger">(*)</small> </label>
+ 			<input type="email" class="form-control input-sm" autocomplete="off" ng-model="fData.correo" placeholder="Ingrese correo" tabindex="100" required /> 
 		</div>
 		<div class="hr-line"> Datos de Acceso </div>
 		<div class="form-group col-md-6 mb-md">
