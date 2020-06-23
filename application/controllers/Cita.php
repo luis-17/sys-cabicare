@@ -147,7 +147,6 @@ class Cita extends CI_Controller {
 		}
 
 		if(strtotime($allInputs['hora_desde']) >= strtotime($allInputs['hora_hasta'])){
-		// if(strtotime($allInputs['hora_desde_str']) >= strtotime($allInputs['hora_hasta_str'])){
 			$arrData['flag'] = 0;
 			$arrData['message'] = 'Debe seleccionar un rango de horas valido.';
 			$this->output
@@ -161,17 +160,7 @@ class Cita extends CI_Controller {
 
 		$horadesde = strtotime($allInputs['hora_desde']);
 		$horahasta = strtotime($allInputs['hora_hasta']);
-		// if(strlen($allInputs['hora_desde_str']) == 7){
-		// 	$horadesde = '0' . strtotime(substr($allInputs['hora_desde_str'], 0,4) . ':00');
-		// }else{
-		// 	$horadesde = strtotime(substr($allInputs['hora_desde_str'], 0,5) . ':00');
-		// }
 
-		// if(strlen($allInputs['hora_hasta_str']) == 7){
-		// 	$horahasta = '0' . strtotime(substr($allInputs['hora_hasta_str'], 0,4) . ':00');
-		// }else{
-		// 	$horahasta = strtotime(substr($allInputs['hora_hasta_str'], 0,5) . ':00');
-		// }
 
 		if(!($horadesde  >= $hora_inicio_calendar &&  $horahasta <= $hora_fin_calendar)){
 			$arrData['flag'] = 0;
@@ -252,7 +241,7 @@ class Cita extends CI_Controller {
 		    return;
 		}
 
-		if(strtotime($allInputs['hora_desde_str']) >= strtotime($allInputs['hora_hasta_str'])){
+		if(strtotime($allInputs['hora_desde']) >= strtotime($allInputs['hora_hasta'])){
 			$arrData['flag'] = 0;
 			$arrData['message'] = 'Debe seleccionar un rango de horas valido.';
 			$this->output
@@ -264,17 +253,9 @@ class Cita extends CI_Controller {
 		$hora_inicio_calendar = strtotime('07:00:00');
 		$hora_fin_calendar = strtotime('23:00:00');
 
-		if(strlen($allInputs['hora_desde_str']) == 7){
-			$horadesde = '0' . strtotime(substr($allInputs['hora_desde_str'], 0,4) . ':00');
-		}else{
-			$horadesde = strtotime(substr($allInputs['hora_desde_str'], 0,5) . ':00');
-		}
+		$horadesde = strtotime($allInputs['hora_desde']);
+		$horahasta = strtotime($allInputs['hora_hasta']);
 
-		if(strlen($allInputs['hora_hasta_str']) == 7){
-			$horahasta = '0' . strtotime(substr($allInputs['hora_hasta_str'], 0,4) . ':00');
-		}else{
-			$horahasta = strtotime(substr($allInputs['hora_hasta_str'], 0,5) . ':00');
-		}
 
 		if(!($horadesde  >= $hora_inicio_calendar &&  $horahasta <= $hora_fin_calendar)){
 			$arrData['flag'] = 0;
