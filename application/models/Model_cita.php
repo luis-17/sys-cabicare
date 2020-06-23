@@ -79,5 +79,10 @@ class Model_cita extends CI_Model {
 		);
 		$this->db->where('id',$datos['id']);
 		return $this->db->update('citaproducto', $data);
-}
+	}
+	public function m_editar_detalle($data, $id)
+	{
+		$this->db->where('id',$id);
+		return $this->db->update('citaproducto', $data);
+	}
 }

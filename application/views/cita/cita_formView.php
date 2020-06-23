@@ -244,7 +244,7 @@
 				</div>
 
 				<div class="col-xs-12">
-					<div ui-grid="gridOptions" ui-grid-auto-resize ui-grid-resize-columns class="grid table-responsive fs-mini-grid" ng-style="getTableHeight();"></div>
+					<div ui-grid="gridOptions" ui-grid-auto-resize ui-grid-resize-columns ui-grid-edit class="grid table-responsive fs-mini-grid" ng-style="getTableHeight();"></div>
 				</div>
 
 			</div>

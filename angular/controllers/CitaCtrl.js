@@ -236,6 +236,7 @@ app.controller('CitaCtrl',
 			}
 		};
 
+		// VISTA LISTA
 
 
 	}
@@ -632,6 +633,7 @@ app.factory("ReservaCitasFactory",
 						enableFiltering: false,
 						enableSorting: false,
 						enableFullRowSelection: false,
+						enableCellEdit: false,
 						multiSelect: false,
 						data: [],
 						columnDefs: [
@@ -639,7 +641,7 @@ app.factory("ReservaCitasFactory",
 							{ field: 'producto', name: 'nombre', displayName: 'PRODUCTO', minWidth: 120 },
 							{ field: 'tipoProducto', name: 'tipoProducto', displayName: 'Tipo Producto', minWidth: 120 },
 
-							{ field: 'precio', name: 'precio', displayName: 'PRECIO', width: 120 },
+							{ field: 'precio', name: 'precio', displayName: 'PRECIO (S/)', width: 120, enableCellEdit: true, cellClass: 'ui-editCell' },
 
 							{
 								field: 'eliminar', name: 'eliminar', displayName: '', width: 50,
@@ -953,6 +955,7 @@ app.factory("ReservaCitasFactory",
 						enableFiltering: false,
 						enableSorting: false,
 						enableFullRowSelection: false,
+						enableCellEdit: false,
 						multiSelect: false,
 						data: [],
 						columnDefs: [
@@ -960,7 +963,7 @@ app.factory("ReservaCitasFactory",
 							{ field: 'producto', name: 'nombre', displayName: 'PRODUCTO', minWidth: 120 },
 							{ field: 'tipoProducto', name: 'tipoProducto', displayName: 'Tipo Producto', minWidth: 120 },
 
-							{ field: 'precio', name: 'precio', displayName: 'PRECIO', width: 120 },
+							{ field: 'precio', name: 'precio', displayName: 'PRECIO (S/)', width: 120, enableCellEdit: true, cellClass: 'ui-editCell' },
 
 							{
 								field: 'eliminar', name: 'eliminar', displayName: '', width: 50,

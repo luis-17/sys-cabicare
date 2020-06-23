@@ -147,7 +147,6 @@ class Cita extends CI_Controller {
 		}
 
 		if(strtotime($allInputs['hora_desde']) >= strtotime($allInputs['hora_hasta'])){
-		// if(strtotime($allInputs['hora_desde_str']) >= strtotime($allInputs['hora_hasta_str'])){
 			$arrData['flag'] = 0;
 			$arrData['message'] = 'Debe seleccionar un rango de horas valido.';
 			$this->output
@@ -161,17 +160,7 @@ class Cita extends CI_Controller {
 
 		$horadesde = strtotime($allInputs['hora_desde']);
 		$horahasta = strtotime($allInputs['hora_hasta']);
-		// if(strlen($allInputs['hora_desde_str']) == 7){
-		// 	$horadesde = '0' . strtotime(substr($allInputs['hora_desde_str'], 0,4) . ':00');
-		// }else{
-		// 	$horadesde = strtotime(substr($allInputs['hora_desde_str'], 0,5) . ':00');
-		// }
 
-		// if(strlen($allInputs['hora_hasta_str']) == 7){
-		// 	$horahasta = '0' . strtotime(substr($allInputs['hora_hasta_str'], 0,4) . ':00');
-		// }else{
-		// 	$horahasta = strtotime(substr($allInputs['hora_hasta_str'], 0,5) . ':00');
-		// }
 
 		if(!($horadesde  >= $hora_inicio_calendar &&  $horahasta <= $hora_fin_calendar)){
 			$arrData['flag'] = 0;
@@ -228,6 +217,15 @@ class Cita extends CI_Controller {
 		    ->set_output(json_encode($arrData));
 	}
 
+	/**
+	 * Método para editar una reserva de Cita
+	 * Tambien se registra o edita el detalle, depediendo si se agrega nuevos items,
+	 * se cambia de precio o se eliminan items
+	 *
+	 * @Creado 19-06-2020
+	 * @author Ing. Ruben Guevara <rguevarac@hotmail.es>
+	 * @return void
+	 */
 	public function editar()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
@@ -252,7 +250,7 @@ class Cita extends CI_Controller {
 		    return;
 		}
 
-		if(strtotime($allInputs['hora_desde_str']) >= strtotime($allInputs['hora_hasta_str'])){
+		if(strtotime($allInputs['hora_desde']) >= strtotime($allInputs['hora_hasta'])){
 			$arrData['flag'] = 0;
 			$arrData['message'] = 'Debe seleccionar un rango de horas valido.';
 			$this->output
@@ -264,17 +262,9 @@ class Cita extends CI_Controller {
 		$hora_inicio_calendar = strtotime('07:00:00');
 		$hora_fin_calendar = strtotime('23:00:00');
 
-		if(strlen($allInputs['hora_desde_str']) == 7){
-			$horadesde = '0' . strtotime(substr($allInputs['hora_desde_str'], 0,4) . ':00');
-		}else{
-			$horadesde = strtotime(substr($allInputs['hora_desde_str'], 0,5) . ':00');
-		}
+		$horadesde = strtotime($allInputs['hora_desde']);
+		$horahasta = strtotime($allInputs['hora_hasta']);
 
-		if(strlen($allInputs['hora_hasta_str']) == 7){
-			$horahasta = '0' . strtotime(substr($allInputs['hora_hasta_str'], 0,4) . ':00');
-		}else{
-			$horahasta = strtotime(substr($allInputs['hora_hasta_str'], 0,5) . ':00');
-		}
 
 		if(!($horadesde  >= $hora_inicio_calendar &&  $horahasta <= $hora_fin_calendar)){
 			$arrData['flag'] = 0;
@@ -319,6 +309,12 @@ class Cita extends CI_Controller {
 						'updatedAt'		=> date('Y-m-d H:i:s')
 					);
 					$this->model_cita->m_registrar_detalle($data_det);
+				}else{
+					$data_det = array(
+						'precioReal' 	=> $row['precio'],
+						'updatedAt'		=> date('Y-m-d H:i:s')
+					);
+					$this->model_cita->m_editar_detalle($data_det, $row['id']);
 				}
 			}
 
@@ -333,7 +329,14 @@ class Cita extends CI_Controller {
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 	}
-
+	/**
+	 * Método para editar la fecha y/o hora de la cita.
+	 * Proviene de arrastar y soltar una cita en el calendario
+	 *
+	 * @Creado 21-06-2020
+	 * @author Ing. Ruben Guevara <rguevarac@hotmail.es>
+	 * @return void
+	 */
 	public function mover_cita(){
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
 		$arrData['flag'] = 0;
