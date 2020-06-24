@@ -384,7 +384,7 @@ fieldset[disabled] a.btn {
   background: transparent !important;
 }
 
-.fc-time-grid-event.fc-short .fc-title{
+.fc-time-grid-event .fc-title{
   font-size: .9em;
   color: white;
   text-shadow: 1px 1px 4px #333333;

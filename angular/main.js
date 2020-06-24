@@ -133,6 +133,16 @@ angular.module('app')
         rootServices.sGetSessionCI().then(function (response) { 
           if(response.flag == 1){
             $scope.fSessionCI = response.datos;
+            console.log('$scope.fSessionCI ==>', $scope.fSessionCI);
+            if($scope.fSessionCI.keyPerfil == 'key_root'){
+              $scope.fConfigSys.valores = [true,true,true,true,true,true,true,true,true];
+            }
+            if($scope.fSessionCI.keyPerfil == 'key_rep'){
+              $scope.fConfigSys.valores = [true,false,true,false,true,false,false];
+            }
+            if($scope.fSessionCI.keyPerfil == 'key_med'){
+              $scope.fConfigSys.valores = [true,false,false,false,false,true,false];
+            }
             // $scope.getListaEmpresasSession();
             $scope.logIn();
             // $scope.CargaMenu();

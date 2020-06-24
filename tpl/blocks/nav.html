@@ -5,14 +5,14 @@
     <span translate="aside.nav.HEADER"> </span> 
   </li>
   <!-- DASHBOARD --> 
-  <li ui-sref-active="active">
+  <li ui-sref-active="active" ng-if="fConfigSys.valores[0]">
     <a ui-sref="app.dashboard">
       <i class="glyphicon glyphicon-stats icon text-primary-dker"></i>
       <span class="font-bold"> Dashboard </span>
     </a>
   </li>
   <!-- SEGURIDAD -->
-  <li>
+  <li ng-if="fConfigSys.valores[1]">
     <a href class="auto">      
       <span class="pull-right text-muted">
         <i class="fa fa-fw fa-angle-right text"></i>
@@ -39,25 +39,29 @@
       </li>
     </ul>
   </li>
-  <li ui-sref-active="active">
+  <!-- PACIENTES -->
+  <li ui-sref-active="active" ng-if="fConfigSys.valores[2]">
     <a ui-sref="app.paciente">
       <i class="glyphicon glyphicon-stats icon text-primary-dker"></i>
       <span class="font-bold"> Pacientes </span>
     </a>
   </li>
-  <li ui-sref-active="active">
+  <!-- PRODUCTO -->
+  <li ui-sref-active="active" ng-if="fConfigSys.valores[3]">
     <a ui-sref="app.producto">
       <i class="glyphicon glyphicon-stats icon text-primary-dker"></i>
       <span class="font-bold"> Productos </span>
     </a>
   </li>
-  <li ui-sref-active="active">
+  <!-- CITA -->
+  <li ui-sref-active="active" ng-if="fConfigSys.valores[4]">
     <a ui-sref="app.reserva-cita">
       <i class="glyphicon glyphicon-stats icon text-primary-dker"></i>
       <span class="font-bold"> Citas </span>
     </a>
   </li>
-  <li>
+  <!-- HIST. MEDICA -->
+  <li ng-if="fConfigSys.valores[5]">
     <a href class="auto">      
       <span class="pull-right text-muted">
         <i class="fa fa-fw fa-angle-right text"></i>
@@ -85,7 +89,7 @@
     </ul>
   </li>
   <!-- CENTRAL DE REPORTES --> 
-  <li ui-sref-active="active">
+  <li ng-if="fConfigSys.valores[6]" ui-sref-active="active">
     <a ui-sref="app.central-reportes">
       <i class="glyphicon glyphicon-stats icon text-primary-dker"></i>
       <span class="font-bold"> Reportes </span> 
