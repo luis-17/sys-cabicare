@@ -9,7 +9,7 @@ class Model_acceso extends CI_Model {
 		$this->db->select('us.id AS usuarioId, us.username, us.nombres, us.apellidos, 
 			us.correo, pe.id AS perfilId, pe.nombre AS perfil, pe.keyPerfil', FALSE);
 		$this->db->from('usuario us');
-		$this->db->join('perfil pe', 'us.id = pe.id AND pe.estado = 1');
+		$this->db->join('perfil pe', 'us.perfilId = pe.id AND pe.estado = 1');
 		$this->db->where('us.username', $data['usuario']);
 		$this->db->where('us.password', do_hash($data['password'] , 'md5'));
 		$this->db->where('us.estado', 1);
