@@ -28,6 +28,6 @@ angular.module('app', [
     'ui.grid.moveColumns',
     'ui.grid.exporter',
     'ui.grid.pinning',
-    'ui.calendar'
+    'ui.calendar',
     // 'ui.tree'
 ]);

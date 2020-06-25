@@ -238,12 +238,110 @@ app.controller('CitaCtrl',
 
 		// VISTA LISTA
 
+		$scope.fBusqueda.fechaDesde = moment().tz('America/Lima').startOf('month').format('DD-MM-YYYY');
+		$scope.fBusqueda.fechaHasta = moment().tz('America/Lima').endOf('month').format('DD-MM-YYYY');
+		$scope.mySelectionGrid = [];
+		$scope.btnBuscar = function () {
+			$scope.gridOptions.enableFiltering = !$scope.gridOptions.enableFiltering;
+			$scope.gridApi.core.notifyDataChange(uiGridConstants.dataChange.COLUMN);
+		};
+		var paginationOptions = {
+			pageNumber: 1,
+			firstRow: 0,
+			pageSize: 100,
+			sort: uiGridConstants.DESC,
+			sortName: null,
+			search: null
+		};
+		$scope.gridOptions = {
+			rowHeight: 30,
+			paginationPageSizes: [100, 500, 1000],
+			paginationPageSize: 100,
+			useExternalPagination: true,
+			useExternalSorting: true,
+			useExternalFiltering: true,
+			enableGridMenu: true,
+			enableSelectAll: true,
+			enableFiltering: false,
+			enableRowSelection: true,
+			enableFullRowSelection: true,
+			multiSelect: false,
+			columnDefs: [
+				{ field: 'id', name: 'ci.id', displayName: 'ID', width: '75', sort: { direction: uiGridConstants.DESC } },
+				{ field: 'fechaCita', name: 'fechaCita', displayName: 'Fecha Cita', minWidth: 100, width: 100, enableFiltering: false },
+				{ field: 'numeroDocumento', name: 'numeroDocumento', displayName: 'Documento', minWidth: 90, width: 100 },
+				{ field: 'paciente', name: 'paciente', displayName: 'Paciente', minWidth: 100 },
+				{ field: 'medico', name: 'medico', displayName: 'Médico', minWidth: 120 },
+				{ field: 'total', name: 'total', displayName: 'Total', minWidth: 100, width: 100 },
+			],
+			onRegisterApi: function (gridApi) {
+				$scope.gridApi = gridApi;
+				gridApi.selection.on.rowSelectionChanged($scope, function (row) {
+					$scope.mySelectionGrid = gridApi.selection.getSelectedRows();
+				});
+				gridApi.selection.on.rowSelectionChangedBatch($scope, function (rows) {
+					$scope.mySelectionGrid = gridApi.selection.getSelectedRows();
+				});
+				$scope.gridApi.core.on.sortChanged($scope, function (grid, sortColumns) {
+					if (sortColumns.length == 0) {
+						paginationOptions.sort = null;
+						paginationOptions.sortName = null;
+					} else {
+						paginationOptions.sort = sortColumns[0].sort.direction;
+						paginationOptions.sortName = sortColumns[0].name;
+					}
+					$scope.metodos.getPaginationServerSide(true);
+				});
+				gridApi.pagination.on.paginationChanged($scope, function (newPage, pageSize) {
+					paginationOptions.pageNumber = newPage;
+					paginationOptions.pageSize = pageSize;
+					paginationOptions.firstRow = (paginationOptions.pageNumber - 1) * paginationOptions.pageSize;
+					$scope.metodos.getPaginationServerSide(true);
+				});
+				$scope.gridApi.core.on.filterChanged($scope, function (grid, searchColumns) {
+					var grid = this.grid;
+					paginationOptions.search = true;
+					paginationOptions.searchColumn = {
+						'ci.id': grid.columns[1].filters[0].term,
+						'ci.fechaCita': grid.columns[2].filters[0].term,
+						'pa.numeroDocumento': grid.columns[3].filters[0].term,
+						"concat_ws(' ', pa.nombres, pa.apellidoPaterno, pa.apellidoMaterno)": grid.columns[4].filters[0].term,
+						"concat_ws(' ', us.nombres, us.apellidos)": grid.columns[5].filters[0].term,
+						'ci.total': grid.columns[6].filters[0].term,
+
+					};
+					$scope.metodos.getPaginationServerSide();
+				});
+			}
+		};
+		paginationOptions.sortName = $scope.gridOptions.columnDefs[0].name;
+		$scope.metodos.getPaginationServerSide = function (loader) {
+			if (loader) {
+				blockUI.start('Procesando información...');
+			}
+			var arrParams = {
+				paginate: paginationOptions,
+				datos: $scope.fBusqueda
+			};
+			CitaServices.sListarCitasGrilla(arrParams).then(function (rpta) {
+				if (rpta.datos.length == 0) {
+					rpta.paginate = { totalRows: 0 };
+				}
+				$scope.gridOptions.totalItems = rpta.paginate.totalRows;
+				$scope.gridOptions.data = rpta.datos;
+				if (loader) {
+					blockUI.stop();
+				}
+			});
+			$scope.mySelectionGrid = [];
+		};
 
 	}
 ]);
 
 app.service("CitaServices", function ($http, $q, handleBehavior) {
 	return({
+		sListarCitasGrilla: sListarCitasGrilla,
 		sListarCitaCalendario: sListarCitaCalendario,
 		sListarDetalleCita: sListarDetalleCita,
 		sRegistrar: sRegistrar,
@@ -251,6 +349,14 @@ app.service("CitaServices", function ($http, $q, handleBehavior) {
 		sMoverCita: sMoverCita
 	});
 
+	function sListarCitasGrilla(datos) {
+		var request = $http({
+			method: "post",
+			url: angular.patchURLCI + "Cita/listar_citas_en_grilla",
+			data: datos
+		});
+		return (request.then(handleBehavior.success, handleBehavior.error));
+	}
 	function sListarCitaCalendario(datos) {
 		var request = $http({
 			method: "post",
@@ -650,6 +756,11 @@ app.factory("ReservaCitasFactory",
 						],
 						onRegisterApi: function (gridApi) {
 							$scope.gridApi = gridApi;
+							gridApi.edit.on.afterCellEdit($scope, function (rowEntity, colDef, newValue, oldValue) {
+								if (newValue != oldValue) {
+									$scope.calcularTotales();
+								}
+							});
 						}
 					};
 
@@ -855,8 +966,6 @@ app.factory("ReservaCitasFactory",
 
 					$scope.configDP.dateOptions = {
 						formatYear: 'yy',
-						maxDate: new Date(2021, 5, 22),
-						minDate: new Date(),
 						startingDay: 1
 					};
 
@@ -972,6 +1081,11 @@ app.factory("ReservaCitasFactory",
 						],
 						onRegisterApi: function (gridApi) {
 							$scope.gridApi = gridApi;
+							gridApi.edit.on.afterCellEdit($scope, function (rowEntity, colDef, newValue, oldValue) {
+								if (newValue != oldValue) {
+									$scope.calcularTotales();
+								}
+							});
 						}
 					};
 

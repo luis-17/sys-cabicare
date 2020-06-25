@@ -14,6 +14,74 @@ class Cita extends CI_Controller {
 
     }
 
+	public function listar_citas_en_grilla()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$paramPaginate = $allInputs['paginate'];
+		$paramDatos = $allInputs['datos'];
+		$lista = $this->model_cita->m_cargar_citas_en_grilla($paramPaginate,$paramDatos);
+		$arrListado = array();
+		if(empty($lista)){
+			$arrData['flag'] = 0;
+			$arrData['datos'] = $arrListado;
+			$arrData['paginate']['totalRows'] = 0;
+    		$arrData['message'] = '';
+			$this->output
+				->set_content_type('application/json')
+				->set_output(json_encode($arrData));
+			return;
+		}
+		$fCount = $this->model_cita->m_count_citas_en_grilla($paramPaginate,$paramDatos);
+
+		foreach ($lista as $row) {
+
+			if ( $row['estado'] == 1 ){
+				$clases = 'b-warning';
+			}elseif ( $row['estado'] == 2 ){
+				$clases = 'b-primary';
+			}elseif ( $row['estado'] == 3 ) {
+				$clases = 'b-success';
+			}else {
+				$clases = '';
+			}
+			array_push(
+				$arrListado,
+				array(
+					'id' => $row['id'],
+					'horaDesde' => $row['horaDesde'],
+					'horaHasta' => $row['horaHasta'],
+					'fechaCita' => darFormatoDMY($row['fechaCita']),
+					'fecha' => $row['fechaCita'],
+					'numeroDocumento' =>  $row['numeroDocumento'],
+					'paciente' =>  $row['paciente'],
+					'peso' =>  $row['peso'],
+					'talla' =>  $row['talla'],
+					'imc' =>  $row['imc'],
+					'apuntesCita' =>  $row['apuntesCita'],
+					'frecuenciaCardiaca' =>  $row['frecuenciaCardiaca'],
+					'temperaturaCorporal' =>  $row['temperaturaCorporal'],
+					'medico' => $row['medico'],
+					'total' => $row['total'],
+
+					'className' => $clases,
+
+					'tipoCita' => $row['estado'],
+					'estado' => $row['estado']
+
+				)
+			);
+		}
+
+		$arrData['datos'] = $arrListado;
+    	$arrData['paginate']['totalRows'] = $fCount['contador'];
+    	$arrData['message'] = '';
+    	$arrData['flag'] = 1;
+
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+
+	}
 	public function listar_citas()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
