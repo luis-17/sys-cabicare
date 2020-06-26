@@ -36,13 +36,17 @@ class Cita extends CI_Controller {
 		foreach ($lista as $row) {
 
 			if ( $row['estado'] == 1 ){
-				$clases = 'b-warning';
+				$clase = 'label-warning';
+				$estado = 'POR CONFIRMAR';
 			}elseif ( $row['estado'] == 2 ){
-				$clases = 'b-primary';
+				$clase = 'label-primary';
+				$estado = 'CONFIRMADO';
 			}elseif ( $row['estado'] == 3 ) {
-				$clases = 'b-success';
+				$clase = 'label-success';
+				$estado = 'ATENDIDO';
 			}else {
-				$clases = '';
+				$clase = '';
+				$estado = '';
 			}
 			array_push(
 				$arrListado,
@@ -64,10 +68,12 @@ class Cita extends CI_Controller {
 					'medico' => $row['medico'],
 					'total' => $row['total'],
 
-					'className' => $clases,
-
 					'tipoCita' => $row['estado'],
-					'estado' => $row['estado']
+					'estado' => array(
+						'string' => $estado,
+						'clase' =>$clase,
+						'bool' =>$row['estado']
+					)
 
 				)
 			);

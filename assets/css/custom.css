@@ -135,6 +135,9 @@ form.edit-form input, form.edit-form select {
 .text-primary{
   color: #428bca !important;
 }
+.label-primary {
+  background-color: #7266ba;
+}
 
 /* bug CSS grid */
 .ui-grid-canvas{

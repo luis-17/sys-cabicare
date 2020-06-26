@@ -302,6 +302,9 @@ app.controller('CitaCtrl',
 				{ field: 'paciente', name: 'paciente', displayName: 'Paciente', minWidth: 100 },
 				{ field: 'medico', name: 'medico', displayName: 'Médico', minWidth: 120 },
 				{ field: 'total', name: 'total', displayName: 'Total', minWidth: 100, width: 100 },
+				{ field: 'estado', type: 'object', name: 'estado', displayName: 'Estado', maxWidth: 200, enableFiltering: false,
+					cellTemplate: '<label style="box-shadow: 1px 1px 0 black; margin: 6px auto; display: block; width: 120px;" class="label {{ COL_FIELD.clase }} ">{{ COL_FIELD.string }}</label>'
+				}
 			],
 			onRegisterApi: function (gridApi) {
 				$scope.gridApi = gridApi;
