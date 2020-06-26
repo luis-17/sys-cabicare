@@ -38,6 +38,7 @@ class Model_cita extends CI_Model {
 		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
 		$this->db->join('usuario us', 'ci.medicoId = us.id','left');
 		$this->db->where('ci.estado <> ', 0);
+		$this->db->where('pa.estado', 1);
 		$this->db->where('ci.fechaCita BETWEEN ' . $desde .' AND ' . $hasta);
 
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
@@ -65,6 +66,7 @@ class Model_cita extends CI_Model {
 		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
 		$this->db->join('usuario us', 'ci.medicoId = us.id','left');
 		$this->db->where('ci.estado <> ', 0);
+		$this->db->where('pa.estado', 1);
 		$this->db->where('ci.fechaCita BETWEEN ' . $desde .' AND ' . $hasta);
 
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
@@ -108,6 +110,7 @@ class Model_cita extends CI_Model {
 		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
 		$this->db->join('usuario us', 'ci.medicoId = us.id','left');
 		$this->db->where('ci.estado <> ', 0);
+		$this->db->where('pa.estado', 1);
 		return $this->db->get()->result_array();
 	}
 	public function m_cargar_detalle_cita($datos)
