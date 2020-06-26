@@ -57,7 +57,8 @@
             </div>
 
             <div class="col-lg-12 col-md-12">
-              <div class="menu-dropdown" uib-dropdown style="position:absolute; top:{{event.posY}}px; left:{{event.posX}}px;"
+
+              <!-- <div class="menu-dropdown" uib-dropdown style="position:absolute; top:{{event.posY}}px; left:{{event.posX}}px;"
                 ng-mouseleave="closeMenu();">
                 <div class="my-dropdown">
                   <ul class="dropdown-menu dropdown-menu-custom" uib-dropdown-menu role="menu">
@@ -74,7 +75,7 @@
 
                   </ul>
                 </div>
-              </div>
+              </div> -->
 
               <div ui-calendar="uiConfig.calendar" ng-model="eventSources" class="calendar"  calendar="calendarCitas" ></div>
             </div>
@@ -125,7 +126,15 @@
 
               <div class="col-md-4 mt-lg">
                 <button
-                  class="btn m-b-xs btn-success btn-xs pull-right"
+                  class="btn  m-b-xs btn-default btn-xs pull-right"
+                  ng-click='btnExportarListaExcel()'
+                  title="Exportar a Excel"
+                >
+                  <i class="fa fa-file-excel-o text-success f-24"></i> Excel
+                </button>
+
+                <button
+                  class="btn m-b-xs btn-success btn-xs pull-right mr-sm"
                   ng-click="btnAgregarCita();"
                 >
                   <i class="fa fa-file-text"></i> Nuevo

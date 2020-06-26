@@ -29,6 +29,7 @@ class Model_cita extends CI_Model {
 			ci.observaciones,
 			ci.estado,
 			concat_ws(' ', pa.nombres, pa.apellidoPaterno, pa.apellidoMaterno) AS paciente,
+			pa.tipoDocumento,
 			pa.numeroDocumento,
 			ci.medicoId,
 			concat_ws(' ', us.nombres, us.apellidos) AS medico,
@@ -36,7 +37,7 @@ class Model_cita extends CI_Model {
 		$this->db->from('cita ci');
 		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
 		$this->db->join('usuario us', 'ci.medicoId = us.id','left');
-
+		$this->db->where('ci.estado <> ', 0);
 		$this->db->where('ci.fechaCita BETWEEN ' . $desde .' AND ' . $hasta);
 
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
@@ -63,7 +64,7 @@ class Model_cita extends CI_Model {
 		$this->db->from('cita ci');
 		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
 		$this->db->join('usuario us', 'ci.medicoId = us.id','left');
-
+		$this->db->where('ci.estado <> ', 0);
 		$this->db->where('ci.fechaCita BETWEEN ' . $desde .' AND ' . $hasta);
 
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
@@ -106,6 +107,7 @@ class Model_cita extends CI_Model {
 		$this->db->from('cita ci');
 		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
 		$this->db->join('usuario us', 'ci.medicoId = us.id','left');
+		$this->db->where('ci.estado <> ', 0);
 		return $this->db->get()->result_array();
 	}
 	public function m_cargar_detalle_cita($datos)
@@ -156,5 +158,14 @@ class Model_cita extends CI_Model {
 	{
 		$this->db->where('id',$id);
 		return $this->db->update('citaproducto', $data);
+	}
+	public function m_anular($datos)
+	{
+		$data = array(
+			'estado' => 0,
+			'updatedat' => date('Y-m-d H:i:s')
+		);
+		$this->db->where('id',$datos['idCita']);
+		return $this->db->update('cita', $data);
 	}
 }

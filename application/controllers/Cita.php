@@ -48,10 +48,11 @@ class Cita extends CI_Controller {
 				$arrListado,
 				array(
 					'id' => $row['id'],
-					'horaDesde' => $row['horaDesde'],
-					'horaHasta' => $row['horaHasta'],
+					'horaDesde' => darFormatoHora($row['horaDesde']),
+					'horaHasta' => darFormatoHora($row['horaHasta']),
 					'fechaCita' => darFormatoDMY($row['fechaCita']),
 					'fecha' => $row['fechaCita'],
+					'tipoDocumento' =>  $row['tipoDocumento'],
 					'numeroDocumento' =>  $row['numeroDocumento'],
 					'paciente' =>  $row['paciente'],
 					'peso' =>  $row['peso'],
@@ -346,8 +347,8 @@ class Cita extends CI_Controller {
 		$data = array(
 			'sedeId'				=> $allInputs['sede']['id'],
 			'fechaCita'				=> Date('Y-m-d',strtotime($allInputs['fecha'])),
-			'horaDesde' 			=> Date('H:i:s',$horadesde),
-			'horaHasta' 			=> Date('H:i:s',$horahasta),
+			'horaDesde' 			=> Date('H:i',$horadesde),
+			'horaHasta' 			=> Date('H:i',$horahasta),
 			'apuntesCita'			=> empty($allInputs['apuntesCita'])? NULL : $allInputs['apuntesCita'],
 			'medicoId'				=> empty($allInputs['medico']) ? NULL : $allInputs['medico']['id'],
 			'total'					=> $allInputs['total_a_pagar'],
@@ -412,8 +413,8 @@ class Cita extends CI_Controller {
 
 
 		$data = array(
-			'horaDesde' => date('H:i:s',strtotime($allInputs['event']['start'])),
-			'horaHasta' => date('H:i:s',strtotime($allInputs['event']['end'])),
+			'horaDesde' => date('H:i',strtotime($allInputs['event']['start'])),
+			'horaHasta' => date('H:i',strtotime($allInputs['event']['end'])),
 			'fechaCita' => date('Y-m-d',strtotime($allInputs['event']['start'])),
 			'updatedAt' => date('Y-m-d H:i:s')
 		);
@@ -425,6 +426,20 @@ class Cita extends CI_Controller {
 		}
 		$this->db->trans_complete();
 
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+	}
+	public function anular()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+
+		$arrData['message'] = 'No se pudo anular los datos';
+    	$arrData['flag'] = 0;
+		if( $this->model_cita->m_anular($allInputs) ){
+			$arrData['message'] = 'Se anularon los datos correctamente';
+    		$arrData['flag'] = 1;
+		}
 		$this->output
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));

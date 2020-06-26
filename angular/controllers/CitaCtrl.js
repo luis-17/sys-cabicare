@@ -9,6 +9,7 @@ app.controller('CitaCtrl',
 	'pinesNotifications',
 	'uiGridConstants',
 	'blockUI',
+	'ModalReporteFactory',
 	'ReservaCitasFactory',
 	'CitaServices',
 
@@ -23,6 +24,7 @@ app.controller('CitaCtrl',
 		pinesNotifications,
 		uiGridConstants,
 		blockUI,
+		ModalReporteFactory,
 		ReservaCitasFactory,
 		CitaServices
 
@@ -149,8 +151,33 @@ app.controller('CitaCtrl',
 			ReservaCitasFactory.editarCitaModal(arrParams);
 		}
 
+		$scope.btnAnular = function () {
+			var pMensaje = '¿Realmente desea anular el registro?';
+			$bootbox.confirm(pMensaje, function (result) {
+				if (result) {
+					var arrParams = {
+						idCita: $scope.mySelectionGrid[0].id
+					};
+					blockUI.start('Procesando información...');
+					CitaServices.sAnular(arrParams).then(function (rpta) {
+						if (rpta.flag == 1) {
+							var pTitle = 'OK!';
+							var pType = 'success';
+							$scope.metodos.getPaginationServerSide();
+						} else if (rpta.flag == 0) {
+							var pTitle = 'Error!';
+							var pType = 'danger';
+						} else {
+							alert('Error inesperado');
+						}
+						pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 2500 });
+						blockUI.stop();
+					});
+				}
+			});
+		}
 
-		/* CARGA DE DATOS */
+		/* CARGA DE DATOS DEL CALENDARIO*/
 		$scope.eventsF = function (start, end, timezone, callback) {
 
 			var events = [];
@@ -269,7 +296,9 @@ app.controller('CitaCtrl',
 			columnDefs: [
 				{ field: 'id', name: 'ci.id', displayName: 'ID', width: '75', sort: { direction: uiGridConstants.DESC } },
 				{ field: 'fechaCita', name: 'fechaCita', displayName: 'Fecha Cita', minWidth: 100, width: 100, enableFiltering: false },
-				{ field: 'numeroDocumento', name: 'numeroDocumento', displayName: 'Documento', minWidth: 90, width: 100 },
+				{ field: 'horaDesde', name: 'horaDesde', displayName: 'Hora Cita', minWidth: 100, width: 100, enableFiltering: false },
+				{ field: 'tipoDocumento', name: 'tipoDocumento', displayName: 'Tipo Doc.', minWidth: 90, width: 115 },
+				{ field: 'numeroDocumento', name: 'numeroDocumento', displayName: 'Nº Documento', minWidth: 90, width: 115 },
 				{ field: 'paciente', name: 'paciente', displayName: 'Paciente', minWidth: 100 },
 				{ field: 'medico', name: 'medico', displayName: 'Médico', minWidth: 120 },
 				{ field: 'total', name: 'total', displayName: 'Total', minWidth: 100, width: 100 },
@@ -303,11 +332,11 @@ app.controller('CitaCtrl',
 					paginationOptions.search = true;
 					paginationOptions.searchColumn = {
 						'ci.id': grid.columns[1].filters[0].term,
-						'ci.fechaCita': grid.columns[2].filters[0].term,
-						'pa.numeroDocumento': grid.columns[3].filters[0].term,
-						"concat_ws(' ', pa.nombres, pa.apellidoPaterno, pa.apellidoMaterno)": grid.columns[4].filters[0].term,
-						"concat_ws(' ', us.nombres, us.apellidos)": grid.columns[5].filters[0].term,
-						'ci.total': grid.columns[6].filters[0].term,
+						'pa.tipoDocumento': grid.columns[4].filters[0].term,
+						'pa.numeroDocumento': grid.columns[5].filters[0].term,
+						"concat_ws(' ', pa.nombres, pa.apellidoPaterno, pa.apellidoMaterno)": grid.columns[6].filters[0].term,
+						"concat_ws(' ', us.nombres, us.apellidos)": grid.columns[7].filters[0].term,
+						'ci.total': grid.columns[87].filters[0].term,
 
 					};
 					$scope.metodos.getPaginationServerSide();
@@ -336,6 +365,21 @@ app.controller('CitaCtrl',
 			$scope.mySelectionGrid = [];
 		};
 
+		$scope.btnExportarListaExcel = function () {
+			var arrParams = {
+				titulo: 'LISTADO DE ANALISIS',
+				datos: {
+					filtro: $scope.fBusqueda,
+					paginate: paginationOptions,
+					tituloAbv: 'LIST-CITA',
+					titulo: 'LISTADO DE CITAS',
+				},
+				salida: 'excel',
+				metodo: 'js'
+			}
+			arrParams.url = angular.patchURLCI + 'Reportes/listado_citas_excel',
+				ModalReporteFactory.getPopupReporte(arrParams);
+		}
 	}
 ]);
 
@@ -346,7 +390,8 @@ app.service("CitaServices", function ($http, $q, handleBehavior) {
 		sListarDetalleCita: sListarDetalleCita,
 		sRegistrar: sRegistrar,
 		sEditar: sEditar,
-		sMoverCita: sMoverCita
+		sMoverCita: sMoverCita,
+		sAnular: sAnular,
 	});
 
 	function sListarCitasGrilla(datos) {
@@ -393,6 +438,14 @@ app.service("CitaServices", function ($http, $q, handleBehavior) {
 		var request = $http({
 			method: "post",
 			url: angular.patchURLCI + "Cita/mover_cita",
+			data: datos
+		});
+		return (request.then(handleBehavior.success, handleBehavior.error));
+	}
+	function sAnular(datos) {
+		var request = $http({
+			method: "post",
+			url: angular.patchURLCI + "Cita/anular",
 			data: datos
 		});
 		return (request.then(handleBehavior.success, handleBehavior.error));

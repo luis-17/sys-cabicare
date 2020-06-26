@@ -28,7 +28,7 @@ angular.module('app')
           }).addClass('in');
         }, 100);
       };
-    } 
+    }
     return $window.bootbox;
   }])
   .factory('pinesNotifications', ['$window', function ($window) {
@@ -43,7 +43,7 @@ angular.module('app')
       },
     }
   }])
-  .factory("handleBehavior", function($bootbox,$location){ 
+  .factory("handleBehavior", function($bootbox,$location){
       var handleBehavior = {
         error: function (error) {
           return function () {
@@ -52,20 +52,20 @@ angular.module('app')
         },
         success: function (response) {
             //console.log('response.data',response.data);
-            if(response.data.flag == 'session_expired' && !($location.path() == '/access/login') ){ 
-              $bootbox.alert({ 
+            if(response.data.flag == 'session_expired' && !($location.path() == '/access/login') ){
+              $bootbox.alert({
                 title: "Mensaje del Sistema",
                 message: response.data.message,
-                buttons: { 
+                buttons: {
                   ok: {
                     label: 'INICIAR SESIÓN',
-                    className: 'btn-sm btn-primary' 
+                    className: 'btn-sm btn-primary'
                   }
                 },
                 callback: function () {
                   // console.log('click me', $location.path() );
                   $location.path('/access/login');
-                  // return false; 
+                  // return false;
                 }
               });
             }
@@ -76,7 +76,7 @@ angular.module('app')
   })
   .factory('MathFactory', function() {
     var interfaz = {
-        redondear: function (num, decimal) { 
+        redondear: function (num, decimal) {
           var decimal = decimal || 2;
           if (isNaN(num) || num === 0){
             return parseFloat(0);
@@ -87,12 +87,12 @@ angular.module('app')
       }
       return interfaz;
   })
-  .factory("ModalReporteFactory", function($uibModal,$http,blockUI){ 
+  .factory("ModalReporteFactory", function($uibModal,$http,blockUI){
     var interfazReporte = {
-      getPopupReporte: function(arrParams){ 
+      getPopupReporte: function(arrParams){
         if( arrParams.salida == 'pdf' || angular.isUndefined(arrParams.salida) ){
           $uibModal.open({
-            templateUrl: angular.patchURLCI+'Configuracion/ver_popup_reporte',
+            templateUrl: angular.patchURLCI+'Reportes/ver_popup_reporte',
             size: 'xlg',
             controller: function ($scope,$uibModalInstance,arrParams) {
               $scope.titleModalReporte = arrParams.titulo;
@@ -103,24 +103,24 @@ angular.module('app')
               $http.post(arrParams.url, arrParams.datos)
                 .success(function(data, status) {
                   blockUI.stop();
-                  $('#frameReporte').attr("src", data.urlTempPDF); 
+                  $('#frameReporte').attr("src", data.urlTempPDF);
                 })
                 .error(function(data, status){
                   blockUI.stop();
                 });
             },
-            resolve: { 
+            resolve: {
               arrParams: function() {
                 return arrParams;
               }
             }
           });
-        }else if( arrParams.datos.salida == 'excel' ){
+        }else if( arrParams.salida == 'excel' ){
           blockUI.start('Preparando reporte');
           $http.post(arrParams.url, arrParams.datos)
             .success(function(data, status) {
               blockUI.stop();
-              if(data.flag == 1){ 
+              if(data.flag == 1){
                 window.location = data.urlTempEXCEL;
               }
           });
@@ -128,4 +128,4 @@ angular.module('app')
       }
     }
     return interfazReporte;
-  }); 
+  });
