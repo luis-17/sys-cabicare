@@ -265,6 +265,7 @@
 </div>
 
 <div class="modal-footer">
+    <button class="btn btn-danger pull-left" ng-click="btnAnular(fData)" ng-if="fData.accion == 'edit' && bool">Anular</button>
     <button class="btn btn-primary" ng-click="aceptar(); $event.preventDefault();" ng-disabled="formCita.$invalid">Aceptar</button>
     <button class="btn btn-warning" ng-click="cancel()">Cerrar</button>
 </div>

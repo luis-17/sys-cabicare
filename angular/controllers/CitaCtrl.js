@@ -68,7 +68,7 @@ app.controller('CitaCtrl',
 		/* EVENTOS */
 		$scope.alertOnClick = function (event, jsEvent, view) {
 			console.log('event', event);
-			$scope.btnEditarCita(event);
+			$scope.btnEditarCita(event, true);
 
 		}
 		$scope.alertOnResize = function (event, delta) {
@@ -140,13 +140,14 @@ app.controller('CitaCtrl',
 			};
 			ReservaCitasFactory.agregarCitaModal(arrParams);
 		}
-		$scope.btnEditarCita = function (cita) {
+		$scope.btnEditarCita = function (cita, bool) {
 			console.log('Edita cita');
 			var arrParams = {
 				// 'start': start,
 				'cita': cita,
 				'fArr': $scope.fArr,
-				'metodos': $scope.metodos
+				'metodos': $scope.metodos,
+				'bool': bool
 			};
 			ReservaCitasFactory.editarCitaModal(arrParams);
 		}
@@ -991,7 +992,7 @@ app.factory("ReservaCitasFactory",
 				size: 'lg',
 				backdrop: 'static',
 				keyboard: false,
-				controller: function ($scope, $uibModalInstance, arrParams) {
+				controller: function ($scope, $uibModalInstance, arrParams, $bootbox) {
 					blockUI.stop();
 					$scope.fData = arrParams.cita;
 					$scope.Form = {}
@@ -1000,6 +1001,7 @@ app.factory("ReservaCitasFactory",
 					$scope.metodos = arrParams.metodos;
 					$scope.fData.eliminados = [];
 					$scope.fData.accion = 'edit';
+					$scope.bool = arrParams.bool;
 					$scope.titleForm = 'Edición de Cita';
 
 					$scope.fData.sede = $scope.fArr.listaSedes[0];
@@ -1329,6 +1331,33 @@ app.factory("ReservaCitasFactory",
 						});
 					}
 
+					$scope.btnAnular = function () {
+						console.log('fdata', $scope.fData);
+						var pMensaje = '¿Realmente desea anular el registro?';
+						$bootbox.confirm(pMensaje, function (result) {
+							if (result) {
+								var arrParams = {
+									idCita: $scope.fData.id
+								};
+								blockUI.start('Procesando información...');
+								CitaServices.sAnular(arrParams).then(function (rpta) {
+									if (rpta.flag == 1) {
+										var pTitle = 'OK!';
+										var pType = 'success';
+										$uibModalInstance.dismiss($scope.fData);
+										$scope.metodos.actualizarCalendario(true);
+									} else if (rpta.flag == 0) {
+										var pTitle = 'Error!';
+										var pType = 'danger';
+									} else {
+										alert('Error inesperado');
+									}
+									pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 2500 });
+									blockUI.stop();
+								});
+							}
+						});
+					}
 
 				},
 				resolve: {
