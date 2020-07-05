@@ -37,7 +37,7 @@ class Model_cita extends CI_Model {
 		$this->db->from('cita ci');
 		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
 		$this->db->join('usuario us', 'ci.medicoId = us.id','left');
-		$this->db->where('ci.estado <> ', 0);
+		// $this->db->where('ci.estado <> ', 0);
 		$this->db->where('pa.estado', 1);
 		$this->db->where('ci.fechaCita BETWEEN ' . $desde .' AND ' . $hasta);
 
@@ -65,7 +65,7 @@ class Model_cita extends CI_Model {
 		$this->db->from('cita ci');
 		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
 		$this->db->join('usuario us', 'ci.medicoId = us.id','left');
-		$this->db->where('ci.estado <> ', 0);
+		// $this->db->where('ci.estado <> ', 0);
 		$this->db->where('pa.estado', 1);
 		$this->db->where('ci.fechaCita BETWEEN ' . $desde .' AND ' . $hasta);
 

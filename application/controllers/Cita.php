@@ -44,6 +44,9 @@ class Cita extends CI_Controller {
 			}elseif ( $row['estado'] == 3 ) {
 				$clase = 'label-success';
 				$estado = 'ATENDIDO';
+			}elseif ( $row['estado'] == 0 ) {
+				$clase = 'label-default';
+				$estado = 'ANULADO';
 			}else {
 				$clase = '';
 				$estado = '';
