@@ -1,0 +1,157 @@
+<div class="" ng-controller="AtencionMedicaCtrl" style="background-color: rgba(255,255,255,0.85);">
+	<div class="bg-light lter b-b wrapper-md">
+	  <h1 class="m-n font-thin h3"> Atención Médica </h1>
+	</div>
+	<div class="nav-tabs-alt" >
+    <ul class="nav nav-tabs nav-justified">
+      <li class="active">
+        <a data-target="#calendario" role="tab" data-toggle="tab"> VISTA DE CALENDARIO </a>
+      </li>
+      <li >
+        <a data-target="#lista" role="tab" data-toggle="tab" ng-click="metodos.getPaginationServerSide(true);"> VISTA DE LISTA </a>
+      </li>
+    </ul>
+  </div>
+  <div class="row-row">
+    <div class="cell scrollable hover">
+      <div class="cell-inner">
+        <div class="tab-content">
+          <!-- calendario -->
+          <div class="tab-pane active" id="calendario">
+            <div class="col-lg-12 col-md-12 mt-lg">
+              <div class="row">
+
+                <div class="pull-left ml-md mr-xs mb-xs" style="width: 120px;">
+                  <span style="font-size: 0.8em;">CITA CONFIRMADA</span>
+                  <div class="bg-primary" style="width:100%; height: 15px;"></div>
+                </div>
+
+                <div class="pull-left" style="width: 120px;">
+                  <span style="font-size: 0.8em;">CITA ATENDIDA</span>
+                  <div class="bg-success" style="width:100%; height: 15px;"></div>
+                </div>
+
+
+
+                <div class="col-lg-5 col-md-5 col-sm-12 col-xs-12 pull-right" style="text-align: right;">
+                  <button type="button" class="btn btn-sm btn-default" ng-click="today()">Hoy</button>
+                  <div class="btn-group">
+                    <button class="btn btn-default btn-sm" ng-click="changeView('agendaDay', 'calendarCitas')">Dia</button>
+                    <button class="btn btn-default btn-sm" ng-click="changeView('agendaWeek', 'calendarCitas')">Semana</button>
+                    <button class="btn btn-default btn-sm" ng-click="changeView('month', 'calendarCitas')">Mes</button>
+                  </div>
+
+
+                  <button type="button" class="btn btn-info btn-sm" ng-click='metodos.actualizarCalendario(true);'>
+                    <i class="fa fa-refresh"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-12 col-md-12">
+
+              <div class="menu-dropdown" uib-dropdown style="position:absolute; top:{{event.posY}}px; left:{{event.posX}}px;"
+                ng-mouseleave="closeMenu();">
+                <div class="my-dropdown">
+                  <ul class="dropdown-menu dropdown-menu-custom" uib-dropdown-menu role="menu">
+
+
+                    <li role="menuitem" ng-if="!event.atencion.idatencion" ng-click="btnEditCita(event)">
+                      <a><i class="fa fa-calendar"></i>Atender Cita</a>
+                    </li>
+                    <li role="menuitem" ng-if="!event.atencion.idatencion" ng-click="btnAnular(event)">
+                      <a><i class="fa fa-remove"></i>Anular Cita</a>
+                    </li>
+
+                  </ul>
+                </div>
+              </div>
+
+              <div ui-calendar="uiConfig.calendar" ng-model="eventSources" class="calendar"  calendar="calendarCitas" ></div>
+            </div>
+
+
+          </div>
+          <!-- Lista -->
+          <div class="tab-pane wrapper-md" id="lista">
+            <div class="row">
+              <div class="col-xs-12 col-md-1 mt-lg">
+                <button class="btn m-b-xs btn-info pull-left btn-xs" ng-click="btnBuscar();">
+                  <i class="fa fa-search"> </i> Buscar </button>
+              </div>
+              <div class="form-group col-md-7 p-n">
+                <div class="pull-left mr-sm">
+                  <label> Desde </label>
+                  <div class="input-group col-xs-12">
+                    <input
+                      type="text"
+                      ng-model="fBusqueda.fechaDesde"
+                      class="form-control input-xs mask"
+                      style="max-width: 80px;"
+                      data-inputmask="'alias': 'dd-mm-yyyy'"
+                    />
+                  </div>
+                </div>
+
+                <div class="pull-left mr-sm">
+                  <label> Hasta </label>
+                  <div class="input-group col-xs-12">
+                    <input
+                      type="text"
+                      ng-model="fBusqueda.fechaHasta"
+                      class="form-control input-xs mask"
+                      style="max-width: 80px;"
+                      data-inputmask="'alias': 'dd-mm-yyyy'"
+                    />
+                  </div>
+                </div>
+
+                <div class="input-group mt-lg pull-left">
+                  <button type="button" class="btn btn-info btn-xs" ng-click="metodos.getPaginationServerSide(true);">
+                    <i class="fa fa-refresh"></i> PROCESAR
+                  </button>
+                </div>
+
+              </div>
+
+              <div class="col-md-4 mt-lg">
+                <button
+                  class="btn  m-b-xs btn-default btn-xs pull-right"
+                  ng-click='btnExportarListaExcel()'
+                  title="Exportar a Excel"
+                >
+                  <i class="fa fa-file-excel-o text-success f-24"></i> Excel
+                </button>
+
+
+                <button
+                  ng-if="mySelectionGrid.length == 1"
+                  class="btn m-b-xs btn-warning btn-xs pull-right mr-sm"
+                  ng-click="btnEditarCita(mySelectionGrid[0],false);"
+                >
+                  <i class="fa fa-edit"></i> Editar
+                </button>
+
+                <button
+                  ng-if="mySelectionGrid.length == 1"
+                  class="btn m-b-xs btn-danger btn-xs pull-right mr-sm"
+                  ng-click="btnAnular();"
+                >
+                  <i class="fa fa-trash-o"></i> Anular
+                </button>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-xs-12">
+                <div ui-grid="gridOptions" ui-grid-pagination ui-grid-selection ui-grid-resize-columns ui-grid-auto-resize
+                  class="grid table-responsive fs-mini-grid"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
