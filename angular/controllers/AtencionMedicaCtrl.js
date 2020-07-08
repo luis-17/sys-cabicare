@@ -10,7 +10,7 @@ app.controller('AtencionMedicaCtrl',
 	'uiGridConstants',
 	'blockUI',
 	'ModalReporteFactory',
-	'ReservaCitasFactory',
+	'AtencionMedicaFactory',
 	'CitaServices',
 
 	function (
@@ -25,7 +25,7 @@ app.controller('AtencionMedicaCtrl',
 		uiGridConstants,
 		blockUI,
 		ModalReporteFactory,
-		ReservaCitasFactory,
+		AtencionMedicaFactory,
 		CitaServices
 
 	) {
@@ -68,7 +68,7 @@ app.controller('AtencionMedicaCtrl',
 		/* EVENTOS */
 		$scope.menu = angular.element('.menu-dropdown');
 		$scope.alertOnClick = function (event, jsEvent, view) {
-			console.log('event 2', event);
+
 			// $scope.btnEditarCita(event, true);
 			$scope.event = event;
 			//console.log(jsEvent);
@@ -79,9 +79,14 @@ app.controller('AtencionMedicaCtrl',
 			var left = wrap.offset().left - cal.offset().left;
 			var right = cal.width() - (wrap.offset().left - cal.offset().left + wrap.width());
 			if (right > $scope.menu.width()) {
+				console.log('right');
 				$scope.menu.addClass('left');
 			} else if (left > $scope.menu.width()) {
 				$scope.menu.addClass('right');
+				console.log('left');
+			}else{
+				console.log('ninguno');
+
 			}
 
 			/* console.log('cal.offset().bottom',cal.offset().bottom);
@@ -168,7 +173,7 @@ app.controller('AtencionMedicaCtrl',
 				'metodos': $scope.metodos,
 				'bool': bool
 			};
-			ReservaCitasFactory.editarCitaModal(arrParams);
+			AtencionMedicaFactory.editarCitaModal(arrParams);
 		}
 
 		$scope.btnAnular = function () {
@@ -475,7 +480,7 @@ app.service("CitaServices", function ($http, $q, handleBehavior) {
 	}
 });
 
-app.factory("ReservaCitasFactory",
+app.factory("AtencionMedicaFactory",
 	function (
 		$uibModal,
 		pinesNotifications,

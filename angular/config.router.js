@@ -102,6 +102,18 @@ angular.module('app')
               'angular/controllers/UsuarioCtrl.js',
             ])
           })
+          .state('app.registrar-atencion', {
+            url: '/registrar-atencion',
+            templateUrl: 'tpl/registrar-atencion.html',
+
+            resolve: load([
+              // 'angular/controllers/ReservaCitaCtrl.js'
+              'angular/controllers/AtencionMedicaCtrl.js',
+              'angular/controllers/ProductoCtrl.js',
+              'angular/controllers/PacienteCtrl.js',
+              'angular/controllers/UsuarioCtrl.js',
+            ])
+          })
           ;
 
         function load(srcs, callback) {
