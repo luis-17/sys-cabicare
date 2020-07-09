@@ -159,6 +159,21 @@ class Cita extends CI_Controller {
 		    ->set_output(json_encode($arrData));
 	}
 
+	public function listar_cita_por_id()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$rowPaciente = $this->model_cita->m_cargar_cita_por_id($allInputs);
+		$rowPaciente['edad'] = devolverEdad($rowPaciente['fechaNacimiento']) . ' años';
+
+
+		$arrData['datos'] = $rowPaciente;
+    	$arrData['message'] = '';
+    	$arrData['flag'] = 1;
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+	}
+
 	/**
 	 * Método que lista los productos de una cita.
 	 * Vista Calendario

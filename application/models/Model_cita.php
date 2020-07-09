@@ -132,6 +132,46 @@ class Model_cita extends CI_Model {
 		$this->db->order_by('cp.id', 'ASC');
 		return $this->db->get()->result_array();
 	}
+
+	public function m_cargar_cita_por_id($datos){
+		$this->db->select("
+			ci.id,
+			ci.pacienteId,
+			ci.usuarioId,
+			ci.sedeId,
+			ci.fechaAtencion,
+			ci.fechaCita,
+			ci.horaDesde,
+			ci.horaHasta,
+			ci.apuntesCita,
+			ci.total,
+			ci.peso,
+			ci.talla,
+			ci.imc,
+			ci.presionArterual,
+			ci.frecuenciaCardiaca,
+			ci.temperaturaCorporal,
+			ci.perimetroAbdominal,
+			ci.observaciones,
+			ci.estado,
+			concat_ws(' ', pa.nombres, pa.apellidoPaterno, pa.apellidoMaterno) AS paciente,
+			pa.tipoDocumento,
+			pa.numeroDocumento,
+			pa.sexo,
+			pa.fechaNacimiento,
+			ci.medicoId,
+			concat_ws(' ', us.nombres, us.apellidos) AS medico,
+		", FALSE);
+		$this->db->from('cita ci');
+		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
+		$this->db->join('usuario us', 'ci.medicoId = us.id','left');
+		$this->db->where('ci.estado <> ', 0);
+		$this->db->where('pa.estado', 1);
+		$this->db->where('ci.id', $datos['id']);
+		$this->db->limit('1');
+		return $this->db->get()->row_array();
+	}
+
 	public function m_registrar($data)
 	{
 		$this->db->insert('cita', $data);

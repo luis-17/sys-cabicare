@@ -103,11 +103,15 @@ app.controller('AtencionMedicaCtrl',
 				$scope.event.posY = 620;
 			}
 		}
+		$scope.closeMenu = function () {
+			$scope.menu.removeClass('open');
+		}
 		$scope.alertOnResize = function (event, delta) {
 			angular.element('.calendar').fullCalendar('refetchEvents');
 		};
 
 		$scope.selectCell = function (date, end, jsEvent, view) {
+			$scope.closeMenu();
 			var typeView = angular.element('.calendar').fullCalendar('getView');
 			if (typeView.type == 'month') {
 				angular.element('.calendar').fullCalendar('gotoDate', date);

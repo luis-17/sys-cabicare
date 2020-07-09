@@ -92,7 +92,7 @@ angular.module('app')
           })
           .state('app.atencion-medica', {
             url: '/atencion-medica',
-            templateUrl: 'tpl/atencion-medica.html',
+            templateUrl: 'tpl/atencion-medica2.html',
 
             resolve: load([
               // 'angular/controllers/ReservaCitaCtrl.js'
@@ -103,15 +103,11 @@ angular.module('app')
             ])
           })
           .state('app.registrar-atencion', {
-            url: '/registrar-atencion',
+            url: '/registrar-atencion/{id}',
             templateUrl: 'tpl/registrar-atencion.html',
 
             resolve: load([
-              // 'angular/controllers/ReservaCitaCtrl.js'
-              'angular/controllers/AtencionMedicaCtrl.js',
-              'angular/controllers/ProductoCtrl.js',
-              'angular/controllers/PacienteCtrl.js',
-              'angular/controllers/UsuarioCtrl.js',
+              'angular/controllers/RegistroAtencionCtrl.js'
             ])
           })
           ;

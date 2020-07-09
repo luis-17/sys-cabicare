@@ -55,7 +55,7 @@
                 ng-mouseleave="closeMenu();">
                 <div class="my-dropdown">
                   <ul class="dropdown-menu dropdown-menu-custom" uib-dropdown-menu role="menu">
-                    <li role="menuitem" ng-if="event.id" ng-click="goToUrl('/registrar-atencion/' + event.id)">
+                    <li role="menuitem" ng-if="event.id" ng-click="goToUrl('/app/registrar-atencion/' + event.id)">
                       <a><i class="fa fa-calendar"></i>Atender Cita</a>
                     </li>
                     <li role="menuitem" ng-if="event.id" ng-click="btnAnular(event)">

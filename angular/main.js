@@ -1,4 +1,4 @@
-'use strict'; 
+'use strict';
 if (!window.location.origin) {
   window.location.origin = window.location.protocol+"//"+window.location.host;
 }
@@ -16,12 +16,12 @@ function handleSuccess( response ) {
     return( response.data );
 }
 
-/* Controllers */ 
+/* Controllers */
 angular.module('app')
-  .controller('AppCtrl', ['$scope', '$translate', '$localStorage', '$location', '$window',  '$timeout', 'rootServices',  'blockUI', 'pinesNotifications', 
-      '$state', 
-    function(              $scope,   $translate,   $localStorage,   $location,   $window,    $timeout,   rootServices,    blockUI ,  pinesNotifications   
-        ,$state) { 
+  .controller('AppCtrl', ['$scope', '$translate', '$localStorage', '$location', '$window',  '$timeout', 'rootServices',  'blockUI', 'pinesNotifications',
+      '$state',
+    function(              $scope,   $translate,   $localStorage,   $location,   $window,    $timeout,   rootServices,    blockUI ,  pinesNotifications
+        ,$state) {
       // add 'ie' classes to html
       console.log('load me AppCtrl');
       var isIE = !!navigator.userAgent.match(/MSIE/i);
@@ -55,13 +55,14 @@ angular.module('app')
           container: false
         }
       }
-      $scope.reloadPage = function() { 
+      $scope.reloadPage = function() {
         $state.reload();
       }
-      $scope.goToUrl = function(param) { 
+      $scope.goToUrl = function(param) {
+        console.log('Ir a : ', param);
         $location.path(param); // Ejm: '/access/login'
       }
-      $scope.listaEmpresaAdminSession = []; 
+      $scope.listaEmpresaAdminSession = [];
       // save settings to local storage
       if ( angular.isDefined($localStorage.settings) ) {
         $scope.app.settings = $localStorage.settings;
@@ -83,7 +84,7 @@ angular.module('app')
       $scope.lang = { isopen: false };
       $scope.langs = {es_SP:'Spanish', en:'English', de_DE:'German', it_IT:'Italian'};
       $scope.selectLang = $scope.langs[$translate.proposedLanguage()] || "Spanish";
-      $scope.setLang = function(langKey, $event) { 
+      $scope.setLang = function(langKey, $event) {
         // set the current lang
         $scope.selectLang = $scope.langs[langKey];
         // You can change the language during runtime
@@ -112,25 +113,25 @@ angular.module('app')
       });
       $scope.isLoggedIn = false;
       $scope.logOut = function() {
-        $scope.isLoggedIn = false; 
+        $scope.isLoggedIn = false;
       }
 
       $scope.logIn = function() {
         $scope.isLoggedIn = true;
       };
-      // $scope.getListaEmpresasSession = function(){ 
-      //   $timeout(function() { 
-      //     rootServices.sListarEmpresaAdminSession().then(function (rpta) { 
-      //       $scope.arrMain.listaEmpresaAdminSession = rpta.datos; 
-      //       var objIndex = $scope.arrMain.listaEmpresaAdminSession.filter(function(obj) { 
+      // $scope.getListaEmpresasSession = function(){
+      //   $timeout(function() {
+      //     rootServices.sListarEmpresaAdminSession().then(function (rpta) {
+      //       $scope.arrMain.listaEmpresaAdminSession = rpta.datos;
+      //       var objIndex = $scope.arrMain.listaEmpresaAdminSession.filter(function(obj) {
       //         return obj.idempresaadmin == $scope.fSessionCI.idempresaadmin;
-      //       }).shift(); 
-      //       $scope.arrMain.empresaadmin = objIndex; 
+      //       }).shift();
+      //       $scope.arrMain.empresaadmin = objIndex;
       //     });
       //   }, 50);
       // }
-      $scope.getValidateSession = function () { 
-        rootServices.sGetSessionCI().then(function (response) { 
+      $scope.getValidateSession = function () {
+        rootServices.sGetSessionCI().then(function (response) {
           if(response.flag == 1){
             $scope.fSessionCI = response.datos;
             console.log('$scope.fSessionCI ==>', $scope.fSessionCI);
@@ -146,7 +147,7 @@ angular.module('app')
             // $scope.getListaEmpresasSession();
             $scope.logIn();
             // $scope.CargaMenu();
-            if( $location.path() == '/access/login' ){ 
+            if( $location.path() == '/access/login' ){
               $location.path('/');
             }else{
               $scope.reloadPage();
@@ -155,26 +156,26 @@ angular.module('app')
             $scope.fSessionCI = {};
             $scope.fConfigSys = {};
             $scope.logOut();
-            $location.path('/access/login'); 
-            return false; 
+            $location.path('/access/login');
+            return false;
           }
         });
       }
       // $scope.getConfiguracionSys = function() {
-      //   rootServices.sGetConfiguracionSys().then(function (response) { 
+      //   rootServices.sGetConfiguracionSys().then(function (response) {
       //     if(response.flag == 1){
       //       $scope.fConfigSys = response.datos;
       //     }else{
       //       $scope.fSessionCI = {};
       //       $scope.fConfigSys = {};
       //       $scope.logOut();
-      //       $location.path('/access/login'); 
-      //       return false; 
+      //       $location.path('/access/login');
+      //       return false;
       //     }
-      //   }); 
+      //   });
       // }
       // $scope.onChangeEmpresaSession = function() {
-      //   var arrData = { 
+      //   var arrData = {
       //     'datos' : $scope.arrMain.empresaadmin,
       //     'session' : $scope.fSessionCI
       //   }
@@ -194,7 +195,7 @@ angular.module('app')
       //     pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 2000 });
       //   });
       // }
-      $scope.btnLogoutToSystem = function () { 
+      $scope.btnLogoutToSystem = function () {
         blockUI.start('Cerrando sesión...');
         rootServices.sLogoutSessionCI().then(function () {
           blockUI.stop();
@@ -205,21 +206,21 @@ angular.module('app')
           $scope.logOut();
           $location.path('/access/login');
         });
-      } 
+      }
       $timeout(function() {
         $scope.getValidateSession();
         // $scope.getConfiguracionSys();
       }, 400);
-      
+
   }])
-  .service('rootServices', function($http, $q, handleBehavior) { 
+  .service('rootServices', function($http, $q, handleBehavior) {
     return({
         sLogoutSessionCI: sLogoutSessionCI,
         sGetSessionCI: sGetSessionCI,
         // sGetConfiguracionSys : sGetConfiguracionSys,
-        // sListarEmpresaAdminSession: sListarEmpresaAdminSession, 
+        // sListarEmpresaAdminSession: sListarEmpresaAdminSession,
         // sCambiarEmpresaSession: sCambiarEmpresaSession,
-        sLoginToSystem: sLoginToSystem 
+        sLoginToSystem: sLoginToSystem
     });
     function sLogoutSessionCI(pDatos) {
       var datos = pDatos || {};
@@ -251,7 +252,7 @@ angular.module('app')
     // function sListarEmpresaAdminSession(datos) {
     //   var request = $http({
     //         method : "post",
-    //         url : angular.patchURLCI+"Acceso/lista_empresa_admin_session", 
+    //         url : angular.patchURLCI+"Acceso/lista_empresa_admin_session",
     //         data : datos
     //   });
     //   return (request.then(handleBehavior.success,handleBehavior.error));
@@ -259,18 +260,18 @@ angular.module('app')
     // function sCambiarEmpresaSession(datos) {
     //   var request = $http({
     //         method : "post",
-    //         url : angular.patchURLCI+"Acceso/cambiar_empresa_admin_session", 
+    //         url : angular.patchURLCI+"Acceso/cambiar_empresa_admin_session",
     //         data : datos
     //   });
     //   return (request.then(handleBehavior.success,handleBehavior.error));
     // }
-    function sLoginToSystem(datos) { 
+    function sLoginToSystem(datos) {
       var request = $http({
             method : "post",
-            url : angular.patchURLCI+"Acceso/", 
+            url : angular.patchURLCI+"Acceso/",
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
     }
-    
+
   });
