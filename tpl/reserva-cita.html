@@ -8,7 +8,7 @@
         <a data-target="#calendario" role="tab" data-toggle="tab"> VISTA DE CALENDARIO </a>
       </li>
       <li >
-        <a data-target="#lista" role="tab" data-toggle="tab" ng-click="metodos.getPaginationServerSide(true);"> VISTA DE LISTA </a>
+        <a data-target="#lista" role="tab" data-toggle="tab"> VISTA DE LISTA </a>
       </li>
     </ul>
   </div>
@@ -89,7 +89,7 @@
                 <button class="btn m-b-xs btn-info pull-left btn-xs" ng-click="btnBuscar();">
                   <i class="fa fa-search"> </i> Buscar </button>
               </div>
-              <div class="form-group col-md-7 p-n">
+              <div class="form-group col-md-4 p-n">
                 <div class="pull-left mr-sm">
                   <label> Desde </label>
                   <div class="input-group col-xs-12">
@@ -124,7 +124,7 @@
 
               </div>
 
-              <div class="col-md-4 mt-lg">
+              <div class="col-md-7 mt-lg">
                 <button
                   class="btn  m-b-xs btn-default btn-xs pull-right"
                   ng-click='btnExportarListaExcel()'
@@ -146,6 +146,14 @@
                   ng-click="btnEditarCita(mySelectionGrid[0],false);"
                 >
                   <i class="fa fa-edit"></i> Editar
+                </button>
+
+                <button
+                  ng-if="mySelectionGrid.length == 1"
+                  class="btn m-b-xs btn-warning btn-xs pull-right mr-sm"
+                  ng-click="btnMetodoPago(mySelectionGrid[0]);"
+                >
+                  <i class="fa fa-money-o"></i> Método de Pago
                 </button>
 
                 <button

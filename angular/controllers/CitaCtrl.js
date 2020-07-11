@@ -55,6 +55,19 @@ app.controller('CitaCtrl',
 			{ id: '0', descripcion: '--Seleccione sexo--' },
 			{ id: 'M', descripcion: 'MASCULINO' },
 			{ id: 'F', descripcion: 'FEMENINO' }
+    ];
+    $scope.fArr.listaMedioContacto = [
+			{ id: '', descripcion: '--Seleccione medio de contacto--' },
+			{ id: 'MEDIO DE CONTACTO 1', descripcion: 'MEDIO DE CONTACTO 1' },
+			{ id: 'MEDIO DE CONTACTO 2', descripcion: 'MEDIO DE CONTACTO 2' }
+    ];
+    $scope.fArr.listaMetodoPago = [
+			{ id: '', descripcion: '--Seleccione método de pago--' },
+			{ id: 'EFECTIVO', descripcion: 'EFECTIVO' },
+			{ id: 'TARJETA DE DÉBITO', descripcion: 'TARJETA DE DÉBITO' },
+			{ id: 'TARJETA DE CRÉDITO', descripcion: 'TARJETA DE CRÉDITO' },
+			{ id: 'TRANSFERENCIA', descripcion: 'TRANSFERENCIA' },
+			{ id: 'SEGURO', descripcion: 'SEGURO' }
 		];
 		$scope.fArr.listaOperadores = [
 			{ id: '0', descripcion: '--Seleccione operador--' },
@@ -150,7 +163,17 @@ app.controller('CitaCtrl',
 				'bool': bool
 			};
 			ReservaCitasFactory.editarCitaModal(arrParams);
-		}
+    }
+    $scope.btnMetodoPago = function (cita) {
+			console.log('ver metodo de pago');
+			var arrParams = {
+				// 'start': start,
+				'cita': cita,
+				'fArr': $scope.fArr,
+				'metodos': $scope.metodos
+			};
+			ReservaCitasFactory.verMetodoPago(arrParams);
+    }
 
 		$scope.btnAnular = function () {
 			var pMensaje = '¿Realmente desea anular el registro?';
@@ -298,11 +321,17 @@ app.controller('CitaCtrl',
 				{ field: 'id', name: 'ci.id', displayName: 'ID', width: '75', sort: { direction: uiGridConstants.DESC } },
 				{ field: 'fechaCita', name: 'fechaCita', displayName: 'Fecha Cita', minWidth: 100, width: 100, enableFiltering: false },
 				{ field: 'horaDesde', name: 'horaDesde', displayName: 'Hora Cita', minWidth: 100, width: 100, enableFiltering: false },
-				{ field: 'tipoDocumento', name: 'tipoDocumento', displayName: 'Tipo Doc.', minWidth: 90, width: 115 },
+				{ field: 'tipoDocumento', name: 'tipoDocumento', displayName: 'Tipo Doc.', minWidth: 80, width: 80, visible: false },
 				{ field: 'numeroDocumento', name: 'numeroDocumento', displayName: 'Nº Documento', minWidth: 90, width: 115 },
 				{ field: 'paciente', name: 'paciente', displayName: 'Paciente', minWidth: 100 },
-				{ field: 'medico', name: 'medico', displayName: 'Médico', minWidth: 120 },
-				{ field: 'total', name: 'total', displayName: 'Total', minWidth: 100, width: 100 },
+        // { field: 'medico', name: 'medico', displayName: 'Médico', minWidth: 120 },
+        { field: 'medico', name: 'medico', width: 130,
+          cellTemplate:'<div class="ui-grid-cell-contents text-left ">'+ '{{ COL_FIELD.medico }}</div>',  displayName: 'Médico' },
+        { field: 'total', name: 'total', displayName: 'Total', minWidth: 100, width: 100 },
+        { field: 'medioContacto', name: 'ci.medioContacto', width: 160, visible: false,
+          cellTemplate:'<div class="ui-grid-cell-contents text-left ">'+ '{{ COL_FIELD.descripcion }}</div>',  displayName: 'Medio Contacto' },
+        { field: 'metodoPago', name: 'ci.metodoPago', width: 160, visible: false,
+          cellTemplate:'<div class="ui-grid-cell-contents text-left ">'+ '{{ COL_FIELD.descripcion }}</div>',  displayName: 'Método de Pago' },
 				{ field: 'estado', type: 'object', name: 'estado', displayName: 'Estado', maxWidth: 200, enableFiltering: false,
 					cellTemplate: '<label style="box-shadow: 1px 1px 0 black; margin: 6px auto; display: block; width: 120px;" class="label {{ COL_FIELD.clase }} ">{{ COL_FIELD.string }}</label>'
 				}
@@ -394,7 +423,8 @@ app.service("CitaServices", function ($http, $q, handleBehavior) {
 		sListarDetalleCita: sListarDetalleCita,
 		sRegistrar: sRegistrar,
 		sEditar: sEditar,
-		sMoverCita: sMoverCita,
+    sMoverCita: sMoverCita,
+    sAgregarMetodoPago: sAgregarMetodoPago,
 		sAnular: sAnular,
 	});
 
@@ -445,7 +475,15 @@ app.service("CitaServices", function ($http, $q, handleBehavior) {
 			data: datos
 		});
 		return (request.then(handleBehavior.success, handleBehavior.error));
-	}
+  }
+  function sAgregarMetodoPago(datos) {
+    var request = $http({
+			method: "post",
+			url: angular.patchURLCI + "Cita/agregar_metodo_pago",
+			data: datos
+		});
+		return (request.then(handleBehavior.success, handleBehavior.error));
+  }
 	function sAnular(datos) {
 		var request = $http({
 			method: "post",
@@ -631,7 +669,7 @@ app.factory("ReservaCitasFactory",
 
 					$scope.titleForm = 'Registro de Cita';
 					// $scope.fArr.listaTipoCita.splice(0, 0, { id: "", descripcion: '--Seleccione tipo cita--' });
-					// $scope.fData.tipoCita = $scope.fArr.listaTipoCita[0];
+					$scope.fData.medioContacto = $scope.fArr.listaMedioContacto[0];
 
 					$scope.fData.sede = $scope.fArr.listaSedes[0];
 
@@ -1005,7 +1043,11 @@ app.factory("ReservaCitasFactory",
 					$scope.titleForm = 'Edición de Cita';
 
 					$scope.fData.sede = $scope.fArr.listaSedes[0];
-
+          //BINDEO MEDIO CONTACTO
+          var objIndexCp = $scope.fArr.listaMedioContacto.filter(function(obj) {
+            return obj.id == $scope.fData.medioContacto.id;
+          }).shift();
+          $scope.fData.medioContacto = objIndexCp;
 
 					/* DATEPICKERS */
 					$scope.configDP = {};
@@ -1366,7 +1408,78 @@ app.factory("ReservaCitasFactory",
 					}
 				}
 			});
-		}
+    },
+    verMetodoPago: function (arrParams) {
+      blockUI.start('Abriendo formulario...');
+			$uibModal.open({
+				templateUrl: angular.patchURLCI + 'Cita/ver_popup_form_metodo_pago',
+				size: 'md',
+				backdrop: 'static',
+				keyboard: false,
+				controller: function ($scope, $uibModalInstance, arrParams) {
+					blockUI.stop();
+          // $scope.fData = {};
+          console.log('arrParams ===>', arrParams)
+          $scope.fDataMP = arrParams.cita;
+          console.log('$scope.fDataMP ==>', $scope.fDataMP);
+					// $scope.Form = {}
+					// $scope.fData.temporal = {};
+					$scope.fArr = arrParams.fArr;
+					$scope.metodos = arrParams.metodos;
+					$scope.fDataMP.accion = 'edit';
+
+					$scope.titleForm = 'Método de Pago';
+					// $scope.fArr.listaTipoCita.splice(0, 0, { id: "", descripcion: '--Seleccione tipo cita--' });
+					// $scope.fData.medioContacto = $scope.fArr.listaMedioContacto[0];
+
+					// $scope.fData.sede = $scope.fArr.listaSedes[0];
+
+          //BINDEO METODO PAGO
+          var objIndexMp = $scope.fArr.listaMetodoPago.filter(function(obj) {
+            return obj.id == $scope.fDataMP.metodoPago.id;
+          }).shift();
+          $scope.fDataMP.metodoPago = objIndexMp;
+          if ( !$scope.fDataMP.metodoPago ) {
+            $scope.fDataMP.metodoPago = $scope.fArr.listaMetodoPago[0];
+          }
+
+					/* BOTONES FINALES */
+					$scope.cancel = function () {
+						$uibModalInstance.dismiss('cancel');
+					}
+
+					$scope.aceptar = function(){
+						blockUI.start("Agregando método de pago");
+						CitaServices.sAgregarMetodoPago($scope.fDataMP).then(function(rpta){
+							if (rpta.flag === 1) {
+								var pTitle = 'OK!';
+								var pType = 'success';
+								$uibModalInstance.dismiss($scope.fDataMP);
+                // $scope.metodos.actualizarCalendario(true);
+                $scope.metodos.getPaginationServerSide();
+							} else {
+								var pTitle = 'Advertencia!';
+								var pType = 'warning';
+							}
+							blockUI.stop();
+							pinesNotifications.notify({
+								title: pTitle,
+								text: rpta.message,
+								type: pType,
+								delay: 5000
+							});
+						});
+					}
+
+
+				},
+				resolve: {
+					arrParams: function () {
+						return arrParams;
+					}
+				}
+			});
+    }
 	}
 
 	return interfaz;

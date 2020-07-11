@@ -43,21 +43,12 @@
 
 				<div class="form-group col-md-3" ng-class="{'has-error': Form.formCita.tipoCita.$invalid}">
 					<label for="tipoCita" class="control-label minotaur-label">Tipo de Cita <span class="text-danger">*</span>: </label>
-					<!-- <select
-						name="tipoCita"
-						class="form-control input-sm"
-						ng-model="fData.tipoCita"
-						ng-options="item as item.descripcion for item in fArr.listaTipoCita"
-
-						required
-					></select> -->
-
 					<select class="form-control input-sm" name="tipoCita" ng-model="fData.tipoCita" required>
 						<option value="">--Seleccione tipo cita--</option>
 						<option ng-repeat="item in fArr.listaTipoCita" value="{{item.id}}">{{item.descripcion}}</option>
 					</select>
 
-	            </div>
+	      </div>
 
 				<div class="form-group col-md-3">
 					<label for="name" class="control-label minotaur-label">Sede : </label>
@@ -90,17 +81,20 @@
 					</div>
 				</div>
 
-				<div class="form-group col-md-6">
-	              <label for="name" class="control-label minotaur-label">Fecha <span class="text-danger">*</span>: </label>
-	              <div class="input-group">
-	                <input type="text" required class="form-control input-sm" uib-datepicker-popup ng-model="fData.fecha" is-open="configDP.popup.opened"
-	                		datepicker-options="configDP.dateOptions" close-text="Cerrar" />
-	                <span class="input-group-btn">
-	                	<button type="button" class="btn btn-default btn-sm" ng-click="configDP.open()"><i class="fa fa-calendar"></i></button>
-	              	</span>
-	              </div>
-	            </div>
-
+				<div class="form-group col-md-3">
+					<label for="name" class="control-label minotaur-label">Fecha <span class="text-danger">*</span>: </label>
+					<div class="input-group">
+						<input type="text" required class="form-control input-sm" uib-datepicker-popup ng-model="fData.fecha" is-open="configDP.popup.opened"
+								datepicker-options="configDP.dateOptions" close-text="Cerrar" />
+						<span class="input-group-btn">
+							<button type="button" class="btn btn-default btn-sm" ng-click="configDP.open()"><i class="fa fa-calendar"></i></button>
+						</span>
+					</div>
+				</div>
+				<div class="form-group col-md-3" ng-class="{'has-error': Form.formCita.tipoCita.$invalid}">
+					<label for="tipoCita" class="control-label minotaur-label"> Medio de Contacto <span class="text-danger">*</span>: </label>
+					<select class="form-control input-sm" ng-model="fData.medioContacto" ng-options="item as item.descripcion for item in fArr.listaMedioContacto" required tabindex="90" ></select>
+	      </div>
 				<div class="form-group col-md-6">
 	              <label for="name" class="control-label minotaur-label">Apuntes: </label>
 				  <textarea
