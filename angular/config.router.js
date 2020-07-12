@@ -45,7 +45,10 @@ angular.module('app')
           .state('app.dashboard', {
             url: '/dashboard',
             templateUrl: 'tpl/app_dashboard.html',
-            resolve: load(['angular/controllers/chart.js'])
+            resolve: load([
+              'angular/controllers/DashboardCtrl.js',
+              'angular/controllers/PacienteCtrl.js'
+            ])
           })
           .state('app.usuario', {
             url: '/usuario',

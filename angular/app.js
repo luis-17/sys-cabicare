@@ -29,5 +29,6 @@ angular.module('app', [
     'ui.grid.exporter',
     'ui.grid.pinning',
     'ui.calendar',
+    'highcharts-ng',
     // 'ui.tree'
 ]);
