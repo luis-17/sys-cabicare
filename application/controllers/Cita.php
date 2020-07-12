@@ -176,11 +176,14 @@ class Cita extends CI_Controller {
 	public function listar_cita_por_id()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
-		$rowPaciente = $this->model_cita->m_cargar_cita_por_id($allInputs);
-		$rowPaciente['edad'] = devolverEdad($rowPaciente['fechaNacimiento']) . ' años';
+		$rowCita = $this->model_cita->m_cargar_cita_por_id($allInputs);
+		$rowCita['detalle'] = $this->model_cita->m_cargar_detalle_cita($allInputs);
+		$rowCita['edad'] = devolverEdad($rowCita['fechaNacimiento']) . ' años';
+		$rowCita['peso'] = empty($rowCita['peso'])? NULL : $rowCita['peso'] . ' Kg.';
+		$rowCita['talla'] = empty($rowCita['talla'])? NULL : $rowCita['talla'] . ' cm.';
 
 
-		$arrData['datos'] = $rowPaciente;
+		$arrData['datos'] = $rowCita;
     	$arrData['message'] = '';
     	$arrData['flag'] = 1;
 		$this->output
