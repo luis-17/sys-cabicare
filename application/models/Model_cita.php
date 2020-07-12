@@ -126,6 +126,8 @@ class Model_cita extends CI_Model {
 			tp.nombre AS tipoProducto,
 			cp.citaId,
 			cp.precioReal AS precio,
+			cp.informe,
+			cp.observaciones,
 			cp.estado
 		", FALSE);
 		$this->db->from('citaproducto cp');
@@ -133,6 +135,7 @@ class Model_cita extends CI_Model {
 		$this->db->join('tipoproducto tp', 'pr.tipoProductoId = tp.id');
 		$this->db->where('cp.citaId', $datos['id']);
 		$this->db->where('cp.estado', 1);
+		$this->db->order_by('pr.tipoProductoId', 'ASC');
 		$this->db->order_by('cp.id', 'ASC');
 		return $this->db->get()->result_array();
 	}
@@ -176,6 +179,7 @@ class Model_cita extends CI_Model {
 		$this->db->limit('1');
 		return $this->db->get()->row_array();
 	}
+
 
 	public function m_registrar($data)
 	{
