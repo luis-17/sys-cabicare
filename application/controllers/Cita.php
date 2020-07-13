@@ -218,7 +218,7 @@ class Cita extends CI_Controller {
   public function ver_popup_form_metodo_pago(){
 		$this->load->view('cita/metodo_pago_formView');
   }
-  
+
 	/**
 	 * Método para registrar una reserva de Cita, puede ser Por Confirmar o Confirmada
 	 * Tambien se registra el detalle, es decir productos de la cita
@@ -422,8 +422,8 @@ class Cita extends CI_Controller {
 			'temperaturaCorporal'	=> empty($allInputs['temperaturaCorporal']) ? NULL : $allInputs['temperaturaCorporal'],
 			'perimetroAbdominal'	=> empty($allInputs['perimetroAbdominal']) ? NULL : $allInputs['perimetroAbdominal'],
 			'observaciones'			=> empty($allInputs['observaciones']) ? NULL : $allInputs['observaciones'],
-      'estado'				=> $allInputs['tipoCita'],
-      'medioContacto'				=> empty($allInputs['medioContacto']) ? NULL : $allInputs['medioContacto']['id'],
+      		'estado'				=> $allInputs['tipoCita'],
+      		'medioContacto'			=> empty($allInputs['medioContacto']) ? NULL : $allInputs['medioContacto']['id'],
 			'updatedAt'				=> date('Y-m-d H:i:s')
 		);
 
@@ -527,6 +527,43 @@ class Cita extends CI_Controller {
 			$arrData['message'] = 'Se anularon los datos correctamente';
     		$arrData['flag'] = 1;
 		}
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+	}
+
+	public function registrar_atencion()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+
+		$arrData['message'] = 'No se pudo registrar los datos';
+    	$arrData['flag'] = 0;
+
+
+		$data = array(
+      		'estado'				=> 3,
+			'updatedAt'				=> date('Y-m-d H:i:s')
+		);
+
+
+		$this->db->trans_start();
+		if($this->model_cita->m_editar($data, $allInputs['id'])) {
+			foreach ($allInputs['detalle'] as $row) {
+
+				$data_det = array(
+					'informe' 	=> $row['informe'],
+					'observaciones' 	=> $row['observaciones'],
+					'updatedAt'		=> date('Y-m-d H:i:s')
+				);
+				$this->model_cita->m_editar_detalle($data_det, $row['id']);
+
+			}
+
+			$arrData['message'] = 'Se registraron los datos correctamente.';
+			$arrData['flag'] = 1;
+		}
+		$this->db->trans_complete();
+
 		$this->output
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));

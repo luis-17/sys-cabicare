@@ -23,6 +23,27 @@ app.controller('RegistroAtencionCtrl', [
 			$scope.fData = rpta.datos;
 		});
 
+		$scope.grabarAtencionMedica = function(){
+			blockUI.start("Registrando atencion...");
+			RegistroAtencionService.sRegistrarAtencion($scope.fData).then(function (rpta) {
+				if (rpta.flag === 1) {
+					var pTitle = 'OK!';
+					var pType = 'success';
+					// $scope.metodos.actualizarCalendario(true);
+				} else {
+					var pTitle = 'Advertencia!';
+					var pType = 'warning';
+
+				}
+				blockUI.stop();
+				pinesNotifications.notify({
+					title: pTitle,
+					text: rpta.message,
+					type: pType,
+					delay: 5000
+				});
+			});
+		}
 		// recetas
 		var paginationOptionsREC = {
 			pageNumber: 1,
@@ -93,12 +114,21 @@ app.controller('RegistroAtencionCtrl', [
 ]);
 app.service("RegistroAtencionService", function ($http, $q, handleBehavior){
 	return({
-		sGetCitaById: sGetCitaById
+		sGetCitaById: sGetCitaById,
+		sRegistrarAtencion: sRegistrarAtencion
 	});
 	function sGetCitaById(datos) {
 		var request = $http({
 			method: "post",
 			url: angular.patchURLCI + "Cita/listar_cita_por_id",
+			data: datos
+		});
+		return (request.then(handleBehavior.success, handleBehavior.error));
+	}
+	function sRegistrarAtencion(datos) {
+		var request = $http({
+			method: "post",
+			url: angular.patchURLCI + "Cita/registrar_atencion",
 			data: datos
 		});
 		return (request.then(handleBehavior.success, handleBehavior.error));
