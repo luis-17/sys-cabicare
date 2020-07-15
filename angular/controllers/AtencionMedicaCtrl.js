@@ -120,25 +120,25 @@ app.controller('AtencionMedicaCtrl',
 				console.log('Click');
 			}
 		}
-		$scope.alertOnDrop = function (event, delta) {
-			blockUI.start('Actualizando calendario...');
-			var datos = {
-				event: event,
-				delta: delta,
-			};
-			CitaServices.sMoverCita(datos).then(function (rpta) {
-				if (rpta.flag == 1) {
-					var pTitle = 'OK!';
-					var pType = 'success';
-				} else if (rpta.flag == 0) {
-					var pTitle = 'Advertencia!';
-					var pType = 'warning';
-				}
-				angular.element('.calendar').fullCalendar('refetchEvents');
-				pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 3000 });
-				blockUI.stop();
-			});
-		};
+		// $scope.alertOnDrop = function (event, delta) {
+		// 	blockUI.start('Actualizando calendario...');
+		// 	var datos = {
+		// 		event: event,
+		// 		delta: delta,
+		// 	};
+		// 	CitaServices.sMoverCita(datos).then(function (rpta) {
+		// 		if (rpta.flag == 1) {
+		// 			var pTitle = 'OK!';
+		// 			var pType = 'success';
+		// 		} else if (rpta.flag == 0) {
+		// 			var pTitle = 'Advertencia!';
+		// 			var pType = 'warning';
+		// 		}
+		// 		angular.element('.calendar').fullCalendar('refetchEvents');
+		// 		pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 3000 });
+		// 		blockUI.stop();
+		// 	});
+		// };
 		$scope.overlay = $('.fc-overlay');
 		$scope.alertOnMouseOver = function (event, jsEvent, view) {
 			$scope.event = event;
@@ -168,14 +168,14 @@ app.controller('AtencionMedicaCtrl',
 
 
 
-		$scope.btnEditarCita = function (cita, bool) {
-			console.log('Edita cita');
+		$scope.btnVerCita = function (cita) {
+			console.log('Ver cita');
 			var arrParams = {
 				// 'start': start,
 				'cita': cita,
 				'fArr': $scope.fArr,
-				'metodos': $scope.metodos,
-				'bool': bool
+				'metodos': $scope.metodos
+
 			};
 			AtencionMedicaFactory.editarCitaModal(arrParams);
 		}
