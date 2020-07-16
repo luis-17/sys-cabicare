@@ -9,10 +9,6 @@
 			<div class="tab-content">
 
 				<div class="col-xs-12" style="line-height: 1.1; font-size: 95%;">
-					<button type="button" class="btn btn-warning" ng-click="goToUrl('app/atencion-medica')"
-						style="width: 150px;">
-						<i class="fa fa-step-backward"></i> Regresar
-					</button>
 					<fieldset class="row">
 						<legend class="col-xs-12 mb-sm pb-n" style="font-size: 14px; font-weight: bold; border: none;">
 							<div class="block" style="background-color: #5d7581; color: white; text-align: center; line-height: 1.5;">
@@ -130,140 +126,21 @@
 						</div>
 					</uib-tab>
 					<uib-tab index="receta" heading="Receta">
-						<div class="block" style="max-height: 400px; overflow-y: auto; overflow-x: hidden;">
-							<div class="row" ng-show="true" style="margin-right: 0px !important;margin-left: 0px !important;">
-								<div class="col-md-12 col-sm-12 col-xs-12 pt-xs">
-									<div class="mb-sm bg-darkgray text-white text-center"> RECETAS MÉDICAS </div>
+						<div class="row" style="margin-right: 0px !important;margin-left: 0px !important;">
+							<div class="form-group col-sm-12">
+								<div class=" mb-n">
+									<label class="m-n text-blue"> Indicaciones Generales: </label>
 								</div>
-								<div class="col-lg-2 col-md-6 col-sm-6 col-xs-12 ">
-									<div class="form-group mb-n">
-										<label class="m-n text-blue"> Desde </label>
-										<input type="text" class="form-control input-sm" ng-model="fBusquedaREC.desde"
-											data-inputmask="'alias': 'dd-mm-yyyy'" style="width:auto;" />
-									</div>
-								</div>
-								<div class="col-lg-2 col-md-6 col-sm-6 col-xs-12 ">
-									<div class="form-group mb-n">
-										<label class="m-n text-blue"> Hasta </label>
-										<input type="text" class="form-control input-sm" ng-model="fBusquedaREC.hasta"
-											data-inputmask="'alias': 'dd-mm-yyyy'" style="width:auto;" />
-									</div>
-								</div>
-								<div class=" col-lg-8 col-md-12 col-sm-12 col-xs-12 mt-sm">
-									<div class="form-group mb-n">
-										<button type="button" class="btn btn-success"
-											ng-click="getPaginationRECServerSide(); $event.preventDefault();"> <i class="fa fa-refresh"></i>
-											PROCESAR </button>
+								<textarea name="informe" id="" cols="30" rows="5" ng-model="fData.indicacionesGenerales" style="width: 100%;"></textarea>
+							</div>
 
-										<button type="button" class="btn btn-midnightblue pull-right"
-											ng-click="btnVerFormRegistrarReceta(); $event.preventDefault();"><i class="fa fa-file"></i> NUEVA
-											RECETA </button>
-										<button ng-if="mySelectionRECGrid.length > 0" type="button" class="btn btn-info pull-right mr"
-											ng-click="btnImprimirRecetaPdf(); $event.preventDefault();"><i class="fa fa-print"></i> IMPRIMIR
-										</button>
+							<div class="block mt text-center">
+								<button class="btn btn-success" ng-click="grabarReceta(); $event.preventDefault();"
+									style="width: 240px;">
+									<i class="fa fa-edit"></i> Grabar Receta
+								</button>
+							</div>
 
-									</div>
-								</div>
-							</div>
-							<div class="row" ng-show="true" style="margin-right: 0px !important;margin-left: 0px !important;">
-								<div class="col-md-12 col-sm-12 col-xs-12 pt-xs">
-									<div
-										class="grid table-responsive"
-										style="overflow: hidden;"
-										ui-grid="gridOptionsRecetaMedica"
-										ui-grid-auto-resize
-										ui-grid-edit
-										ui-grid-pagination
-										ui-grid-selection
-										ui-grid-resize-columns
-										ui-grid-auto-resize
-										ui-grid-move-columns
-									></div>
-								</div>
-							</div>
-							<!-- FORMULARIO DE NUEVA RECETA -->
-							<div class="row" ng-show="formRecetaMedica">
-								<form name="formReceta" id="formReceta">
-									<div class="col-md-12 col-sm-12 col-xs-12 mb-xs mt-sm pt-xs" style="border-top: 1px solid #e0e0e0;">
-										<div class="mb-sm bg-darkgray text-white text-center"> NUEVA RECETA </div>
-										<div class="row">
-											<div class="col-md-4 col-xs-4">
-												<div class="form-group mb-sm">
-													<label class="m-n text-blue block"> Medicamento </label>
-													<input id="fTemporalmedicamento" type="text" ng-model="fDataREC.fTemporal.medicamento"
-														class="form-control input-sm" placeholder="Digite el medicamento para autocompletar"
-														typeahead-loading="loadingLocations" typeahead-wait-ms="500"
-														uib-typeahead="item as item.medicamento_stock for item in getMedicamentoAutocomplete($viewValue)"
-														typeahead-on-select="getSelectedMedicamento($item, $model, $label)"
-														typeahead-min-length="3" autocomplete="off" />
-													<!-- <input tabindex="114" type="text" ng-model="fDataREC.procedimiento" class="form-control input-sm" required />  -->
-													<i ng-show="loadingLocations" class="fa fa-refresh"></i>
-													<div ng-show="noResultsMEDI">
-														<i class="fa fa-remove"></i> No se encontró resultados
-													</div>
-												</div>
-											</div>
-											<div class="col-md-1 col-xs-2">
-												<div class="form-group mb-sm">
-													<label class="m-n text-blue block"> Stock </label>
-													<input type="text" ng-model="fDataREC.fTemporal.medicamento.stock"
-														class="form-control input-sm" readonly="true" />
-												</div>
-											</div>
-											<div class="col-md-1 col-xs-2 p-n">
-												<div class="form-group mb-sm">
-													<label class="m-n text-blue block"> Forma Far. </label>
-													<input type="text" ng-model="fDataREC.fTemporal.medicamento.formafarmaceutica"
-														class="form-control input-sm" readonly="true" />
-												</div>
-											</div>
-											<div class="col-md-1 col-xs-2">
-												<div class="form-group mb-sm">
-													<label class="m-n text-blue block"> Cantidad </label>
-													<input id="fTemporalCantidad" type="text" ng-model="fDataREC.fTemporal.cantidad"
-														class="form-control input-sm" />
-												</div>
-											</div>
-											<div class="col-md-4 col-xs-5">
-												<div class="form-group mb-sm">
-													<label class="m-n text-blue block"> Indicaciones </label>
-													<input type="text" ng-model="fDataREC.fTemporal.indicacion" class="form-control input-sm"
-														placeholder="Dosis, Via de Administración, Frecuencia, Duración, etc" />
-													<!-- <textarea ng-model="fDataREC.indicacion" class="form-control input-sm" required ></textarea> -->
-												</div>
-											</div>
-											<div class="col-md-1 col-xs-1" style="margin-top: 15px;">
-												<button tooltip-placement="left" tooltip="AGREGAR" type="button" class="btn btn-info-alt"
-													ng-click="agregarMedicamentoAReceta(); $event.preventDefault();"> <i class="fa fa-plus"></i>
-												</button>
-											</div>
-											<div class="form-group col-xs-12 m-n">
-												<label class="control-label"> Medicamentos agregados: </label>
-												<div ui-if="gridOptionsMedicamentosAdd.data.length>0" ui-grid="gridOptionsMedicamentosAdd"
-													ui-grid-cellNav ui-grid-resize-columns ui-grid-auto-resize class="grid table-responsive"
-													style="overflow: hidden;" ng-style="getTableHeightMED();"></div>
-											</div>
-											<div class="col-md-12 col-xs-12 mt">
-												<div class="form-group mb-sm">
-													<label class="m-n text-blue block"> Indicaciones Generales </label>
-													<textarea ng-model="fDataREC.indicaciones_generales" class="form-control input-sm"
-														placeholder="Indicaciones Generales"> </textarea>
-												</div>
-											</div>
-											<div class="col-md-12 col-xs-12 mt">
-												<div class="form-group mb-sm text-right">
-													<button type="button" class="btn btn-primary"
-														ng-click="registrarRecetaMedica(); $event.preventDefault();">
-														GRABAR RECETA </button>
-													<button type="button" class="btn btn-warning"
-														ng-click="btnRegresarAlListadoReceta(); $event.preventDefault();">
-														<i class="fa fa-step-backward"></i> REGRESAR </button>
-												</div>
-											</div>
-										</div>
-									</div>
-								</form>
-							</div>
 						</div>
 					</uib-tab>
 

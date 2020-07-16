@@ -220,4 +220,15 @@ class Model_cita extends CI_Model {
 		$this->db->where('id',$datos['idCita']);
 		return $this->db->update('cita', $data);
 	}
+
+	public function m_registrar_receta($data)
+	{
+		$this->db->insert('receta', $data);
+		return $this->db->insert_id();
+	}
+	public function m_editar_receta($data, $id)
+	{
+		$this->db->where('id',$id);
+		return $this->db->update('receta', $data);
+	}
 }

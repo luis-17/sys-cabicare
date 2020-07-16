@@ -568,4 +568,44 @@ class Cita extends CI_Controller {
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 	}
+
+	public function registrar_receta()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$arrData['message'] = 'No se pudo registrar los datos';
+    	$arrData['flag'] = 0;
+
+		$data = array(
+			'citaId' => $allInputs['id'],
+      		'indicacionesGenerales'	=> $allInputs['indicacionesGenerales'],
+			'fechaReceta'			=> date('Y-m-d H:i:s'),
+			'estado' 		=> 1,
+			'createdAt'		=> date('Y-m-d H:i:s'),
+			'updatedAt'		=> date('Y-m-d H:i:s')
+		);
+		$this->db->trans_start();
+		if(empty($allInputs['idreceta'])){
+
+			$idreceta = $this->model_cita->m_registrar_receta($data);
+			if($idreceta) {
+				$arrData['message'] = 'Se registraron los datos correctamente.';
+				$arrData['flag'] = 1;
+				$arrData['idreceta'] = $idreceta;
+			}
+		}else{
+			$data = array(
+				'indicacionesGenerales'	=> $allInputs['indicacionesGenerales'],
+				'updatedAt'		=> date('Y-m-d H:i:s')
+			);
+			if($this->model_cita->m_editar_receta($data, $allInputs['idreceta']) ){
+				$arrData['message'] = 'Se editaron los datos correctamente.';
+				$arrData['flag'] = 1;
+				$arrData['idreceta'] = $allInputs['idreceta'];
+			}
+		}
+		$this->db->trans_complete();
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+	}
 }
