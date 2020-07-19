@@ -68,18 +68,18 @@ class Cita extends CI_Controller {
 					'apuntesCita' =>  $row['apuntesCita'],
 					'frecuenciaCardiaca' =>  $row['frecuenciaCardiaca'],
 					'temperaturaCorporal' =>  $row['temperaturaCorporal'],
-          // 'medico' => $row['medico'],
-          'medico' => array(
+          			// 'medico' => $row['medico'],
+          			'medico' => array(
 						'id' => $row['medicoId'],
 						'medico' => $row['medico']
 					),
 					'total' => $row['total'],
-          'medioContacto'=> array(
+          			'medioContacto'=> array(
 						'id'=> $row['medioContacto'],
 						'descripcion'=> $row['medioContacto']
-          ),
-          'numOperacion'=> $row['numOperacion'],
-          'metodoPago'=> array(
+         			 ),
+          			'numOperacion'=> $row['numOperacion'],
+          			'metodoPago'=> array(
 						'id'=> $row['metodoPago'],
 						'descripcion'=> $row['metodoPago']
 					),
@@ -148,7 +148,7 @@ class Cita extends CI_Controller {
 						'id' => $row['medicoId'],
 						'medico' => $row['medico']
 					),
-          'medioContacto'=> array(
+          			'medioContacto'=> array(
 						'id'=> $row['medioContacto'],
 						'descripcion'=> $row['medioContacto']
 					),
@@ -312,8 +312,8 @@ class Cita extends CI_Controller {
 			'temperaturaCorporal'	=> empty($allInputs['temperaturaCorporal']) ? NULL : $allInputs['temperaturaCorporal'],
 			'perimetroAbdominal'	=> empty($allInputs['perimetroAbdominal']) ? NULL : $allInputs['perimetroAbdominal'],
 			'observaciones'			=> empty($allInputs['observaciones']) ? NULL : $allInputs['observaciones'],
-      'estado'				=> $allInputs['tipoCita'],
-      'medioContacto'				=> empty($allInputs['medioContacto']) ? NULL : $allInputs['medioContacto']['id'],
+      		'estado'				=> $allInputs['tipoCita'],
+      		'medioContacto'			=> empty($allInputs['medioContacto']) ? NULL : $allInputs['medioContacto']['id'],
 			'createdAt'				=> date('Y-m-d H:i:s'),
 			'updatedAt'				=> date('Y-m-d H:i:s')
 		);
@@ -493,30 +493,30 @@ class Cita extends CI_Controller {
 		$this->output
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
-  }
-  public function agregar_metodo_pago()
-  {
-    $allInputs = json_decode(trim($this->input->raw_input_stream),true);
-		$arrData['flag'] = 0;
-		$arrData['message'] = 'Ha ocurrido un error actualizando la cita';
+  	}
+	public function agregar_metodo_pago()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+			$arrData['flag'] = 0;
+			$arrData['message'] = 'Ha ocurrido un error actualizando la cita';
 
-		$data = array(
-      // 'id' => $allInputs['id'],
-			'metodoPago' => $allInputs['metodoPago']['id'],
-			'numOperacion' => empty($allInputs['numOperacion']) ? NULL : $allInputs['numOperacion']
-		);
+			$data = array(
+		// 'id' => $allInputs['id'],
+				'metodoPago' => $allInputs['metodoPago']['id'],
+				'numOperacion' => empty($allInputs['numOperacion']) ? NULL : $allInputs['numOperacion']
+			);
 
-		$this->db->trans_start();
-		if ($this->model_cita->m_editar($data, $allInputs['id'])) {
-			$arrData['flag'] = 1;
-			$arrData['message'] = 'Método de pago actualizado.';
-		}
-		$this->db->trans_complete();
+			$this->db->trans_start();
+			if ($this->model_cita->m_editar($data, $allInputs['id'])) {
+				$arrData['flag'] = 1;
+				$arrData['message'] = 'Método de pago actualizado.';
+			}
+			$this->db->trans_complete();
 
-		$this->output
-		    ->set_content_type('application/json')
-		    ->set_output(json_encode($arrData));
-  }
+			$this->output
+				->set_content_type('application/json')
+				->set_output(json_encode($arrData));
+	}
 	public function anular()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
@@ -541,6 +541,7 @@ class Cita extends CI_Controller {
 
 
 		$data = array(
+			'fechaAtencion'			=> date('Y-m-d H:i:s'),
       		'estado'				=> 3,
 			'updatedAt'				=> date('Y-m-d H:i:s')
 		);

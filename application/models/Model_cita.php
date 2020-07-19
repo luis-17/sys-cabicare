@@ -169,9 +169,13 @@ class Model_cita extends CI_Model {
 			pa.fechaNacimiento,
 			ci.medicoId,
 			concat_ws(' ', us.nombres, us.apellidos) AS medico,
+			rec.id AS idreceta,
+			rec.fechaReceta,
+			rec.indicacionesGenerales
 		", FALSE);
 		$this->db->from('cita ci');
 		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
+		$this->db->join('receta rec', 'ci.id = rec.Citaid');
 		$this->db->join('usuario us', 'ci.medicoId = us.id','left');
 		$this->db->where('ci.estado <> ', 0);
 		$this->db->where('pa.estado', 1);

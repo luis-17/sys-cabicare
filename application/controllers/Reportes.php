@@ -6,7 +6,7 @@ class Reportes extends CI_Controller {
         parent::__construct();
         $this->load->helper(array('fechas_helper'));
         $this->load->model(array('model_cita'));
-		$this->load->library('excel');
+		$this->load->library(array('excel','Fpdfext'));
 
         $this->output->set_header("Cache-Control: no-store, no-cache, must-revalidate, no-transform, max-age=0, post-check=0, pre-check=0");
 		$this->output->set_header("Pragma: no-cache");
@@ -193,6 +193,55 @@ class Reportes extends CI_Controller {
 		$this->output
 			->set_content_type('application/json')
 			->set_output(json_encode($arrData));
+	}
+
+	public function generar_pdf_receta()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$arrData['message'] = '';
+    	$arrData['flag'] = 1;
+
+    	$cita = $this->model_cita->m_cargar_cita_por_id($allInputs['cita']);
+
+		$fechaUT = strtotime($cita['fechaReceta']);
+		$d	= date('d', $fechaUT);
+		$m	= date('m', $fechaUT);
+		$y	= date('Y', $fechaUT);
+
+		$this->pdf = new Fpdfext();
+		$this->pdf->AddPage();
+    	$this->pdf->SetMargins(0, 10, 10);
+    	$this->pdf->SetAutoPageBreak(false);
+    	$variablePosY = 0;
+
+		$this->pdf->SetFont('Arial','B',11);
+
+        $this->pdf->SetXY(38,48);
+        $this->pdf->Cell(65,6,utf8_decode($cita['paciente']),0,0,'L');
+        $this->pdf->SetXY(38,61);
+        $this->pdf->Cell(65,6,utf8_decode(devolverEdad($cita['fechaNacimiento']) . ' años'),0,0,'L');
+
+        $this->pdf->SetXY(78,61);
+        $this->pdf->Cell(12,6,$d,0,0,'L');
+
+        $this->pdf->SetXY(89,61);
+        $this->pdf->Cell(12,6,$m,0,0,'L');
+
+        $this->pdf->SetXY(100,61);
+        $this->pdf->Cell(12,6,$y,0,0,'L');
+
+        $this->pdf->SetXY(17,90);
+        $this->pdf->TextArea(array(utf8_decode($cita['indicacionesGenerales'])),0,0,FALSE,5,20);
+		//salida
+		$timestamp = date('YmdHis');
+		$nombreArchivo = 'assets/dinamic/pdfTemporales/tempPDF_'. $timestamp .'.pdf';
+		$result = $this->pdf->Output( 'F', $nombreArchivo);
+
+		$arrData['urlTempPDF'] = $nombreArchivo;
+
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
 	}
 
 }

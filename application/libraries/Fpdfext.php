@@ -2,8 +2,8 @@
     // Incluimos el archivo fpdf
     require_once APPPATH."/third_party/fpdf/fpdf.php";
 
-    //Extendemos la clase Pdf de la clase fpdf para que herede todas sus variables y funciones. . 
-    class Fpdfext extends FPDF { 
+    //Extendemos la clase Pdf de la clase fpdf para que herede todas sus variables y funciones. .
+    class Fpdfext extends FPDF {
       public function __construct($orientation='P', $unit='mm', $size='A4') {
         parent::__construct($orientation, $unit, $size);
       }
@@ -169,7 +169,7 @@
               // if( empty($heigthCell) ){
               //   $heigthCell = 5;
               // }
-              
+
               $this->MultiCell($w,$heigthCell,$textoCell,$border,$a,$fill);
               //$this->SetFont('Arial','',$fontSize);
               //Put the position to the right of the cell
@@ -290,7 +290,7 @@
           if($this->GetY()+$h>$this->PageBreakTrigger){
             $this->AddPage($this->CurOrientation);
           }
-              
+
       }
 
       public function NbLines($w,$txt)
@@ -344,24 +344,16 @@
           return $nl;
       }
       public function Header(){
-        // var_dump( $this->tituloAbr ); exit(); //SetMargins 
-        if( $this->tituloAbr == 'VEN-COMPR' ){
-          //$this->SetAutoPageBreak(TRUE,25); 
-          // $this->SetFont('Arial','',6);
-          // $this->MultiCell(120,6,'USUARIO: ');
-          return; 
-        }
-
+        $this->Image(base_url('img/receta.jpeg'),'0','0','200','300','JPG');
         //$this->SetAutoPageBreak(TRUE,25);
-        $ci2 =& get_instance(); 
+        $ci2 =& get_instance();
         $this->SetFont('Arial','',6);
         $this->SetXY(-70,0);
-        $this->MultiCell(120,6,'USUARIO: '.strtoupper($ci2->sessionFactur['username']).utf8_decode('    /   FECHA DE IMPRESIÓN: ').date('Y-m-d H:i:s')); 
-        $this->Image($this->getImagenCab(),4,4,50); 
+
         if( $this->PageNo() > 1 ){
           $this->SetY(26);
         }
-        
+
       }
        // El pie del pdf
       public function Footer(){

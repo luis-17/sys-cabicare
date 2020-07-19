@@ -5,14 +5,16 @@ app.controller('RegistroAtencionCtrl', [
 	'$stateParams',
 	'$uibModal',
 	'$bootbox',
-	'$log',
-	'$timeout',
 	'pinesNotifications',
 	'uiGridConstants',
 	'blockUI',
-	'$location',
+	'ModalReporteFactory',
 	'RegistroAtencionService',
-	function ($scope, $filter, $state, $stateParams, $uibModal, $bootbox, $log, $timeout, pinesNotifications, uiGridConstants, blockUI, $location, RegistroAtencionService){
+	function ($scope, $filter, $state, $stateParams, $uibModal, $bootbox, pinesNotifications, uiGridConstants,
+		blockUI,
+		ModalReporteFactory,
+		RegistroAtencionService
+	){
 
 		$scope.fData = {}
 
@@ -69,6 +71,23 @@ app.controller('RegistroAtencionCtrl', [
 				});
 			});
 
+		}
+
+		// IMPRIMIR RECETA
+		$scope.btnImprimirReceta = function () {
+			var arrParams = {
+				titulo: 'RECETA',
+				datos: {
+					cita: $scope.fData,
+					salida: 'pdf',
+					tituloAbv: 'REC',
+					titulo: 'RECETA'
+				},
+				envio_correo: 'si',
+				metodo: 'php',
+				url: angular.patchURLCI + "Reportes/generar_pdf_receta"
+			}
+			ModalReporteFactory.getPopupReporte(arrParams);
 		}
 	}
 ]);
