@@ -84,6 +84,10 @@ class Model_cita extends CI_Model {
 	}
 
 	public function m_cargar_citas($datos){
+		$arrEstados = array(1, 2, 3);
+		if ($datos['origen'] === 'ate') {
+			$arrEstados = array(2, 3);
+		}
 		$this->db->select("
 			ci.id,
 			ci.pacienteId,
@@ -113,7 +117,7 @@ class Model_cita extends CI_Model {
 		$this->db->from('cita ci');
 		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
 		$this->db->join('usuario us', 'ci.medicoId = us.id','left');
-		$this->db->where('ci.estado <> ', 0);
+		$this->db->where_in('ci.estado', $arrEstados);
 		$this->db->where('pa.estado', 1);
 		return $this->db->get()->result_array();
 	}
@@ -123,6 +127,7 @@ class Model_cita extends CI_Model {
 			cp.id,
 			cp.productoId AS idproducto,
 			pr.nombre AS producto,
+			pr.tipoProductoId,
 			tp.nombre AS tipoProducto,
 			cp.citaId,
 			cp.precioReal AS precio,
@@ -175,7 +180,7 @@ class Model_cita extends CI_Model {
 		", FALSE);
 		$this->db->from('cita ci');
 		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
-		$this->db->join('receta rec', 'ci.id = rec.Citaid');
+		$this->db->join('receta rec', 'ci.id = rec.Citaid', 'left');
 		$this->db->join('usuario us', 'ci.medicoId = us.id','left');
 		$this->db->where('ci.estado <> ', 0);
 		$this->db->where('pa.estado', 1);

@@ -61,7 +61,13 @@
     </a>
   </li>
   <!-- HIST. MEDICA -->
-  <li ng-if="fConfigSys.valores[5]">
+  <li ui-sref-active="active" ng-if="fConfigSys.valores[5]">
+    <a ui-sref="app.atencion-medica">
+      <i class="glyphicon glyphicon-stats icon text-primary-dker"></i>
+      <span class="font-bold"> Atención Médica </span>
+    </a>
+  </li>
+  <!-- <li ng-if="fConfigSys.valores[5]">
     <a href class="auto">      
       <span class="pull-right text-muted">
         <i class="fa fa-fw fa-angle-right text"></i>
@@ -69,8 +75,8 @@
       </span>
       <i class="glyphicon glyphicon-user icon text-primary-dker"></i>
       <span class="font-bold"> Historia Médica </span>
-    </a>
-    <ul class="nav nav-sub dk">
+    </a> -->
+    <!-- <ul class="nav nav-sub dk">
       <li class="nav-sub-header">
         <a href>
           <span> Historia Médica</span>
@@ -86,8 +92,8 @@
           <span>Historial</span>
         </a>
       </li>
-    </ul>
-  </li>
+    </ul> -->
+  <!-- </li> -->
   <!-- CENTRAL DE REPORTES --> 
   <li ng-if="fConfigSys.valores[6]" ui-sref-active="active">
     <a ui-sref="app.central-reportes">

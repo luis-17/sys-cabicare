@@ -214,7 +214,7 @@ app.controller('AtencionMedicaCtrl',
 
 			$scope.fBusqueda.desde = moment(start).tz('America/Lima').format('YYYY-MM-DD');
 			$scope.fBusqueda.hasta = moment(end).tz('America/Lima').format('YYYY-MM-DD');
-
+			$scope.fBusqueda.origen = 'ate'
 			CitaServices.sListarCitaCalendario($scope.fBusqueda).then(function (rpta) {
 				if (rpta.flag == 1) {
 					angular.forEach(rpta.datos, function (row, key) {
@@ -329,7 +329,8 @@ app.controller('AtencionMedicaCtrl',
 				{ field: 'tipoDocumento', name: 'tipoDocumento', displayName: 'Tipo Doc.', minWidth: 90, width: 115 },
 				{ field: 'numeroDocumento', name: 'numeroDocumento', displayName: 'Nº Documento', minWidth: 90, width: 115 },
 				{ field: 'paciente', name: 'paciente', displayName: 'Paciente', minWidth: 100 },
-				{ field: 'medico', name: 'medico', displayName: 'Médico', minWidth: 120 },
+				// { field: 'medico', name: 'medico', displayName: 'Médico', minWidth: 120 },
+				{ field: 'medico', name: 'medico', width: 130, cellTemplate:'<div class="ui-grid-cell-contents text-left ">'+ '{{ COL_FIELD.medico }}</div>',  displayName: 'Médico' },
 				{ field: 'total', name: 'total', displayName: 'Total', minWidth: 100, width: 100 },
 				{ field: 'estado', type: 'object', name: 'estado', displayName: 'Estado', maxWidth: 200, enableFiltering: false,
 					cellTemplate: '<label style="box-shadow: 1px 1px 0 black; margin: 6px auto; display: block; width: 120px;" class="label {{ COL_FIELD.clase }} ">{{ COL_FIELD.string }}</label>'

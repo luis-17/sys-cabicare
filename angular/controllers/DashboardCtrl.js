@@ -51,13 +51,13 @@ app.controller('DashboardCtrl', [
         name: 'Medio de contacto.',
         colorByPoint: true,
         data: [{
-          name:"FEMENINO",
+          name:"REDES SOCIALES",
           y:60,
           sliced:false,
           selected:false
         },
         {
-          name:"MASCULINO",
+          name:"RECOMENDACIÓN",
           y:34,
           sliced:true,
           selected:true

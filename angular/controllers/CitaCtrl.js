@@ -209,7 +209,7 @@ app.controller('CitaCtrl',
 
 			$scope.fBusqueda.desde = moment(start).tz('America/Lima').format('YYYY-MM-DD');
 			$scope.fBusqueda.hasta = moment(end).tz('America/Lima').format('YYYY-MM-DD');
-
+			$scope.fBusqueda.origen = 'cit';
 			CitaServices.sListarCitaCalendario($scope.fBusqueda).then(function (rpta) {
 				if (rpta.flag == 1) {
 					angular.forEach(rpta.datos, function (row, key) {

@@ -5,7 +5,7 @@ class Cita extends CI_Controller {
 	public function __construct(){
         parent::__construct();
         $this->load->helper(array('fechas_helper', 'otros_helper'));
-        $this->load->model(array('model_cita'));
+        $this->load->model(array('model_cita', 'model_diagnostico'));
 
         $this->output->set_header("Cache-Control: no-store, no-cache, must-revalidate, no-transform, max-age=0, post-check=0, pre-check=0");
 		$this->output->set_header("Pragma: no-cache");
@@ -177,10 +177,11 @@ class Cita extends CI_Controller {
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
 		$rowCita = $this->model_cita->m_cargar_cita_por_id($allInputs);
+		// var_dump('<pre>', $rowCita);
 		$rowCita['detalle'] = $this->model_cita->m_cargar_detalle_cita($allInputs);
 		$rowCita['edad'] = devolverEdad($rowCita['fechaNacimiento']) . ' años';
-		$rowCita['peso'] = empty($rowCita['peso'])? NULL : $rowCita['peso'] . ' Kg.';
-		$rowCita['talla'] = empty($rowCita['talla'])? NULL : $rowCita['talla'] . ' cm.';
+		$rowCita['peso'] = empty($rowCita['peso'])? NULL : $rowCita['peso'];
+		$rowCita['talla'] = empty($rowCita['talla'])? NULL : $rowCita['talla'];
 
 
 		$arrData['datos'] = $rowCita;
@@ -231,16 +232,16 @@ class Cita extends CI_Controller {
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
 		$arrData['message'] = 'Error al registrar los datos, inténtelo nuevamente';
-    	$arrData['flag'] = 0;
-    	// VALIDACIONES
-    	if( empty($allInputs['pacienteId']) ){
-    		$arrData['message'] = 'Debe seleccionar un paciente';
-    		$arrData['flag'] = 0;
-    		$this->output
-			    ->set_content_type('application/json')
-			    ->set_output(json_encode($arrData));
-		    return;
-    	}
+		$arrData['flag'] = 0;
+		// VALIDACIONES
+		if( empty($allInputs['pacienteId']) ){
+			$arrData['message'] = 'Debe seleccionar un paciente';
+			$arrData['flag'] = 0;
+			$this->output
+				->set_content_type('application/json')
+				->set_output(json_encode($arrData));
+			return;
+		}
 
 		if(empty($allInputs['fecha'])){
 			$arrData['flag'] = 0;
@@ -381,8 +382,8 @@ class Cita extends CI_Controller {
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 		    return;
-    }
-    if (empty($allInputs['medioContacto']['id'])) {
+    	}
+    	if (empty($allInputs['medioContacto']['id'])) {
 			$arrData['flag'] = 0;
 			$arrData['message'] = 'Debe seleccionar medio de contacto.';
 			$this->output
@@ -537,29 +538,45 @@ class Cita extends CI_Controller {
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
 
 		$arrData['message'] = 'No se pudo registrar los datos';
-    	$arrData['flag'] = 0;
+    $arrData['flag'] = 0;
 
 
 		$data = array(
-			'fechaAtencion'			=> date('Y-m-d H:i:s'),
-      		'estado'				=> 3,
-			'updatedAt'				=> date('Y-m-d H:i:s')
+			'fechaAtencion' => date('Y-m-d H:i:s'),
+      'estado' => 3,
+			'updatedAt' => date('Y-m-d H:i:s'),
+			'peso' => $allInputs['peso'],
+			'talla' => $allInputs['talla'],
+			'imc' => $allInputs['imc'],
+			'presionArterual' => $allInputs['presionArterual'],
+			'frecuenciaCardiaca' => $allInputs['frecuenciaCardiaca'],
+			'temperaturaCorporal' => $allInputs['temperaturaCorporal'],
+			'perimetroAbdominal' => $allInputs['perimetroAbdominal'],
 		);
 
 
 		$this->db->trans_start();
 		if($this->model_cita->m_editar($data, $allInputs['id'])) {
-			foreach ($allInputs['detalle'] as $row) {
 
+			foreach ($allInputs['detalle'] as $row) {
 				$data_det = array(
 					'informe' 	=> $row['informe'],
 					'observaciones' 	=> $row['observaciones'],
 					'updatedAt'		=> date('Y-m-d H:i:s')
 				);
 				$this->model_cita->m_editar_detalle($data_det, $row['id']);
-
 			}
-
+			// eliminar diagnosticos y crearlos denuevo
+			$this->model_diagnostico->m_eliminar($allInputs['id']);
+			foreach ($allInputs['diagnostico'] as $row) {
+				$data_det = array(
+					'citaId'=> $allInputs['id'],
+					'diagnosticoId' 	=> $row['iddiagnostico'],
+					'tipoDiagnostico' 	=> $row['tipoDiagnostico']['id'],
+					'createdAt'		=> date('Y-m-d H:i:s')
+				);
+				$this->model_diagnostico->m_registrar_diagnostico($data_det);
+			}
 			$arrData['message'] = 'Se registraron los datos correctamente.';
 			$arrData['flag'] = 1;
 		}
