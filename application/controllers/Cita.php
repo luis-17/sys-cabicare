@@ -3,11 +3,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Cita extends CI_Controller {
 	public function __construct(){
-        parent::__construct();
-        $this->load->helper(array('fechas_helper', 'otros_helper'));
-        $this->load->model(array('model_cita', 'model_diagnostico'));
+    parent::__construct();
+		$this->load->helper(array('fechas_helper', 'otros_helper'));
+		$this->load->model(array('model_cita', 'model_diagnostico'));
 
-        $this->output->set_header("Cache-Control: no-store, no-cache, must-revalidate, no-transform, max-age=0, post-check=0, pre-check=0");
+		$this->output->set_header("Cache-Control: no-store, no-cache, must-revalidate, no-transform, max-age=0, post-check=0, pre-check=0");
 		$this->output->set_header("Pragma: no-cache");
 		$this->sessionFactur = @$this->session->userdata('sess_cabi_'.substr(base_url(),-20,7));
 		date_default_timezone_set("America/Lima");
@@ -182,6 +182,10 @@ class Cita extends CI_Controller {
 		$rowCita['edad'] = devolverEdad($rowCita['fechaNacimiento']) . ' años';
 		$rowCita['peso'] = empty($rowCita['peso'])? NULL : $rowCita['peso'];
 		$rowCita['talla'] = empty($rowCita['talla'])? NULL : $rowCita['talla'];
+		$rowCita['medico'] = array(
+			'id'=> $rowCita['medicoId'],
+			'descripcion'=> $rowCita['medico'],
+		);
 
 
 		$arrData['datos'] = $rowCita;
@@ -471,7 +475,8 @@ class Cita extends CI_Controller {
 	 * @author Ing. Ruben Guevara <rguevarac@hotmail.es>
 	 * @return void
 	 */
-	public function mover_cita(){
+	public function mover_cita()
+	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
 		$arrData['flag'] = 0;
 		$arrData['message'] = 'Ha ocurrido un error actualizando la cita';
@@ -521,9 +526,9 @@ class Cita extends CI_Controller {
 	public function anular()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
-
 		$arrData['message'] = 'No se pudo anular los datos';
-    	$arrData['flag'] = 0;
+		$arrData['flag'] = 0;
+		$allInputs['username'] = $this->sessionFactur['username'];
 		if( $this->model_cita->m_anular($allInputs) ){
 			$arrData['message'] = 'Se anularon los datos correctamente';
     		$arrData['flag'] = 1;
@@ -533,10 +538,23 @@ class Cita extends CI_Controller {
 		    ->set_output(json_encode($arrData));
 	}
 
+	// public function liberar_atencion()
+	// {
+	// 	$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+	// 	$arrData['message'] = 'No se pudo anular los datos';
+  //   $arrData['flag'] = 0;
+	// 	if( $this->model_cita->m_liberar_cita($allInputs) ){
+	// 		$arrData['message'] = 'Se liberó la cita correctamente.';
+  //   	$arrData['flag'] = 1;
+	// 	}
+	// 	$this->output
+	// 	    ->set_content_type('application/json')
+	// 	    ->set_output(json_encode($arrData));
+	// }
+
 	public function registrar_atencion()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
-
 		$arrData['message'] = 'No se pudo registrar los datos';
     	$arrData['flag'] = 0;
 
@@ -553,7 +571,9 @@ class Cita extends CI_Controller {
 			'temperaturaCorporal' => $allInputs['temperaturaCorporal'],
 			'perimetroAbdominal' => $allInputs['perimetroAbdominal'],
 		);
-
+		if ($this->sessionFactur['keyPerfil'] == 'key_root' && $allInputs['medico']['id']) {
+			$data['medicoId'] = $allInputs['medico']['id'];
+		}
 
 		$this->db->trans_start();
 		if($this->model_cita->m_editar($data, $allInputs['id'])) {

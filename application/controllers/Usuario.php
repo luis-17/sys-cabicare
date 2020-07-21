@@ -56,6 +56,27 @@ class Usuario extends CI_Controller {
 	 * @author Ing. Ruben Guevara <rguevarac@hotmail.es>
 	 * @return void
 	 */
+	public function listar_medico_cbo()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+
+		$arrListado = array();
+		$lista = $this->model_usuario->m_listar_medico_cbo();
+		foreach ($lista as $row) {
+			array_push($arrListado,
+				array(
+					'id'=> $row['id'],
+					'descripcion'=> strtoupper($row['medico']),
+				)
+			);
+		}
+		$arrData['datos'] = $arrListado;
+		$arrData['message'] = '';
+		$arrData['flag'] = 1;
+		$this->output
+			->set_content_type('application/json')
+			->set_output(json_encode($arrData));
+	}
 	public function listar_medico_autocomplete()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);

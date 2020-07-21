@@ -163,6 +163,7 @@ app.controller('UsuarioCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$l
 app.service("UsuarioServices",function($http, $q, handleBehavior) {
   return({
     sListarMedicoAutocomplete: sListarMedicoAutocomplete,
+    sListarMedicoCbo: sListarMedicoCbo,
     sListar: sListar,
     sRegistrar: sRegistrar,
     sEditar: sEditar,
@@ -172,6 +173,14 @@ app.service("UsuarioServices",function($http, $q, handleBehavior) {
     var request = $http({
       method : "post",
       url : angular.patchURLCI+"Usuario/listar_medico_autocomplete",
+      data : datos
+    });
+    return (request.then(handleBehavior.success,handleBehavior.error));
+  }
+  function sListarMedicoCbo(datos) {
+    var request = $http({
+      method : "post",
+      url : angular.patchURLCI+"Usuario/listar_medico_cbo",
       data : datos
     });
     return (request.then(handleBehavior.success,handleBehavior.error));

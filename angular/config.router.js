@@ -100,9 +100,9 @@ angular.module('app')
             resolve: load([
               // 'angular/controllers/ReservaCitaCtrl.js'
               'angular/controllers/AtencionMedicaCtrl.js',
-              'angular/controllers/ProductoCtrl.js',
-              'angular/controllers/PacienteCtrl.js',
-              'angular/controllers/UsuarioCtrl.js',
+              'angular/controllers/CitaCtrl.js',
+              // 'angular/controllers/PaCtrl.js',
+              // 'angular/controllers/UsuarioCtrl.js',
             ])
           })
           .state('app.registrar-atencion', {
@@ -111,7 +111,8 @@ angular.module('app')
 
             resolve: load([
               'angular/controllers/RegistroAtencionCtrl.js',
-              'angular/controllers/DiagnosticoCtrl.js'
+              'angular/controllers/DiagnosticoCtrl.js',
+              'angular/controllers/UsuarioCtrl.js'
             ])
           });
 
