@@ -224,12 +224,21 @@ class Model_cita extends CI_Model {
 	{
 		$data = array(
 			'estado' => 0,
-			'updatedat' => date('Y-m-d H:i:s')
+			'userAnulacion'=> $datos['username'],
+			'updatedAt' => date('Y-m-d H:i:s')
 		);
 		$this->db->where('id',$datos['idCita']);
 		return $this->db->update('cita', $data);
 	}
-
+	public function m_liberar_cita($datos)
+	{
+		$data = array(
+			'estado' => 2, // confirmada
+			'updatedAt' => date('Y-m-d H:i:s')
+		);
+		$this->db->where('id',$datos['idCita']);
+		return $this->db->update('cita', $data);
+	}
 	public function m_registrar_receta($data)
 	{
 		$this->db->insert('receta', $data);

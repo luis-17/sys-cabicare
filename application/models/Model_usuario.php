@@ -64,6 +64,15 @@ class Model_usuario extends CI_Model {
 		$this->db->limit('10');
 		return $this->db->get()->result_array();
 	}
+	public function m_listar_medico_cbo()
+	{
+		$this->db->select("us.id, us.nombres, us.apellidos, concat_ws(' ', us.nombres, us.apellidos) AS medico,", FALSE);
+		$this->db->from('usuario us');
+		$this->db->where('us.estado', 1);
+		$this->db->where('perfilId', 3); // solo perfil médico
+		// $this->db->limit('10');
+		return $this->db->get()->result_array();
+	}
 	// VALIDACIONES
 	public function m_validar_usuario_username($username, $excepcion = FALSE, $idusuario=NULL)
 	{

@@ -11,11 +11,13 @@ app.controller('RegistroAtencionCtrl', [
 	'ModalReporteFactory',
 	'RegistroAtencionService',
 	'DiagnosticoServices',
+	'UsuarioServices',
 	function ($scope, $filter, $state, $stateParams, $uibModal, $bootbox, pinesNotifications, uiGridConstants,
 		blockUI,
 		ModalReporteFactory,
 		RegistroAtencionService,
-		DiagnosticoServices
+		DiagnosticoServices,
+		UsuarioServices
 	){
 		$scope.metodos = {}; // contiene todas las funciones
 		$scope.fArr = {}; // contiene todos los arrays generados por las funciones
@@ -26,7 +28,14 @@ app.controller('RegistroAtencionCtrl', [
     ];
 		$scope.fData = {}
 		$scope.fData.temporal = {};
-		
+		$scope.metodos.listaMedico = function(myCallback) {
+      var myCallback = myCallback || function() { };
+      UsuarioServices.sListarMedicoCbo().then(function(rpta) {
+        $scope.fArr.listaMedico = rpta.datos;
+        myCallback();
+      });
+    };
+
 		var datos = {
 			id: $stateParams.id
 		}
@@ -36,6 +45,14 @@ app.controller('RegistroAtencionCtrl', [
 			$scope.fData.temporal = {};
 			$scope.fData.temporal.tipoDiagnostico = $scope.fArr.listaTipoDiagnostico[0];
 			$scope.getPaginationServerSideDet(true);
+			//BINDEO MEDICO
+			var myCallBackCC = function() {
+				var objIndex = $scope.fArr.listaMedico.filter(function(obj) {
+					return obj.id == $scope.fData.medico.id;
+				}).shift();
+				$scope.fData.medico = objIndex;
+			}
+			$scope.metodos.listaMedico(myCallBackCC);
 
 		});
 		/* CALCULO DE IMC */

@@ -45,7 +45,7 @@
 					</fieldset>
 				</div>
 
-				<div class="col-xs-12" style="line-height: 1.1; font-size: 95%;">
+				<div class="col-xs-12 acto-medico" style="line-height: 1.1; font-size: 95%;">
 					<fieldset class="row">
 						<legend class="col-xs-12  mb-sm pb-n" style="font-weight: bold; font-size: 14px; border: none;">
 							<div class="block" style="background-color: #5d7581; color: white; text-align: center; line-height: 1.5;">
@@ -56,7 +56,14 @@
 								<div class=" mb-n">
 									<label for="inputHelpBlock" class="m-n text-blue"> Profesional </label>
 								</div>
-								<span class="help-block text-black m-n"> {{ fData.medico }} </span>
+								<span ng-if="fSessionCI.keyPerfil == 'key_med'" class="help-block text-black m-n"> {{ fData.medico.descripcion }} </span>
+								<select ng-if="fSessionCI.keyPerfil == 'key_root'"
+									class="form-control input-xs"
+									ng-model="fData.medico"
+									ng-options="item as item.descripcion for item in fArr.listaMedico"
+									required
+								></select>
+								<!-- <select ng-if="fSessionCI.keyPerfil == 'key_root'" type="text" class="form-control input-xs" ng-model="fData.perimetroAbdominal" placeholder="Perímetro Abdominal"> -->
 							</div>
 							<div class="form-group col-md-3 col-sm-6 col-xs-12 mb-xs">
 								<div class=" mb-n">
@@ -257,8 +264,12 @@
             style="width: 150px;">
             <i class="fa fa-step-backward"></i> Regresar
           </button>
-          <button class="btn btn-success" ng-click="grabarAtencionMedica(); $event.preventDefault();"
-            ng-disabled="formAtencionMedicaAmb.$invalid || gridOptionsDiagnostico.data.length==0" style="width: 240px;">
+          <button ng-if="fSessionCI.usuarioId == fData.medicoId && fSessionCI.keyPerfil == 'key_med'" class="btn btn-success" ng-click="grabarAtencionMedica(); $event.preventDefault();"
+            ng-disabled="formAtencionMedicaAmb.$invalid" style="width: 240px;">
+            <i class="fa fa-edit"></i> Grabar
+					</button>
+					<button ng-if="fSessionCI.keyPerfil == 'key_root'" class="btn btn-success" ng-click="grabarAtencionMedica(); $event.preventDefault();"
+            ng-disabled="formAtencionMedicaAmb.$invalid" style="width: 240px;">
             <i class="fa fa-edit"></i> Grabar
           </button>
         </div>
@@ -267,3 +278,8 @@
 
 	</div>
 </div>
+<style>
+	.acto-medico .form-group{
+		height: 40px;
+	}
+</style>
