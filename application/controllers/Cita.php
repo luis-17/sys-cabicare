@@ -270,14 +270,14 @@ class Cita extends CI_Controller {
 		    return;
 		}
 
-    if (empty($allInputs['medioContacto']['id'])) {
-			$arrData['flag'] = 0;
-			$arrData['message'] = 'Debe seleccionar medio de contacto.';
-			$this->output
-		    ->set_content_type('application/json')
-		    ->set_output(json_encode($arrData));
-		    return;
-    }
+		if (empty($allInputs['medioContacto']['id'])) {
+				$arrData['flag'] = 0;
+				$arrData['message'] = 'Debe seleccionar medio de contacto.';
+				$this->output
+				->set_content_type('application/json')
+				->set_output(json_encode($arrData));
+				return;
+		}
 
 		$hora_inicio_calendar = strtotime('07:00:00');
 		$hora_fin_calendar = strtotime('23:00:00');
@@ -538,12 +538,12 @@ class Cita extends CI_Controller {
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
 
 		$arrData['message'] = 'No se pudo registrar los datos';
-    $arrData['flag'] = 0;
+    	$arrData['flag'] = 0;
 
 
 		$data = array(
 			'fechaAtencion' => date('Y-m-d H:i:s'),
-      'estado' => 3,
+      		'estado' => 3,
 			'updatedAt' => date('Y-m-d H:i:s'),
 			'peso' => $allInputs['peso'],
 			'talla' => $allInputs['talla'],
@@ -606,6 +606,19 @@ class Cita extends CI_Controller {
 
 			$idreceta = $this->model_cita->m_registrar_receta($data);
 			if($idreceta) {
+				// REGISTRAR DETALLE
+				foreach ($allInputs['detalle'] as $row) {
+					$datos = array(
+						'recetaId' => $idreceta,
+						'nombreMedicamento' =>  $row['nombreMedicamento'],
+						'cantidad' =>  $row['cantidad'],
+						'indicaciones' =>  $row['indicaciones'],
+						'estado'	=> 1,
+						'createdAt'		=> date('Y-m-d H:i:s'),
+						'updatedAt'		=> date('Y-m-d H:i:s')
+					);
+					$this->model_cita->m_registrar_detalle_receta($datos);
+				}
 				$arrData['message'] = 'Se registraron los datos correctamente.';
 				$arrData['flag'] = 1;
 				$arrData['idreceta'] = $idreceta;
@@ -625,5 +638,20 @@ class Cita extends CI_Controller {
 		$this->output
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
+	}
+	public function listar_detalle_receta()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$arrData['message'] = '';
+    	$arrData['flag'] = 0;
+
+		$arrData['datos'] = $this->model_cita->m_cargar_detalle_receta($allInputs['datos']);
+
+
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+
+
 	}
 }

@@ -240,4 +240,24 @@ class Model_cita extends CI_Model {
 		$this->db->where('id',$id);
 		return $this->db->update('receta', $data);
 	}
+	public function m_registrar_detalle_receta($datos)
+	{
+		$this->db->insert('recetamedicamento', $datos);
+		return $this->db->insert_id();
+	}
+
+	public function m_cargar_detalle_receta($data)
+	{
+		$this->db->select("
+			rm.id,
+			rm.recetaId,
+			rm.nombreMedicamento,
+			rm.cantidad,
+			rm.indicaciones,
+			rm.estado
+		", FALSE);
+		$this->db->from('recetamedicamento rm');
+		$this->db->where('rm.recetaId', $data['idreceta']);
+		return $this->db->get()->result_array();
+	}
 }

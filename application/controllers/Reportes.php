@@ -202,6 +202,7 @@ class Reportes extends CI_Controller {
     	$arrData['flag'] = 1;
 
     	$cita = $this->model_cita->m_cargar_cita_por_id($allInputs['cita']);
+		$recetaDet = $this->model_cita->m_cargar_detalle_receta($cita);
 
 		$fechaUT = strtotime($cita['fechaReceta']);
 		$d	= date('d', $fechaUT);
@@ -230,7 +231,29 @@ class Reportes extends CI_Controller {
         $this->pdf->SetXY(100,61);
         $this->pdf->Cell(12,6,$y,0,0,'L');
 
-        $this->pdf->SetXY(17,90);
+		$this->pdf->Ln(15);
+		$this->pdf->SetX(10);
+		$this->pdf->SetFont('Arial','B',8);
+		$this->pdf->Cell(80,6,utf8_decode('MEDICAMENTO'),1,0);
+		$this->pdf->Cell(10,6,utf8_decode('CANT.'),1,0);
+		$this->pdf->Cell(100,6,strip_tags(utf8_decode('INDICACIONES')),1,0);
+		$this->pdf->Ln(6);
+
+		$this->pdf->SetFont('Arial','',8);
+		foreach ($recetaDet as $key => $value) {
+			$this->pdf->SetX(10);
+			$this->pdf->SetWidths(array(80, 10, 100));
+			$this->pdf->Row(
+				array(
+				strtoupper($value['nombreMedicamento']),
+				$value['cantidad'],
+				nl2br($value['indicaciones'])
+				)
+			);
+		}
+
+
+        $this->pdf->SetXY(17,120);
         $this->pdf->TextArea(array(utf8_decode($cita['indicacionesGenerales'])),0,0,FALSE,5,20);
 		//salida
 		$timestamp = date('YmdHis');

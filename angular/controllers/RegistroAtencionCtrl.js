@@ -26,7 +26,7 @@ app.controller('RegistroAtencionCtrl', [
     ];
 		$scope.fData = {}
 		$scope.fData.temporal = {};
-		
+
 		var datos = {
 			id: $stateParams.id
 		}
@@ -36,6 +36,7 @@ app.controller('RegistroAtencionCtrl', [
 			$scope.fData.temporal = {};
 			$scope.fData.temporal.tipoDiagnostico = $scope.fArr.listaTipoDiagnostico[0];
 			$scope.getPaginationServerSideDet(true);
+			$scope.getPaginationServerSideRec();
 
 		});
 		/* CALCULO DE IMC */
@@ -89,30 +90,8 @@ app.controller('RegistroAtencionCtrl', [
 				});
 			});
 		}
-		// recetas
-		$scope.grabarReceta = function(){
-			blockUI.start("Registrando receta...");
 
-			RegistroAtencionService.sRegistrarReceta($scope.fData).then(function (rpta) {
-				if (rpta.flag === 1) {
-					var pTitle = 'OK!';
-					var pType = 'success';
-					$scope.fData.idreceta = rpta.idreceta;
-				} else {
-					var pTitle = 'Advertencia!';
-					var pType = 'warning';
-
-				}
-				blockUI.stop();
-				pinesNotifications.notify({
-					title: pTitle,
-					text: rpta.message,
-					type: pType,
-					delay: 5000
-				});
-			});
-
-		}
+		// DIAGNOSTICO
 		$scope.getDiagnosticoAutocomplete = function (value) {
 			var params = {
 				searchText: value,
@@ -187,7 +166,7 @@ app.controller('RegistroAtencionCtrl', [
 				}
 			});
 		};
-		
+
 		$scope.getTableHeight = function () {
 			var rowHeight = 30; // your row height
 			var headerHeight = 30; // your header height
@@ -258,6 +237,120 @@ app.controller('RegistroAtencionCtrl', [
 			$scope.gridOptions.data.splice(index, 1);
 			// $scope.calcularTotales();
 		}
+
+		// RECETA
+		$scope.gridOptionsRec = {
+			rowHeight: 30,
+			enableGridMenu: false,
+			enableColumnMenus: false,
+			enableRowSelection: false,
+			enableSelectAll: false,
+			enableFiltering: false,
+			enableSorting: false,
+			enableFullRowSelection: false,
+			enableCellEdit: false,
+			multiSelect: false,
+			data: [],
+			columnDefs: [
+				{ field: 'nombreMedicamento', name: 'nombreMedicamento', displayName: 'MEDICAMENTO', minWidth: 120 },
+				{ field: 'cantidad', name: 'cantidad', displayName: 'CANTIDAD', minWidth: 120, width:90 },
+				{ field: 'indicaciones', name: 'indicaciones', displayName: 'INDICACIONES', minWidth: 120 },
+				{
+					field: 'eliminar', name: 'eliminar', displayName: '', width: 50,
+					cellTemplate: '<button class="btn btn-default btn-sm text-danger btn-action" ng-click="grid.appScope.btnQuitarDeLaCestaRec(row);$event.stopPropagation();"> <i class="fa fa-trash" tooltip-placement="left" uib-tooltip="ELIMINAR!"></i> </button>'
+				}
+			],
+			onRegisterApi: function (gridApi) {
+				$scope.gridApi = gridApi;
+			}
+		};
+		$scope.getPaginationServerSideRec = function (loader) {
+			if (loader) {
+				blockUI.start('Procesando información...');
+			}
+			var arrParams = {
+				datos: {
+					idreceta: $scope.fData.idreceta
+				}
+			};
+			RegistroAtencionService.sGetDetalleReceta(arrParams).then(function (rpta) {
+				if (rpta.datos.length == 0) {
+					rpta.paginate = { totalRows: 0 };
+				}
+				// $scope.gridOptionsRec.totalItems = rpta.paginate.totalRows;
+				$scope.gridOptionsRec.data = rpta.datos;
+				// $scope.calcularTotales();
+				if (loader) {
+					blockUI.stop();
+				}
+			});
+		};
+		$scope.grabarReceta = function () {
+			blockUI.start("Registrando receta...");
+			$scope.fData.detalle = $scope.gridOptionsRec.data;
+			RegistroAtencionService.sRegistrarReceta($scope.fData).then(function (rpta) {
+				if (rpta.flag === 1) {
+					var pTitle = 'OK!';
+					var pType = 'success';
+					$scope.fData.idreceta = rpta.idreceta;
+				} else {
+					var pTitle = 'Advertencia!';
+					var pType = 'warning';
+
+				}
+				blockUI.stop();
+				pinesNotifications.notify({
+					title: pTitle,
+					text: rpta.message,
+					type: pType,
+					delay: 5000
+				});
+			});
+
+		}
+		$scope.agregarItemMedicamento = function () {
+			if ($scope.fData.temporal.nombreMedicamento == null) {
+				pinesNotifications.notify({
+					title: 'Advertencia.',
+					text: 'Debe seleccionar un diagnostico.',
+					type: 'warning',
+					delay: 5000
+				});
+				return;
+			}
+
+
+			var producto_repetido = false;
+			angular.forEach($scope.gridOptionsRec.data, function (value, key) {
+				if (value.nombreMedicamento == $scope.fData.temporal.nombreMedicamento) {
+					producto_repetido = true;
+					pinesNotifications.notify({
+						title: 'Advertencia.',
+						text: 'Ya está cargado este medicamento.',
+						type: 'warning',
+						delay: 5000
+					});
+					return;
+				}
+			});
+
+			if (producto_repetido === false) {
+				$scope.gridOptionsRec.data.push({
+					nombreMedicamento: $scope.fData.temporal.nombreMedicamento,
+					cantidad: $scope.fData.temporal.cantidad,
+					indicaciones: $scope.fData.temporal.indicaciones,
+				});
+
+				$scope.fData.temporal.nombreMedicamento = null;
+				$scope.fData.temporal.cantidad = null;
+				$scope.fData.temporal.indicaciones = null;
+			}
+		}
+		$scope.btnQuitarDeLaCestaRec = function (row) {
+			var index = $scope.gridOptionsRec.data.indexOf(row.entity);
+			$scope.gridOptionsRec.data.splice(index, 1);
+			// $scope.calcularTotales();
+		}
 		// IMPRIMIR RECETA
 		$scope.btnImprimirReceta = function () {
 			var arrParams = {
@@ -279,6 +372,7 @@ app.controller('RegistroAtencionCtrl', [
 app.service("RegistroAtencionService", function ($http, $q, handleBehavior){
 	return({
 		sGetCitaById: sGetCitaById,
+		sGetDetalleReceta: sGetDetalleReceta,
 		sRegistrarAtencion: sRegistrarAtencion,
 		sRegistrarReceta: sRegistrarReceta,
 	});
@@ -286,6 +380,14 @@ app.service("RegistroAtencionService", function ($http, $q, handleBehavior){
 		var request = $http({
 			method: "post",
 			url: angular.patchURLCI + "Cita/listar_cita_por_id",
+			data: datos
+		});
+		return (request.then(handleBehavior.success, handleBehavior.error));
+	}
+	function sGetDetalleReceta(datos) {
+		var request = $http({
+			method: "post",
+			url: angular.patchURLCI + "Cita/listar_detalle_receta",
 			data: datos
 		});
 		return (request.then(handleBehavior.success, handleBehavior.error));
