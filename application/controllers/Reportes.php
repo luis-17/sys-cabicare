@@ -4,7 +4,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Reportes extends CI_Controller {
 	public function __construct(){
         parent::__construct();
-        $this->load->helper(array('fechas_helper'));
+        $this->load->helper(array('fechas_helper', 'pdf_helper', 'otros_helper'));
         $this->load->model(array('model_cita'));
 		$this->load->library(array('excel','Fpdfext'));
 
@@ -204,32 +204,29 @@ class Reportes extends CI_Controller {
     	$cita = $this->model_cita->m_cargar_cita_por_id($allInputs['cita']);
 		$recetaDet = $this->model_cita->m_cargar_detalle_receta($cita);
 
-		$fechaUT = strtotime($cita['fechaReceta']);
-		$d	= date('d', $fechaUT);
-		$m	= date('m', $fechaUT);
-		$y	= date('Y', $fechaUT);
-
 		$this->pdf = new Fpdfext();
+		mostrar_plantilla_pdf($this->pdf,utf8_decode($allInputs['titulo']),FALSE,$allInputs['tituloAbv']);
 		$this->pdf->AddPage();
-    	$this->pdf->SetMargins(0, 10, 10);
+    	$this->pdf->SetMargins(10, 10);
     	$this->pdf->SetAutoPageBreak(false);
     	$variablePosY = 0;
 
-		$this->pdf->SetFont('Arial','B',11);
+		$this->pdf->SetFont('Arial','B',12);
+        $this->pdf->Cell(25,6,utf8_decode('Paciente: '),0,0,'L');
+		$this->pdf->SetFont('Arial','',12);
+        $this->pdf->Cell(165,6,utf8_decode($cita['paciente']),0,0,'L');
+        $this->pdf->Ln(12);
 
-        $this->pdf->SetXY(38,48);
-        $this->pdf->Cell(65,6,utf8_decode($cita['paciente']),0,0,'L');
-        $this->pdf->SetXY(38,61);
-        $this->pdf->Cell(65,6,utf8_decode(devolverEdad($cita['fechaNacimiento']) . ' años'),0,0,'L');
+		$this->pdf->SetFont('Arial','B',12);
+        $this->pdf->Cell(25,6,utf8_decode('Edad: '),0,0,'L');
+		$this->pdf->SetFont('Arial','',12);
+        $this->pdf->Cell(43,6,utf8_decode(devolverEdad($cita['fechaNacimiento']) . ' años'),0,0,'L');
 
-        $this->pdf->SetXY(78,61);
-        $this->pdf->Cell(12,6,$d,0,0,'L');
+		$this->pdf->SetFont('Arial','B',12);
+        $this->pdf->Cell(25,6,utf8_decode('Fecha: '),0,0,'L');
+		$this->pdf->SetFont('Arial','',12);
+        $this->pdf->Cell(43,6, darFormatoDMY2($cita['fechaReceta']),0,0,'L');
 
-        $this->pdf->SetXY(89,61);
-        $this->pdf->Cell(12,6,$m,0,0,'L');
-
-        $this->pdf->SetXY(100,61);
-        $this->pdf->Cell(12,6,$y,0,0,'L');
 
 		$this->pdf->Ln(15);
 		$this->pdf->SetX(10);
@@ -253,8 +250,23 @@ class Reportes extends CI_Controller {
 		}
 
 
-        $this->pdf->SetXY(17,120);
-        $this->pdf->TextArea(array(utf8_decode($cita['indicacionesGenerales'])),0,0,FALSE,5,20);
+        // $this->pdf->SetXY(17,120);
+		$this->pdf->Ln(26);
+		$this->pdf->SetFont('Arial','B',8);
+        $this->pdf->Cell(190,6,utf8_decode('Observaciones'),0,0);
+		$this->pdf->Ln(6);
+		$this->pdf->MultiCell(190,6,utf8_decode($cita['indicacionesGenerales']),0,'L',FALSE);
+
+		$this->pdf->Ln(30);
+		$this->pdf->SetFont('Arial','',11);
+		$this->pdf->Cell(100,6,'');
+		$this->pdf->Cell(90,6,utf8_decode($cita['medico']),0,0,'C');
+		$this->pdf->Ln(4);
+		$this->pdf->SetFont('Arial','',8);
+		$this->pdf->Cell(100,6,'');
+		$this->pdf->Cell(90,6,utf8_decode('Sello y firma'),0,0,'C');
+		$this->pdf->Ln(8);
+
 		//salida
 		$timestamp = date('YmdHis');
 		$nombreArchivo = 'assets/dinamic/pdfTemporales/tempPDF_'. $timestamp .'.pdf';
