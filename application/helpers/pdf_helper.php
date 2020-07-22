@@ -1,15 +1,40 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+// function mostrar_plantilla_pdf($obj,$titulo,$subTitulo = false,$tituloAbr=false,$arrConfig = FALSE)
+// {
+//     // $ci2 =& get_instance(); 
+//     // if( empty($arrConfig) ){
+//     //     $fConfig = $ci2->model_config->m_cargar_empresa_usuario_activa(); 
+//     //     $fConfig['mode_report'] = FALSE;
+//     // }else{ 
+//     //     $fConfig = $arrConfig;
+//     // }
+   
+//     // return true;
+
+// }
 function mostrar_plantilla_pdf($obj,$titulo,$subTitulo = false,$tituloAbr=false,$arrConfig = FALSE)
 {
-    // $ci2 =& get_instance(); 
+    $ci2 =& get_instance(); 
     // if( empty($arrConfig) ){
     //     $fConfig = $ci2->model_config->m_cargar_empresa_usuario_activa(); 
+    //     $fConfigSede = $ci2->model_config->m_cargar_empresa_sede_activa(); 
     //     $fConfig['mode_report'] = FALSE;
     // }else{ 
     //     $fConfig = $arrConfig;
+    //     $fConfigSede = $arrConfigSede;
     // }
-   
-    // return true;
+    $obj->setNombreEmpresa('CABICARE S.A.C');
+    $obj->setDireccion('Av. Benavides 3082, piso 3 ofic 306 Miraflores'); //var_dump($fConfig['domicilio_fiscal']); exit();
+    $obj->setImagenCab('img/logo.png');
+    $obj->setTitulo($titulo);
+    $obj->setTituloAbr($tituloAbr);
+    // $obj->setEstado($arrConfig['estado']);
+    // $obj->setRucEmpresa(@$arrConfig['ruc']);
+    $obj->setModeReport(FALSE); 
+    // $obj->setDireccionSede($fConfigSede['direccion_se']);
+    // $obj->setReferenciaSede($fConfigSede['referencia_se']);
+    // $obj->setNombreSede('HIGUERETA'); 
+    return true;
 
 }
 function textIntoCols($strOriginal,$noCols,$pdf,$iMaxCharRow)

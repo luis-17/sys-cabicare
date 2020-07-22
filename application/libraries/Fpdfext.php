@@ -344,16 +344,59 @@
           return $nl;
       }
       public function Header(){
-        $this->Image(base_url('img/receta.jpeg'),'0','0','200','300','JPG');
+        // $this->Image(base_url('img/receta.jpeg'),'0','0','200','300','JPG');
         //$this->SetAutoPageBreak(TRUE,25);
-        $ci2 =& get_instance();
+        // $ci2 =& get_instance();
+        // $this->SetFont('Arial','',6);
+        // $this->SetXY(-70,0);
+
+        // if( $this->PageNo() > 1 ){
+        //   $this->SetY(26);
+        // }
+        // MODO NORMAL 
+        $this->SetAutoPageBreak(TRUE,25);
+
+        // $ci2 =& get_instance(); 
+        // $this->SetFont('Arial','',6);
+        // $this->SetXY(-70,0);
+        // $this->MultiCell(120,6,'USUARIO:'.strtoupper_total($ci2->sessionFactur['username']).'    /   FECHA DE IMPRESION: '.date('Y-m-d H:i:s'));
+        // $this->Image($this->getImagenCab(),2,2,50); 
+        // $this->SetFont('Arial','',5);
+        // $this->SetXY(16,10);
+        // $this->MultiCell( 120,6,utf8_decode(strtoupper_total($this->getNombreEmpresa())) ); 
+        // $this->SetXY(16,12);
+        // $this->SetFont('Arial','',4);
+        // $this->MultiCell( 120,6,utf8_decode(strtoupper_total($this->getDireccion())) ); 
+        // $this->SetFont('Arial','B',13);
+        // $this->SetXY(100,10);
+        // $this->Cell(120,10,utf8_decode($this->getTitulo()),0,0);
+        // $this->Line(350,20,4,20);
+        // $this->Ln(15);
+
+        $ci2 =& get_instance(); 
         $this->SetFont('Arial','',6);
         $this->SetXY(-70,0);
-
-        if( $this->PageNo() > 1 ){
-          $this->SetY(26);
+        $this->MultiCell(120,6,'USUARIO:'.strtoupper($ci2->sessionFactur['username']).'    /   FECHA DE IMPRESION: '.date('Y-m-d H:i:s'));
+        $this->Image($this->getImagenCab(),8,0,30); 
+        $varXPositionNE= 8;
+        $varXPositionDIR= 8;
+        $this->SetFont('Arial','',5);
+        $this->SetXY($varXPositionNE,14);
+        $this->MultiCell( 120,6,utf8_decode(strtoupper_total($this->getNombreEmpresa())) );
+        $this->SetXY($varXPositionDIR,16);
+        $this->SetFont('Arial','',4);
+        $this->MultiCell( 120,6,utf8_decode(strtoupper_total($this->getDireccion())),0,'L' );
+        $this->SetTextColor(0,0,0);
+        $this->SetFont('Arial','B',13);
+        $this->SetXY(100,10);
+        $this->Cell(120,10,utf8_decode($this->getTitulo()),0,0);
+        $this->Line(292,20,4,20);
+        $this->Ln(15);
+        if( @$this->tituloAbr  === 0 ){ 
+          $this->SetFont('Arial','B',50);
+          $this->SetTextColor(255,192,203);
+          $this->RotatedText(70,190,'A N U L A D O',45);  
         }
-
       }
        // El pie del pdf
       public function Footer(){

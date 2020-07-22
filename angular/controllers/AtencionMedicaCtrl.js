@@ -328,14 +328,15 @@ app.controller('AtencionMedicaCtrl',
 			multiSelect: false,
 			columnDefs: [
 				{ field: 'id', name: 'ci.id', displayName: 'ID', width: '75', sort: { direction: uiGridConstants.DESC } },
-				{ field: 'fechaCita', name: 'fechaCita', displayName: 'Fecha Cita', minWidth: 100, width: 100, enableFiltering: false },
-				{ field: 'horaDesde', name: 'horaDesde', displayName: 'Hora Cita', minWidth: 100, width: 100, enableFiltering: false },
+				{ field: 'fechaCita', name: 'fechaCita', displayName: 'Fecha Atención', minWidth: 100, width: 100, enableFiltering: false },
+				{ field: 'horaDesde', name: 'horaDesde', displayName: 'Hora', minWidth: 100, width: 100, enableFiltering: false },
+				{ field: 'username', name: 'username', displayName: 'Usuario Registro', minWidth: 90, width: 115, visible: false },
 				{ field: 'tipoDocumento', name: 'tipoDocumento', displayName: 'Tipo Doc.', minWidth: 90, width: 115 },
 				{ field: 'numeroDocumento', name: 'numeroDocumento', displayName: 'Nº Documento', minWidth: 90, width: 115 },
 				{ field: 'paciente', name: 'paciente', displayName: 'Paciente', minWidth: 100 },
-				// { field: 'medico', name: 'medico', displayName: 'Médico', minWidth: 120 },
+				{ field: 'edad', name: 'edad', displayName: 'Edad', width: 64, enableFiltering: false },
 				{ field: 'medico', name: 'medico', width: 130, cellTemplate:'<div class="ui-grid-cell-contents text-left ">'+ '{{ COL_FIELD.medico }}</div>',  displayName: 'Médico' },
-				{ field: 'total', name: 'total', displayName: 'Total', minWidth: 100, width: 100 },
+				{ field: 'total', name: 'total', displayName: 'Total', minWidth: 100, width: 100, visible: false },
 				{ field: 'estado', type: 'object', name: 'estado', displayName: 'Estado', maxWidth: 200, enableFiltering: false,
 					cellTemplate: '<label style="box-shadow: 1px 1px 0 black; margin: 6px auto; display: block; width: 120px;" class="label {{ COL_FIELD.clase }} ">{{ COL_FIELD.string }}</label>'
 				}
@@ -369,11 +370,12 @@ app.controller('AtencionMedicaCtrl',
 					paginationOptions.search = true;
 					paginationOptions.searchColumn = {
 						'ci.id': grid.columns[1].filters[0].term,
-						'pa.tipoDocumento': grid.columns[4].filters[0].term,
-						'pa.numeroDocumento': grid.columns[5].filters[0].term,
-						"concat_ws(' ', pa.nombres, pa.apellidoPaterno, pa.apellidoMaterno)": grid.columns[6].filters[0].term,
-						"concat_ws(' ', us.nombres, us.apellidos)": grid.columns[7].filters[0].term,
-						'ci.total': grid.columns[87].filters[0].term,
+						'uscr.username': grid.columns[4].filters[0].term,
+						'pa.tipoDocumento': grid.columns[5].filters[0].term,
+						'pa.numeroDocumento': grid.columns[6].filters[0].term,
+						"concat_ws(' ', pa.nombres, pa.apellidoPaterno, pa.apellidoMaterno)": grid.columns[7].filters[0].term,
+						"concat_ws(' ', us.nombres, us.apellidos)": grid.columns[9].filters[0].term,
+						// 'ci.total': grid.columns[9].filters[0].term,
 
 					};
 					$scope.metodos.getPaginationServerSide();
@@ -390,7 +392,7 @@ app.controller('AtencionMedicaCtrl',
 				paginate: paginationOptions,
 				datos: $scope.fBusqueda
 			};
-			CitaServices.sListarCitasGrilla(arrParams).then(function (rpta) {
+			AtencionServices.sListarAtencionesGrilla(arrParams).then(function (rpta) {
 				if (rpta.datos.length == 0) {
 					rpta.paginate = { totalRows: 0 };
 				}
@@ -402,7 +404,19 @@ app.controller('AtencionMedicaCtrl',
 			});
 			$scope.mySelectionGrid = [];
 		};
-
+		$scope.btnImprimirFichaAtencion = function (event) { 
+      var arrParams = {
+        titulo: 'FICHA DE ATENCION',
+        url: angular.patchURLCI+'CentralReportes/report_ficha_atencion',
+        datos: {
+          id: event.id,
+          titulo: 'FICHA DE ATENCION',
+          tituloAbv: 'AM-FAM'
+        },
+        metodo: 'php'
+      };
+      ModalReporteFactory.getPopupReporte(arrParams); 
+    }
 		// $scope.btnExportarListaExcel = function () {
 		// 	var arrParams = {
 		// 		titulo: 'LISTADO DE ANALISIS',
@@ -423,7 +437,7 @@ app.controller('AtencionMedicaCtrl',
 
 app.service("AtencionServices", function ($http, $q, handleBehavior) {
 	return({
-		// sListarCitasGrilla: sListarCitasGrilla,
+		sListarAtencionesGrilla: sListarAtencionesGrilla,
 		// sListarCitaCalendario: sListarCitaCalendario,
 		// sListarDetalleCita: sListarDetalleCita,
 		// sRegistrar: sRegistrar,
@@ -432,12 +446,12 @@ app.service("AtencionServices", function ($http, $q, handleBehavior) {
 		// sLiberarAtencion: sLiberarAtencion,
 	});
 
-	// function sLiberarAtencion(datos) {
-	// 	var request = $http({
-	// 		method: "post",
-	// 		url: angular.patchURLCI + "Cita/liberar_atencion",
-	// 		data: datos
-	// 	});
-	// 	return (request.then(handleBehavior.success, handleBehavior.error));
-	// }
+	function sListarAtencionesGrilla(datos) {
+		var request = $http({
+			method: "post",
+			url: angular.patchURLCI + "Cita/listar_atenciones_grilla",
+			data: datos
+		});
+		return (request.then(handleBehavior.success, handleBehavior.error));
+	}
 });

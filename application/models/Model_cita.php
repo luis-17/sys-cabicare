@@ -82,7 +82,89 @@ class Model_cita extends CI_Model {
 		$fData = $this->db->get()->row_array();
 		return $fData;
 	}
+	public function m_cargar_atenciones_en_grilla($paramPaginate,$paramDatos){
+		$desde = $this->db->escape(darFormatoYMD($paramDatos['fechaDesde']));
+ 		$hasta = $this->db->escape(darFormatoYMD($paramDatos['fechaHasta']));
+		$this->db->select("
+			ci.id,
+			ci.pacienteId,
+			ci.usuarioId,
+			ci.sedeId,
+			ci.fechaAtencion,
+			ci.fechaCita,
+			ci.horaDesde,
+			ci.horaHasta,
+			ci.apuntesCita,
+			ci.total,
+			ci.peso,
+			ci.talla,
+			ci.imc,
+			ci.presionArterual,
+			ci.frecuenciaCardiaca,
+			ci.temperaturaCorporal,
+			ci.perimetroAbdominal,
+			ci.observaciones,
+			ci.estado,
+			ci.medioContacto,
+			ci.metodoPago,
+			ci.numOperacion,
+			concat_ws(' ', pa.nombres, pa.apellidoPaterno, pa.apellidoMaterno) AS paciente,
+			pa.tipoDocumento,
+			pa.numeroDocumento,
+			ci.medicoId,
+			concat_ws(' ', us.nombres, us.apellidos) AS medico,
+			uscr.username
+		", FALSE);
+		// $this->db->select("DATE_PART('YEAR',AGE(pa.fechaNacimiento)) AS edad",FALSE);
+		// $this->db->select("EXTRACT(YEAR FROM AGE(pa.fechaNacimiento)) AS edad",FALSE);
+		$this->db->select("FLOOR(DATEDIFF(NOW(), pa.fechaNacimiento)/365) AS edad", FALSE);
+		$this->db->from('cita ci');
+		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
+		$this->db->join('usuario us', 'ci.medicoId = us.id','left');
+		$this->db->join('usuario uscr', 'ci.usuarioId = uscr.id');
+		$this->db->where_in('ci.estado', array(0, 2, 3));
+		$this->db->where('pa.estado', 1);
+		$this->db->where('ci.fechaCita BETWEEN ' . $desde .' AND ' . $hasta);
 
+		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
+			foreach ($paramPaginate['searchColumn'] as $key => $value) {
+				if(! empty($value)){
+					$this->db->like($key ,strtoupper_total($value) ,FALSE);
+				}
+			}
+		}
+
+		if( $paramPaginate['sortName'] ){
+			$this->db->order_by($paramPaginate['sortName'], $paramPaginate['sort']);
+		}
+		if( $paramPaginate['firstRow'] || $paramPaginate['pageSize'] ){
+			$this->db->limit($paramPaginate['pageSize'],$paramPaginate['firstRow'] );
+		}
+		return $this->db->get()->result_array();
+	}
+
+	public function m_count_atenciones_en_grilla($paramPaginate,$paramDatos){
+		$desde = $this->db->escape(darFormatoYMD($paramDatos['fechaDesde']));
+ 		$hasta = $this->db->escape(darFormatoYMD($paramDatos['fechaHasta']));
+		$this->db->select('COUNT(*) AS contador');
+		$this->db->from('cita ci');
+		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
+		$this->db->join('usuario us', 'ci.medicoId = us.id','left');
+		$this->db->join('usuario uscr', 'ci.usuarioId = uscr.id');
+		$this->db->where_in('ci.estado', array(0, 2, 3));
+		$this->db->where('pa.estado', 1);
+		$this->db->where('ci.fechaCita BETWEEN ' . $desde .' AND ' . $hasta);
+
+		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
+			foreach ($paramPaginate['searchColumn'] as $key => $value) {
+				if(! empty($value)){
+					$this->db->like($key ,strtoupper_total($value) ,FALSE);
+				}
+			}
+		}
+		$fData = $this->db->get()->row_array();
+		return $fData;
+	}
 	public function m_cargar_citas($datos){
 		$arrEstados = array(1, 2, 3);
 		if ($datos['origen'] === 'ate') {
@@ -178,6 +260,9 @@ class Model_cita extends CI_Model {
 			rec.fechaReceta,
 			rec.indicacionesGenerales
 		", FALSE);
+		// $this->db->select("EXTRACT(YEAR FROM AGE(pa.fechaNacimiento)) AS edad",FALSE);
+		// $this->db->select("EXTRACT(YEAR FROM AGE(pa.fechaNacimiento)) AS edad",FALSE);
+		$this->db->select("FLOOR(DATEDIFF(NOW(), pa.fechaNacimiento)/365) AS edad", FALSE);
 		$this->db->from('cita ci');
 		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
 		$this->db->join('receta rec', 'ci.id = rec.Citaid', 'left');
@@ -267,6 +352,25 @@ class Model_cita extends CI_Model {
 		", FALSE);
 		$this->db->from('recetamedicamento rm');
 		$this->db->where('rm.recetaId', $data['idreceta']);
+		return $this->db->get()->result_array();
+	}
+
+	public function m_cargar_detalle_receta_por_cita($idcita)
+	{
+		$this->db->select("
+			re.indicacionesGenerales,
+			re.citaId,
+			rm.id,
+			rm.recetaId,
+			rm.nombreMedicamento,
+			rm.cantidad,
+			rm.indicaciones,
+			rm.estado
+		", FALSE);
+		$this->db->from('receta re');
+		$this->db->join('recetamedicamento rm', 're.id = rm.recetaId');
+		$this->db->where('re.citaId', $idcita);
+		$this->db->where('re.estado', 1);
 		return $this->db->get()->result_array();
 	}
 }

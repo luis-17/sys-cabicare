@@ -8,7 +8,7 @@
         <a data-target="#calendario" role="tab" data-toggle="tab"> VISTA DE CALENDARIO </a>
       </li>
       <li >
-        <a data-target="#lista" role="tab" data-toggle="tab" ng-click="metodos.getPaginationServerSide(true);"> VISTA DE LISTA </a>
+        <a data-target="#lista" role="tab" data-toggle="tab"> VISTA DE LISTA </a>
       </li>
     </ul>
   </div>
@@ -68,8 +68,8 @@
                     <!-- <li role="menuitem" ng-if="event.id" ng-click="btnVerCita(event)">
                       <a><i class="fa fa-eye"></i>Ver Cita</a>
                     </li> -->
-                    <li role="menuitem" ng-if="event.id" ng-click="btnFicha(event)">
-                      <a><i class="fa fa-eye"></i>Ficha del Paciente</a>
+                    <li role="menuitem" ng-if="event.id && (event.estado == 3)" ng-click="btnImprimirFichaAtencion(event)">
+                      <a><i class="fa fa-eye"></i>Imprimir Ficha</a>
                     </li>
 
                   </ul>
@@ -124,29 +124,30 @@
               </div>
 
               <div class="col-md-4 mt-lg">
-                <button
+                <!-- <button
                   class="btn  m-b-xs btn-default btn-xs pull-right"
                   ng-click='btnExportarListaExcel()'
                   title="Exportar a Excel"
                 >
                   <i class="fa fa-file-excel-o text-success f-24"></i> Excel
-                </button>
+                </button> -->
+                
+                <button type="button" class="btn m-b-xs btn-success btn-xs pull-right mr-sm"
+                  ng-if="mySelectionGrid.length == 1 && (mySelectionGrid[0].estado.bool == 3)"
+                  ng-click='btnImprimirFichaAtencion(mySelectionGrid[0])'> Imprimir Ficha </button>
 
-
-                <button
-                  ng-if="mySelectionGrid.length == 1"
+                <button ng-if="mySelectionGrid.length == 1 && (mySelectionGrid[0].estado.bool == 2 || mySelectionGrid[0].estado.bool == 3)"
                   class="btn m-b-xs btn-warning btn-xs pull-right mr-sm"
-                  ng-click="btnEditarCita(mySelectionGrid[0],false);"
+                  ng-click="goToUrl('/app/registrar-atencion/' + mySelectionGrid[0].id)"
                 >
-                  <i class="fa fa-edit"></i> Editar
+                  <i class="fa fa-success"></i> IR A ATENCIÓN
                 </button>
 
-                <button
-                  ng-if="mySelectionGrid.length == 1"
+                <button ng-if="mySelectionGrid.length == 1 && (mySelectionGrid[0].estado.bool != 0)"
                   class="btn m-b-xs btn-danger btn-xs pull-right mr-sm"
-                  ng-click="btnAnular();"
+                  ng-click="btnAnularAtencion(mySelectionGrid[0]);"
                 >
-                  <i class="fa fa-trash-o"></i> Anular
+                  <i class="fa fa-trash-o"></i> ANULAR
                 </button>
               </div>
             </div>

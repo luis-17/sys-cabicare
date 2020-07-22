@@ -103,6 +103,83 @@ class Cita extends CI_Controller {
 		    ->set_output(json_encode($arrData));
 
 	}
+
+	public function listar_atenciones_grilla()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$paramPaginate = $allInputs['paginate'];
+		$paramDatos = $allInputs['datos'];
+		$lista = $this->model_cita->m_cargar_atenciones_en_grilla($paramPaginate,$paramDatos);
+		$arrListado = array();
+		if(empty($lista)){
+			$arrData['flag'] = 0;
+			$arrData['datos'] = $arrListado;
+			$arrData['paginate']['totalRows'] = 0;
+    	$arrData['message'] = '';
+			$this->output
+				->set_content_type('application/json')
+				->set_output(json_encode($arrData));
+			return;
+		}
+		$fCount = $this->model_cita->m_count_atenciones_en_grilla($paramPaginate,$paramDatos);
+
+		foreach ($lista as $row) {
+
+			if ( $row['estado'] == 2 ){
+				$clase = 'label-primary';
+				$estado = 'CONFIRMADO';
+			}elseif ( $row['estado'] == 3 ) {
+				$clase = 'label-success';
+				$estado = 'ATENDIDO';
+			}elseif ( $row['estado'] == 0 ) {
+				$clase = 'label-default';
+				$estado = 'ANULADO';
+			}else {
+				$clase = '';
+				$estado = '';
+			}
+			array_push(
+				$arrListado,
+				array(
+					'id' => $row['id'],
+					'horaDesde' => darFormatoHora($row['horaDesde']),
+					'horaHasta' => darFormatoHora($row['horaHasta']),
+					'fechaCita' => darFormatoDMY($row['fechaCita']),
+					'fecha' => $row['fechaCita'],
+					'edad' =>  $row['edad'],
+					'tipoDocumento' =>  $row['tipoDocumento'],
+					'numeroDocumento' =>  $row['numeroDocumento'],
+					'paciente' =>  $row['paciente'],
+					'peso' =>  $row['peso'],
+					'talla' =>  $row['talla'],
+					'imc' =>  $row['imc'],
+					'apuntesCita' =>  $row['apuntesCita'],
+					'frecuenciaCardiaca' =>  $row['frecuenciaCardiaca'],
+					'temperaturaCorporal' =>  $row['temperaturaCorporal'],
+          'medico' => array(
+						'id' => $row['medicoId'],
+						'medico' => $row['medico']
+					),
+					'username'=> $row['username'],
+					'estado' => array(
+						'string' => $estado,
+						'clase' =>$clase,
+						'bool' =>$row['estado']
+					)
+				)
+			);
+		}
+
+		$arrData['datos'] = $arrListado;
+		$arrData['paginate']['totalRows'] = $fCount['contador'];
+		$arrData['message'] = '';
+		$arrData['flag'] = 1;
+
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+	}
+
 	public function listar_citas()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
