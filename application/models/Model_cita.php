@@ -226,6 +226,31 @@ class Model_cita extends CI_Model {
 		$this->db->order_by('cp.id', 'ASC');
 		return $this->db->get()->result_array();
 	}
+	public function m_cargar_detalle_cita_atendida_por_paciente($datos)
+	{
+		$this->db->select("
+			cp.id,
+			cp.productoId AS idproducto,
+			pr.nombre AS producto,
+			pr.tipoProductoId,
+			tp.nombre AS tipoProducto,
+			cp.citaId,
+			cp.precioReal AS precio,
+			cp.informe,
+			cp.observaciones,
+			cp.estado
+		", FALSE);
+		$this->db->from('cita ci');
+		$this->db->join('citaproducto cp', 'ci.id = cp.citaId');
+		$this->db->join('producto pr', 'cp.productoId = pr.id');
+		$this->db->join('tipoproducto tp', 'pr.tipoProductoId = tp.id');
+		$this->db->where('ci.pacienteId', $datos['id']);
+		$this->db->where('cp.estado', 1);
+		$this->db->where_in('ci.estado', 3); // atendida
+		$this->db->order_by('pr.tipoProductoId', 'ASC');
+		$this->db->order_by('cp.id', 'ASC');
+		return $this->db->get()->result_array();
+	}
 
 	public function m_cargar_cita_por_id($datos){
 		$this->db->select("

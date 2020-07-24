@@ -56,10 +56,35 @@ class Model_paciente extends CI_Model {
 			pa.email,
 			pa.alergias,
 			pa.operador,
-			pa.antecedentes
+			pa.antecedentes,
+			concat_ws(' ', pa.nombres, pa.apellidoPaterno, pa.apellidoMaterno) AS paciente
 		", FALSE);
 		$this->db->from('paciente pa');
 		$this->db->where('pa.numeroDocumento', $datos['numeroDocumento']);
+		$this->db->limit('1');
+		return $this->db->get()->row_array();
+	}
+
+	public function m_cargar_paciente_por_id($datos)
+	{
+		$this->db->select("
+			id AS pacienteId,
+			pa.nombres,
+			pa.apellidoPaterno,
+			pa.apellidoMaterno,
+			pa.tipoDocumento,
+			pa.numeroDocumento,
+			pa.sexo,
+			pa.fechaNacimiento,
+			pa.celular,
+			pa.email,
+			pa.alergias,
+			pa.operador,
+			pa.antecedentes,
+			concat_ws(' ', pa.nombres, pa.apellidoPaterno, pa.apellidoMaterno) AS paciente
+		", FALSE);
+		$this->db->from('paciente pa');
+		$this->db->where('pa.id', $datos['id']);
 		$this->db->limit('1');
 		return $this->db->get()->row_array();
 	}

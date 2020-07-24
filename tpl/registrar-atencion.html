@@ -241,26 +241,31 @@
 
 
 							<div class="form-group col-sm-12">
-
 								<div class=" mb-n">
 									<label class="m-n text-blue"> Indicaciones Generales: </label>
 								</div>
 								<textarea name="informe" id="" cols="30" rows="5" ng-model="fData.indicacionesGenerales" style="width: 100%;"></textarea>
 							</div>
-						</div>
-
-						<div class="row">
-							<div class="block mt text-center">
-								<button class="btn btn-success" ng-click="grabarReceta(); $event.preventDefault();"
-									style="width: 240px;">
+							<div class="col-sm-12 mb-lg text-center">
+								<button ng-if="fSessionCI.usuarioId == fData.medicoId && fSessionCI.keyPerfil == 'key_med'" 
+									class="btn btn-success btn-sm" ng-click="grabarReceta(); $event.preventDefault();">
 									<i class="fa fa-edit"></i> Grabar Receta
 								</button>
-								<button class="btn btn-info" ng-click="btnImprimirReceta(); $event.preventDefault();"
-									style="width: 240px;">
+								<button ng-if="fSessionCI.keyPerfil == 'key_root'" 
+									class="btn btn-success btn-sm" ng-click="grabarReceta(); $event.preventDefault();">
+									<i class="fa fa-edit"></i> Grabar Receta
+								</button>
+								<button class="btn btn-info btn-sm" ng-click="btnImprimirReceta(); $event.preventDefault();">
 									<i class="fa fa-download"></i> Imprimir Receta
 								</button>
 							</div>
 						</div>
+
+						<!-- <div class="row">
+							<div class="block mt text-center">
+								
+							</div>
+						</div> -->
 
 					</uib-tab>
         </uib-tabset>

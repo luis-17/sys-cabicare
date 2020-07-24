@@ -7,7 +7,7 @@ class CentralReportes extends CI_Controller {
   {
     parent::__construct();
     $this->load->helper(array('fechas_helper', 'otros_helper', 'pdf_helper'));
-    $this->load->model(array('model_cita', 'model_diagnostico'));
+    $this->load->model(array('model_cita', 'model_diagnostico', 'model_paciente'));
     $this->output->set_header("Cache-Control: no-store, no-cache, must-revalidate, no-transform, max-age=0, post-check=0, pre-check=0");
     $this->output->set_header("Pragma: no-cache");
     $this->sessionFactur = @$this->session->userdata('sess_cabi_'.substr(base_url(),-20,7));
@@ -56,7 +56,8 @@ class CentralReportes extends CI_Controller {
       $this->pdf->AliasNbPages();
 
       $this->pdf->SetFont('Arial','B',10);
-      $this->pdf->Cell(0,7,'DATOS DEL PACIENTE',1,0,'C');
+      $this->pdf->SetFillColor(214,225,242);
+      $this->pdf->Cell(0,7,'DATOS DEL PACIENTE',1,0,'C', true);
       $this->pdf->Ln(8);
       $this->pdf->SetFont('Arial','B',9);
       $this->pdf->Cell(90,6,'Nombres y Apellidos');
@@ -72,10 +73,11 @@ class CentralReportes extends CI_Controller {
       $this->pdf->Ln(10);
       // APARTADO: ACTO MEDICO
       $this->pdf->SetFont('Arial','B',10);
-      $this->pdf->Cell(0,7,'ACTO MEDICO',1,0,'C');
+      $this->pdf->SetFillColor(214,225,242);
+      $this->pdf->Cell(0,7,'ACTO MEDICO',1,0,'C', true);
       $this->pdf->Ln(8);
       $this->pdf->SetFont('Arial','B',9);
-      $this->pdf->Cell(50,6,utf8_decode('Nº Acto Médico'));
+      $this->pdf->Cell(60,6,utf8_decode('Nº Acto Médico'));
       // $this->pdf->Cell(40,6,utf8_decode('Nº Orden'));
       $this->pdf->Cell(80,6,'Especialidad:');
       $this->pdf->Cell(100,6,utf8_decode('Profesional'));
@@ -83,7 +85,7 @@ class CentralReportes extends CI_Controller {
       
       $this->pdf->Ln(4);
       $this->pdf->SetFont('Arial','',8);
-      $this->pdf->Cell(50,6,$fAtencion['id'].'-'.$fDetAtencion['id']);
+      $this->pdf->Cell(60,6,$fAtencion['id'].'-'.$fDetAtencion['id']);
       // $this->pdf->Cell(40,6,$fAtencion['orden_venta']);
       $this->pdf->Cell(80,6,utf8_decode('OBSTETRICIA-GINECOLOGÍA'));
       $this->pdf->Cell(100,6,utf8_decode($fAtencion['medico']));
@@ -91,9 +93,9 @@ class CentralReportes extends CI_Controller {
 
       $this->pdf->Ln(6);
       $this->pdf->SetFont('Arial','B',9);
-      $this->pdf->Cell(50,6,utf8_decode('Fecha de Atención'));
-      $this->pdf->Cell(40,6,utf8_decode('Edad en la Atención'));
-      $this->pdf->Cell(40,6,'Area Hospitalaria');
+      $this->pdf->Cell(60,6,utf8_decode('Fecha de Atención'));
+      $this->pdf->Cell(80,6,utf8_decode('Edad en la Atención'));
+      // $this->pdf->Cell(40,6,'Area Hospitalaria');
       $this->pdf->Cell(60,6,utf8_decode('Actividad Específica'));
       
 
@@ -102,9 +104,9 @@ class CentralReportes extends CI_Controller {
       
       $this->pdf->SetFont('Arial','',8);
       
-      $this->pdf->Cell(50,6,formatoConDiaHora($fAtencion['fechaCita']));
-      $this->pdf->Cell(40,6,utf8_decode($edadEnAtencion));
-      $this->pdf->Cell(40,6,utf8_decode('ATENCIÓN AMBULATORIA'));
+      $this->pdf->Cell(60,6,formatoConDiaHora($fAtencion['fechaCita']));
+      $this->pdf->Cell(80,6,utf8_decode($edadEnAtencion));
+      // $this->pdf->Cell(40,6,utf8_decode('ATENCIÓN AMBULATORIA'));
       // $this->pdf->Cell(60,6,utf8_decode($fAtencion['producto']));
       $this->pdf->SetWidths(array(60));
       $this->pdf->Row( 
@@ -121,13 +123,15 @@ class CentralReportes extends CI_Controller {
         
       
         $this->pdf->SetFont('Arial','B',9);
-        $this->pdf->Cell(0,6,utf8_decode('INFORME'),1,0,'C');
+        $this->pdf->SetFillColor(214,225,242);
+        $this->pdf->Cell(0,6,utf8_decode('INFORME'),1,0,'C', true);
         $this->pdf->Ln(8);
         $this->pdf->SetFont('Arial','',8);
         $this->pdf->MultiCell(0,6,utf8_decode($fDetAtencion['informe']));
         $this->pdf->Ln(4);
         $this->pdf->SetFont('Arial','B',9);
-        $this->pdf->Cell(0,6,utf8_decode('SIGNOS VITALES'),1,0,'C');
+        $this->pdf->SetFillColor(214,225,242);
+        $this->pdf->Cell(0,6,utf8_decode('SIGNOS VITALES'),1,0,'C',true);
         $this->pdf->Ln(8);
         $this->pdf->SetFont('Arial','B',9);
         $this->pdf->Cell(47,6,utf8_decode('Presión Arterial'));
@@ -143,7 +147,8 @@ class CentralReportes extends CI_Controller {
         // $this->pdf->Cell(48,6,$fAtencion['frec_respiratoria']);
         $this->pdf->Ln(10);
         $this->pdf->SetFont('Arial','B',9);
-        $this->pdf->Cell(0,6,utf8_decode('ANTROPOMETRÍA'),1,0,'C');
+        $this->pdf->SetFillColor(214,225,242);
+        $this->pdf->Cell(0,6,utf8_decode('ANTROPOMETRÍA'),1,0,'C', true);
         $this->pdf->Ln(8);
         $this->pdf->SetFont('Arial','B',9);
         $this->pdf->Cell(47,6,utf8_decode('Peso (Kg)'));
@@ -164,13 +169,15 @@ class CentralReportes extends CI_Controller {
         $this->pdf->MultiCell(0,6,utf8_decode($fDetAtencion['informe']));
         $this->pdf->Ln(4);
         $this->pdf->SetFont('Arial','B',9);
-        $this->pdf->Cell(0,6,utf8_decode('PLAN DE TRABAJO, COMENTARIOS Y/O OBSERVACIONES'),1,0,'C');
+        $this->pdf->SetFillColor(214,225,242);
+        $this->pdf->Cell(0,6,utf8_decode('PLAN DE TRABAJO, COMENTARIOS Y/O OBSERVACIONES'),1,0,'C',true);
         $this->pdf->Ln(8);
         $this->pdf->SetFont('Arial','',8);
         $this->pdf->MultiCell(0,6,utf8_decode($fDetAtencion['observaciones']));
         $this->pdf->Ln(4);
         $this->pdf->SetFont('Arial','B',9);
-        $this->pdf->Cell(0,6,utf8_decode('DIAGNÓSTICOS'),1,0,'C');
+        $this->pdf->SetFillColor(214,225,242);
+        $this->pdf->Cell(0,6,utf8_decode('DIAGNÓSTICOS'),1,0,'C', true);
         $this->pdf->Ln(8);
         $this->pdf->SetFont('Arial','B',9);
         $this->pdf->Cell(47,6,utf8_decode('CÓDIGO'));
@@ -194,7 +201,8 @@ class CentralReportes extends CI_Controller {
         $recetas = $this->model_cita->m_cargar_detalle_receta_por_cita($fAtencion['id']);
         if( !empty($recetas) ){
           $this->pdf->SetFont('Arial','B',9);
-          $this->pdf->Cell(0,6,utf8_decode('RECETA MÉDICA'),1,0,'C');
+          $this->pdf->SetFillColor(214,225,242);
+          $this->pdf->Cell(0,6,utf8_decode('RECETA MÉDICA'),1,0,'C', true);
           $this->pdf->Ln(8);
           $this->pdf->SetFont('Arial','B',9);
           $this->pdf->Cell(80,6,utf8_decode('MEDICAMENTO'),0,0);
@@ -218,7 +226,8 @@ class CentralReportes extends CI_Controller {
       // EXAMEN AUXILIAR
       elseif($fDetAtencion['tipoProductoId'] == 2){
         $this->pdf->SetFont('Arial','B',10);
-        $this->pdf->Cell(0,7,utf8_decode('EXAMEN AUXILIAR'),1,0,'C');
+        $this->pdf->SetFillColor(214,225,242);
+        $this->pdf->Cell(0,7,utf8_decode('EXAMEN AUXILIAR'),1,0,'C',true);
         $this->pdf->Ln(8);
         $this->pdf->SetFont('Arial','B',9);
         $this->pdf->Cell(50,6,utf8_decode('Observaciones'));
@@ -236,7 +245,8 @@ class CentralReportes extends CI_Controller {
       // PROCEDIMIENTO
       elseif($fDetAtencion['tipoProductoId'] == 3){
         $this->pdf->SetFont('Arial','B',10);
-        $this->pdf->Cell(0,7,utf8_decode('PROCEDIMIENTO CLÍNICO'),1,0,'C');
+        $this->pdf->SetFillColor(214,225,242);
+        $this->pdf->Cell(0,7,utf8_decode('PROCEDIMIENTO CLÍNICO'),1,0,'C',true);
         $this->pdf->Ln(8);
         $this->pdf->SetFont('Arial','B',9);
         $this->pdf->Cell(50,6,utf8_decode('Observaciones'));
@@ -276,118 +286,93 @@ class CentralReportes extends CI_Controller {
         ->set_content_type('application/json')
         ->set_output(json_encode($arrData));
   }
-  public function report_ficha_atencion_salud_ocup()
+  public function reporte_ficha_paciente()
   {
     $allInputs = json_decode(trim($this->input->raw_input_stream),true); 
     $this->pdf = new Fpdfext();
     // var_dump($allInputs); exit(); 
-    mostrar_plantilla_pdf($this->pdf,utf8_decode($allInputs['titulo']),FALSE,$allInputs['tituloAbv']);
+    mostrar_plantilla_pdf($this->pdf,$allInputs['titulo'],FALSE,$allInputs['tituloAbv']);
     //$this->pdf->SetFont('Arial','',12);
     // $this->pdf->AddPage('P','A4');
     // $this->pdf->AliasNbPages();
-    $arrIds = array();
-    if( !empty($allInputs['filas']) ){ 
-      foreach ($allInputs['filas'] as $key => $row) {
-        $arrIds['arrIds'][] = $row['idatencionocupacional'];
-      }
-    } 
+    // $arrIds = array();
+    // if( !empty($allInputs['filas']) ){ 
+    //   foreach ($allInputs['filas'] as $key => $row) {
+    //     $arrIds['arrIds'][] = $row['idatencionocupacional'];
+    //   }
+    // } 
     //var_dump($arrIds); exit();
     //$arrIds = array($allInputs['num_acto_medico']);
-    $listaAtenciones = $this->model_atencion_salud_ocup->m_cargar_estas_atencion_salud_ocupacional($arrIds); 
-    
-    foreach ($listaAtenciones as $key => $fAtencion) { 
-      $this->pdf->AddPage('P','A4');
-      $this->pdf->AliasNbPages();
+    $listaAtenciones = $this->model_cita->m_cargar_detalle_cita_atendida_por_paciente($allInputs);
+    $fPac = $this->model_paciente->m_cargar_paciente_por_id($allInputs);
+    $this->pdf->AddPage('P','A4');
+    $this->pdf->AliasNbPages();
 
-      $this->pdf->SetFont('Arial','B',10);
-      $this->pdf->Cell(0,7,'DATOS DEL PACIENTE',1,0,'C');
+    $this->pdf->SetFont('Arial','B',10);
+    $this->pdf->SetFillColor(214,225,242);
+    $this->pdf->Cell(0,7,'DATOS DEL PACIENTE',1,0,'C', true);
+    $this->pdf->Ln(8);
+    $this->pdf->SetFont('Arial','B',9);
+    $this->pdf->Cell(40,6,'Tipo de Documento');
+    $this->pdf->Cell(40,6,'Num Documento');
+    $this->pdf->Cell(90,6,'Nombres y Apellidos');
+    $this->pdf->Cell(30,6,'Sexo');
+    // $this->pdf->Cell(30,6,utf8_decode('Historia Nº'));
+    $this->pdf->Ln(4);
+    $this->pdf->SetFont('Arial','',8);
+    $this->pdf->Cell(40,6,$fPac['tipoDocumento']);
+    $this->pdf->Cell(40,6,$fPac['numeroDocumento']);
+    $this->pdf->Cell(90,6,utf8_decode($fPac['paciente']));
+    $this->pdf->Cell(30,6,$fPac['sexo']);
+    // $this->pdf->Cell(30,6,$fPac['pacienteId']);
+    $this->pdf->Ln(8);
+    $this->pdf->SetFont('Arial','B',9);
+    $this->pdf->Cell(40,6,'Fecha de Nac.');
+    $this->pdf->Cell(40,6,'E-mail');
+    $this->pdf->Cell(30,6,'Celular');
+    // $this->pdf->Cell(30,6,utf8_decode('Historia Nº'));
+    $this->pdf->Ln(4);
+    $this->pdf->SetFont('Arial','',8);
+    $this->pdf->Cell(40,6,$fPac['fechaNacimiento']);
+    $this->pdf->Cell(40,6,utf8_decode($fPac['email']));
+    $this->pdf->Cell(30,6,$fPac['celular']);
+    // $this->pdf->Cell(30,6,$fPac['pacienteId']);
+    $this->pdf->Ln(10);
+    if( !empty($listaAtenciones) ){
+      $this->pdf->SetFont('Arial','B',9);
+      $this->pdf->SetFillColor(214,225,242);
+      $this->pdf->Cell(0,6,utf8_decode('ATENCIONES DEL PACIENTE'),1,0,'C', true);
       $this->pdf->Ln(8);
       $this->pdf->SetFont('Arial','B',9);
-      $this->pdf->Cell(90,6,'Apellidos y Nombre');
-      $this->pdf->Cell(40,6,'Num Documento');
-      $this->pdf->Cell(30,6,'Sexo:');
-      $this->pdf->Cell(30,6,utf8_decode('Historia Nº'));
-      $this->pdf->Ln(4);
-      $this->pdf->SetFont('Arial','',8);
-      $this->pdf->Cell(90,6,utf8_decode($fAtencion['cliente']));
-      $this->pdf->Cell(40,6,$fAtencion['num_documento']);
-      $this->pdf->Cell(30,6,$fAtencion['sexo']);
-      $this->pdf->Cell(30,6,$fAtencion['idhistoria']);
-      $this->pdf->Ln(10);
-      // APARTADO: ACTO MEDICO
-      $this->pdf->SetFont('Arial','B',10);
-      $this->pdf->Cell(0,7,'ACTO MEDICO',1,0,'C');
-      $this->pdf->Ln(8);
-      $this->pdf->SetFont('Arial','B',9);
-      $this->pdf->Cell(50,6,utf8_decode('Nº Acto Médico'));
-      $this->pdf->Cell(40,6,utf8_decode('Nº Orden'));
-      $this->pdf->Cell(40,6,'Especialidad:');
-      $this->pdf->Cell(60,6,utf8_decode('Profesional Responsable'));
-      
-      
-      $this->pdf->Ln(4);
-      $this->pdf->SetFont('Arial','',8);
-      $this->pdf->Cell(50,6,$fAtencion['idatencionocupacional']);
-      $this->pdf->Cell(40,6,$fAtencion['orden_venta']);
-      $this->pdf->Cell(40,6,utf8_decode($fAtencion['especialidad']));
-      $this->pdf->Cell(60,6,utf8_decode($fAtencion['medico_responsable']));
-      
-
-      $this->pdf->Ln(10);
-      $this->pdf->SetFont('Arial','B',9);
-      $this->pdf->Cell(50,6,utf8_decode('Fecha de Atención'));
-      $this->pdf->Cell(40,6,utf8_decode('Edad en la Atención'));
-      $this->pdf->Cell(40,6,'Area Hospitalaria');
-      $this->pdf->Cell(60,6,utf8_decode('Perfil'));
-     
-
-      $this->pdf->Ln(4);
-      
+      $this->pdf->Cell(30,6,utf8_decode('ACTO MÉDICO'),0,0);
+      $this->pdf->Cell(80,6,utf8_decode('TIPO'),0,0);
+      $this->pdf->Cell(117,6,strip_tags(utf8_decode('SERVICIO')),0,0);
+      $this->pdf->Ln(6);
       
       $this->pdf->SetFont('Arial','',8);
-      
-      $this->pdf->Cell(50,6,$fAtencion['fecha_atencion']);
-      $this->pdf->Cell(40,6,utf8_decode(devolverEdadAtencion($fAtencion['fecha_nacimiento'],$fAtencion['fecha_atencion'])));
-      $this->pdf->Cell(40,6,utf8_decode('CONSULTA EXTERNA'));
-      // $this->pdf->Cell(60,6,utf8_decode($fAtencion['producto'])); CONSULTA EXTERNA
-      $this->pdf->SetWidths(array(60));
-      $this->pdf->Row( 
-        array(
-          utf8_decode($fAtencion['producto'])
-        )
-      );
-      $this->pdf->Ln(10);
-      // SALUD OCUPACIONAL
-      $strArchivoAdjuntoBool = 'SI';
-      if(empty($fAtencion['nombre_archivo'])){
-        $strArchivoAdjuntoBool = 'NO';
+      foreach ($listaAtenciones as $key => $value) { 
+        $this->pdf->SetWidths(array(30, 80, 117));
+        $this->pdf->Row( 
+          array(
+            $fPac['pacienteId'].'-'.$value['id'],
+            $value['tipoProducto'],
+            $value['producto']
+          )
+        );
       }
-      $this->pdf->SetFont('Arial','B',10);
-      $this->pdf->Cell(0,7,'INFORME',1,0,'C');
-      $this->pdf->Ln(8);
-      $this->pdf->SetFont('Arial','B',9);
-      $this->pdf->Cell(50,6,utf8_decode('Informe / Resultado'));
-      
-      $this->pdf->Ln(4);
-      $this->pdf->SetFont('Arial','',8);
-      $this->pdf->MultiCell(0,6,strip_tags(utf8_decode($fAtencion['informe'])));
-      
-      $this->pdf->Ln(2);
-      $this->pdf->SetFont('Arial','B',9);
-      $this->pdf->Cell(50,6,utf8_decode('Archivo Adjunto')); // mostrar_plantilla_pdf
-      $this->pdf->Ln(4);
-      $this->pdf->SetFont('Arial','',8);
-      $this->pdf->MultiCell(0,6,$strArchivoAdjuntoBool);
+    } else {
+      $this->pdf->Cell(30,6,'Aún no tiene atenciones registradas.');
     }
+    
     $arrData['message'] = 'ERROR';
     $arrData['flag'] = 2;
     $timestamp = date('YmdHis');
-    if($this->pdf->Output( 'F','assets/img/dinamic/pdfTemporales/tempPDF_'. $timestamp .'.pdf' )){
+    if($this->pdf->Output( 'F','assets/dinamic/pdfTemporales/tempPDF_'. $timestamp .'.pdf' )){
       $arrData['message'] = 'OK';
       $arrData['flag'] = 1;
     }
     $arrData = array(
-      'urlTempPDF'=> 'assets/img/dinamic/pdfTemporales/tempPDF_'. $timestamp .'.pdf'
+      'urlTempPDF'=> 'assets/dinamic/pdfTemporales/tempPDF_'. $timestamp .'.pdf'
     );
     $this->output
         ->set_content_type('application/json')

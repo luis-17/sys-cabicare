@@ -1,8 +1,10 @@
 app.controller('PacienteCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$log', '$timeout', 'pinesNotifications', 'uiGridConstants', 'blockUI',
   'PacienteFactory',
+  'ModalReporteFactory',
   'PacienteServices',
   function($scope, $filter, $uibModal, $bootbox, $log, $timeout, pinesNotifications, uiGridConstants, blockUI,
   PacienteFactory,
+  ModalReporteFactory,
   PacienteServices
   ) {
     $scope.metodos = {}; // contiene todas las funciones
@@ -171,6 +173,19 @@ app.controller('PacienteCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$
           });
         }
       });
+    }
+    $scope.btnImprimirFicha = function() {
+      var arrParams = {
+        // titulo: 'FICHA DE ATENCION',
+        url: angular.patchURLCI+'CentralReportes/reporte_ficha_paciente',
+        datos: {
+          id: $scope.mySelectionGrid[0].idpaciente,
+          titulo: 'HISTORIA MÉDICA N°'+$scope.mySelectionGrid[0].idpaciente,
+          tituloAbv: 'PAC-FIC'
+        },
+        metodo: 'php'
+      };
+      ModalReporteFactory.getPopupReporte(arrParams); 
     }
 }]);
 
