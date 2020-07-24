@@ -615,19 +615,19 @@ class Cita extends CI_Controller {
 		    ->set_output(json_encode($arrData));
 	}
 
-	// public function liberar_atencion()
-	// {
-	// 	$allInputs = json_decode(trim($this->input->raw_input_stream),true);
-	// 	$arrData['message'] = 'No se pudo anular los datos';
-  //   $arrData['flag'] = 0;
-	// 	if( $this->model_cita->m_liberar_cita($allInputs) ){
-	// 		$arrData['message'] = 'Se liberó la cita correctamente.';
-  //   	$arrData['flag'] = 1;
-	// 	}
-	// 	$this->output
-	// 	    ->set_content_type('application/json')
-	// 	    ->set_output(json_encode($arrData));
-	// }
+	public function liberar_atencion()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$arrData['message'] = 'No se pudo anular los datos';
+    	$arrData['flag'] = 0;
+		if( $this->model_cita->m_liberar_cita($allInputs) ){
+			$arrData['message'] = 'Se liberó la cita correctamente.';
+    	$arrData['flag'] = 1;
+		}
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+	}
 
 	public function registrar_atencion()
 	{
