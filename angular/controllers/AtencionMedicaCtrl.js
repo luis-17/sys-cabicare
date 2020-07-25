@@ -191,11 +191,11 @@ app.controller('AtencionMedicaCtrl',
 						idCita: event.id
 					};
 					blockUI.start('Procesando información...');
-					AtencionServices.sLiberarAtencion(arrParams).then(function (rpta) {
+					CitaServices.sAnular(arrParams).then(function (rpta) {
 						if (rpta.flag == 1) {
 							var pTitle = 'OK!';
 							var pType = 'success';
-							$scope.metodos.getPaginationServerSide();
+							// $scope.metodos.getPaginationServerSide();
 							$scope.metodos.actualizarCalendario();
 						} else if (rpta.flag == 0) {
 							var pTitle = 'Error!';
@@ -443,21 +443,13 @@ app.service("AtencionServices", function ($http, $q, handleBehavior) {
 		// sRegistrar: sRegistrar,
 		// sEditar: sEditar,
 		// sMoverCita: sMoverCita,
-		sLiberarAtencion: sLiberarAtencion,
+		// sLiberarAtencion: sLiberarAtencion,
 	});
 
 	function sListarAtencionesGrilla(datos) {
 		var request = $http({
 			method: "post",
 			url: angular.patchURLCI + "Cita/listar_atenciones_grilla",
-			data: datos
-		});
-		return (request.then(handleBehavior.success, handleBehavior.error));
-	}
-	function sLiberarAtencion(datos) {
-		var request = $http({
-			method: "post",
-			url: angular.patchURLCI + "Cita/liberar_atencion",
 			data: datos
 		});
 		return (request.then(handleBehavior.success, handleBehavior.error));
