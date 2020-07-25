@@ -356,47 +356,61 @@
         // MODO NORMAL
         $this->SetAutoPageBreak(TRUE,25);
 
-        // $ci2 =& get_instance();
-        // $this->SetFont('Arial','',6);
-        // $this->SetXY(-70,0);
-        // $this->MultiCell(120,6,'USUARIO:'.strtoupper_total($ci2->sessionFactur['username']).'    /   FECHA DE IMPRESION: '.date('Y-m-d H:i:s'));
-        // $this->Image($this->getImagenCab(),2,2,50);
-        // $this->SetFont('Arial','',5);
-        // $this->SetXY(16,10);
-        // $this->MultiCell( 120,6,utf8_decode(strtoupper_total($this->getNombreEmpresa())) );
-        // $this->SetXY(16,12);
-        // $this->SetFont('Arial','',4);
-        // $this->MultiCell( 120,6,utf8_decode(strtoupper_total($this->getDireccion())) );
-        // $this->SetFont('Arial','B',13);
-        // $this->SetXY(100,10);
-        // $this->Cell(120,10,utf8_decode($this->getTitulo()),0,0);
-        // $this->Line(350,20,4,20);
-        // $this->Ln(15);
-
         $ci2 =& get_instance();
-        $this->SetFont('Arial','',6);
-        $this->SetXY(-70,0);
-        $this->MultiCell(120,6,'USUARIO:'.strtoupper($ci2->sessionFactur['username']).'    /   FECHA DE IMPRESION: '.date('Y-m-d H:i:s'));
-        $this->Image($this->getImagenCab(),8,0,30);
-        $varXPositionNE= 8;
-        $varXPositionDIR= 8;
-        $this->SetFont('Arial','',5);
-        $this->SetXY($varXPositionNE,14);
-        $this->MultiCell( 120,6,utf8_decode(strtoupper_total($this->getNombreEmpresa())) );
-        $this->SetXY($varXPositionDIR,16);
-        $this->SetFont('Arial','',4);
-        $this->MultiCell( 120,6,utf8_decode(strtoupper_total($this->getDireccion())),0,'L' );
-        $this->SetTextColor(0,0,0);
-        $this->SetFont('Arial','B',13);
-        $this->SetXY(100,10);
-        $this->Cell(120,10,utf8_decode($this->getTitulo()),0,0);
-        $this->Line(292,20,4,20);
-        $this->Ln(15);
-        if( @$this->tituloAbr  === 0 ){
+        if( $this->tituloAbr === 'REC' ){
+          $this->Image($this->getImagenCab(),8,8,57);
+          $this->SetFont('Arial','',12);
+
+          $this->SetXY(-85,12);
+          $this->Image(base_url('img/icono_ubicacion.png'),115,12,5);
+          $this->Cell( 65,6,utf8_decode('Av. Benavides 3082, piso 3 ofic 306'),0,0,'R' );
+
+          $this->SetXY(-85,17);
+          $this->Cell( 65,6,utf8_decode('Miraflores (Óvalo Higuereta)'),0,0,'R' );
+
+          $this->SetXY(-85,22);
+          $this->Image(base_url('img/icono_email.png'),142,22,5);
+          $this->Cell( 65,6,utf8_decode('cabicare@gmail.com'),0,0,'R' );
+
+          $this->SetXY(-85,27);
+          $this->Image(base_url('img/icono_movil.png'),155,27,6);
+          $this->Cell( 65,6,utf8_decode('+51992198055'),0,0,'R' );
+
+          $this->SetXY(-85,32);
+          $this->Image(base_url('img/icono_instagram.png'),162,33,5);
+          $this->Cell( 65,6,utf8_decode('@cabicare'),0,0,'R' );
+
+          $this->Ln(15);
+        }
+        else if( @$this->tituloAbr  === 0 ){
           $this->SetFont('Arial','B',50);
           $this->SetTextColor(255,192,203);
           $this->RotatedText(70,190,'A N U L A D O',45);
         }
+        else{
+          $this->SetFont('Arial','',6);
+          $this->SetXY(-70,0);
+          $this->MultiCell(120,6,'USUARIO:'.strtoupper($ci2->sessionFactur['username']).'    /   FECHA DE IMPRESION: '.date('Y-m-d H:i:s'));
+          $this->Image($this->getImagenCab(),8,0,30);
+          $varXPositionNE= 8;
+          $varXPositionDIR= 8;
+          $this->SetFont('Arial','',5);
+          $this->SetXY($varXPositionNE,14);
+          $this->MultiCell( 120,6,utf8_decode(strtoupper_total($this->getNombreEmpresa())) );
+          $this->SetXY($varXPositionDIR,16);
+          $this->SetFont('Arial','',4);
+          $this->MultiCell( 120,6,utf8_decode(strtoupper_total($this->getDireccion())),0,'L' );
+          $this->SetTextColor(0,0,0);
+          $this->SetFont('Arial','B',13);
+          $this->SetXY(100,10);
+          $this->Cell(120,10,utf8_decode($this->getTitulo()),0,0);
+          $this->Line(292,20,4,20);
+          $this->Ln(15);
+
+        }
+
+
+
       }
        // El pie del pdf
       public function Footer(){
@@ -439,6 +453,63 @@
               $this->_out('Q');
           }
           parent::_endpage();
+      }
+
+      function RoundedRect($x, $y, $w, $h, $r, $corners = '1234', $style = '')
+      {
+          $k = $this->k;
+          $hp = $this->h;
+          if($style=='F')
+              $op='f';
+          elseif($style=='FD' || $style=='DF')
+              $op='B';
+          else
+              $op='S';
+          $MyArc = 4/3 * (sqrt(2) - 1);
+          $this->_out(sprintf('%.2F %.2F m',($x+$r)*$k,($hp-$y)*$k ));
+
+          $xc = $x+$w-$r;
+          $yc = $y+$r;
+          $this->_out(sprintf('%.2F %.2F l', $xc*$k,($hp-$y)*$k ));
+          if (strpos($corners, '2')===false)
+              $this->_out(sprintf('%.2F %.2F l', ($x+$w)*$k,($hp-$y)*$k ));
+          else
+              $this->_Arc($xc + $r*$MyArc, $yc - $r, $xc + $r, $yc - $r*$MyArc, $xc + $r, $yc);
+
+          $xc = $x+$w-$r;
+          $yc = $y+$h-$r;
+          $this->_out(sprintf('%.2F %.2F l',($x+$w)*$k,($hp-$yc)*$k));
+          if (strpos($corners, '3')===false)
+              $this->_out(sprintf('%.2F %.2F l',($x+$w)*$k,($hp-($y+$h))*$k));
+          else
+              $this->_Arc($xc + $r, $yc + $r*$MyArc, $xc + $r*$MyArc, $yc + $r, $xc, $yc + $r);
+
+          $xc = $x+$r;
+          $yc = $y+$h-$r;
+          $this->_out(sprintf('%.2F %.2F l',$xc*$k,($hp-($y+$h))*$k));
+          if (strpos($corners, '4')===false)
+              $this->_out(sprintf('%.2F %.2F l',($x)*$k,($hp-($y+$h))*$k));
+          else
+              $this->_Arc($xc - $r*$MyArc, $yc + $r, $xc - $r, $yc + $r*$MyArc, $xc - $r, $yc);
+
+          $xc = $x+$r ;
+          $yc = $y+$r;
+          $this->_out(sprintf('%.2F %.2F l',($x)*$k,($hp-$yc)*$k ));
+          if (strpos($corners, '1')===false)
+          {
+              $this->_out(sprintf('%.2F %.2F l',($x)*$k,($hp-$y)*$k ));
+              $this->_out(sprintf('%.2F %.2F l',($x+$r)*$k,($hp-$y)*$k ));
+          }
+          else
+              $this->_Arc($xc - $r, $yc - $r*$MyArc, $xc - $r*$MyArc, $yc - $r, $xc, $yc - $r);
+          $this->_out($op);
+      }
+
+      function _Arc($x1, $y1, $x2, $y2, $x3, $y3)
+      {
+          $h = $this->h;
+          $this->_out(sprintf('%.2F %.2F %.2F %.2F %.2F %.2F c ', $x1*$this->k, ($h-$y1)*$this->k,
+              $x2*$this->k, ($h-$y2)*$this->k, $x3*$this->k, ($h-$y3)*$this->k));
       }
 
     }

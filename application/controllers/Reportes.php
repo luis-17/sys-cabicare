@@ -209,37 +209,57 @@ class Reportes extends CI_Controller {
 		$this->pdf->AddPage();
     	$this->pdf->SetMargins(10, 10);
     	$this->pdf->SetAutoPageBreak(false);
-    	$variablePosY = 0;
 
-		$this->pdf->SetFont('Arial','B',12);
+		$this->pdf->SetLeftMargin(14);
+
+
+		// SetDrawColor($r, $g=null, $b=null)
+		// RoundedRect($x, $y, $w, $h, $r, $corners = '1234', $style = '')
+		$this->pdf->SetDrawColor(129,164,196);
+		$this->pdf->SetLineWidth(1);
+		$this->pdf->RoundedRect(12,44,181,26,5,'1234','');
+    	$this->pdf->SetY(48);
+		$this->pdf->SetFont('Arial','',15);
         $this->pdf->Cell(25,6,utf8_decode('Paciente: '),0,0,'L');
 		$this->pdf->SetFont('Arial','',12);
         $this->pdf->Cell(165,6,utf8_decode($cita['paciente']),0,0,'L');
         $this->pdf->Ln(12);
 
-		$this->pdf->SetFont('Arial','B',12);
-        $this->pdf->Cell(25,6,utf8_decode('Edad: '),0,0,'L');
+		$this->pdf->SetFont('Arial','',15);
+        $this->pdf->Cell(18,6,utf8_decode('Edad: '),0,0,'L');
 		$this->pdf->SetFont('Arial','',12);
-        $this->pdf->Cell(43,6,utf8_decode(devolverEdad($cita['fechaNacimiento']) . ' años'),0,0,'L');
+        $this->pdf->Cell(29,6,utf8_decode(devolverEdad($cita['fechaNacimiento']) . ' años'),0,0,'L');
 
-		$this->pdf->SetFont('Arial','B',12);
-        $this->pdf->Cell(25,6,utf8_decode('Fecha: '),0,0,'L');
+		$this->pdf->SetFont('Arial','',15);
+        $this->pdf->Cell(18,6,utf8_decode('Fecha: '),0,0,'L');
 		$this->pdf->SetFont('Arial','',12);
         $this->pdf->Cell(43,6, darFormatoDMY2($cita['fechaReceta']),0,0,'L');
 
 
-		$this->pdf->Ln(15);
-		$this->pdf->SetX(10);
-		$this->pdf->SetFont('Arial','B',8);
-		$this->pdf->Cell(80,6,utf8_decode('MEDICAMENTO'),1,0);
-		$this->pdf->Cell(10,6,utf8_decode('CANT.'),1,0);
-		$this->pdf->Cell(100,6,strip_tags(utf8_decode('INDICACIONES')),1,0);
-		$this->pdf->Ln(6);
+		$this->pdf->SetLeftMargin(10);
+		$this->pdf->Ln(25);
+		// $this->pdf->SetX(10);
+		// $this->pdf->SetFont('Arial','B',8);
+		// $this->pdf->Cell(80,6,utf8_decode('MEDICAMENTO'),1,0);
+		// $this->pdf->Cell(10,6,utf8_decode('CANT.'),1,0);
+		// $this->pdf->Cell(100,6,strip_tags(utf8_decode('INDICACIONES')),1,0);
+		// $this->pdf->Ln(6);
+
+		$this->pdf->SetFont('Arial','B',9);
+       	$this->pdf->SetFillColor(214,225,242);
+		$this->pdf->SetDrawColor(0,0,0);
+		$this->pdf->SetLineWidth(0);
+       	$this->pdf->Cell(0,6,utf8_decode('RECETA MÉDICA'),1,0,'C', true);
+       	$this->pdf->Ln(8);
+       	$this->pdf->Cell(80,6,utf8_decode('MEDICAMENTO'),0,0);
+       	$this->pdf->Cell(15,6,utf8_decode('CANT.'),0,0);
+       	$this->pdf->Cell(95,6,utf8_decode('INDICACIONES'),0,0);
+       	$this->pdf->Ln(6);
 
 		$this->pdf->SetFont('Arial','',8);
 		foreach ($recetaDet as $key => $value) {
 			$this->pdf->SetX(10);
-			$this->pdf->SetWidths(array(80, 10, 100));
+			$this->pdf->SetWidths(array(80, 15, 95));
 			$this->pdf->Row(
 				array(
 				strtoupper($value['nombreMedicamento']),
@@ -250,21 +270,22 @@ class Reportes extends CI_Controller {
 		}
 
 
-        // $this->pdf->SetXY(17,120);
-		$this->pdf->Ln(26);
-		$this->pdf->SetFont('Arial','B',8);
-        $this->pdf->Cell(190,6,utf8_decode('Observaciones'),0,0);
+		$this->pdf->Ln(20);
+		$this->pdf->SetFont('Arial','B',9);
+        $this->pdf->Cell(190,6,utf8_decode('INDICACIONES GENERALES'),0,0);
 		$this->pdf->Ln(6);
+		$this->pdf->SetFont('Arial','',8);
 		$this->pdf->MultiCell(190,6,utf8_decode($cita['indicacionesGenerales']),0,'L',FALSE);
 
-		$this->pdf->Ln(30);
-		$this->pdf->SetFont('Arial','',11);
-		$this->pdf->Cell(100,6,'');
-		$this->pdf->Cell(90,6,utf8_decode($cita['medico']),0,0,'C');
-		$this->pdf->Ln(4);
+        // SELLO Y FIRMA
+		$this->pdf->SetXY(-85,260);
+		// $this->pdf->SetFont('Arial','',11);
+		// $this->pdf->Cell(100,6,'');
+		// $this->pdf->Cell(90,6,utf8_decode($cita['medico']),0,0,'C');
+		// $this->pdf->Ln(4);
 		$this->pdf->SetFont('Arial','',8);
-		$this->pdf->Cell(100,6,'');
-		$this->pdf->Cell(90,6,utf8_decode('Sello y firma'),0,0,'C');
+		// $this->pdf->Cell(100,6,'');
+		$this->pdf->Cell(50,6,utf8_decode('Firma / Sello'),'T',0,'C');
 		$this->pdf->Ln(8);
 
 		//salida
