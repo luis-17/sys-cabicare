@@ -44,6 +44,12 @@ class Paciente extends CI_Controller {
 				case 'PTP':
 					$strTipoDoc = 'PERMISO TEMPORAL DE PERMANENCIA';
 					break;
+				case 'CED':
+					$strTipoDoc = 'CÉDULA';
+					break;
+				case 'CR':
+					$strTipoDoc = 'CARNET DE REFUGIO';
+					break;
 				default:
 					$strTipoDoc = NULL;
 					break;
