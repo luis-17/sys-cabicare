@@ -222,6 +222,7 @@ class Model_cita extends CI_Model {
 		$this->db->join('tipoproducto tp', 'pr.tipoProductoId = tp.id');
 		$this->db->where('cp.citaId', $datos['id']);
 		$this->db->where('cp.estado', 1);
+		$this->db->where('pr.tipoProductoId <>', 4);
 		$this->db->order_by('pr.tipoProductoId', 'ASC');
 		$this->db->order_by('cp.id', 'ASC');
 		return $this->db->get()->result_array();
