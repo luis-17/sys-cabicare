@@ -19,7 +19,9 @@ app.controller('PacienteCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$
       {id: 'DNI', descripcion: 'DOCUMENTO NACIONAL DE IDENTIDAD'},
       {id: 'CEX', descripcion: 'CARNET DE EXTRANJERIA' },
       {id: 'PAS', descripcion: 'PASAPORTE' },
-      {id: 'PTP', descripcion: 'PERMISO TEMPORAL DE PERMANENCIA' }
+      {id: 'PTP', descripcion: 'PERMISO TEMPORAL DE PERMANENCIA' },
+      {id: 'CED', descripcion: 'CEDULA' },
+      {id: 'CR', descripcion: 'CARNET DE REFUGIO' }
     ];
     $scope.fArr.listaSexo = [
       {id : '0', descripcion:'--Seleccione sexo--'},
