@@ -70,7 +70,8 @@ angular.module('app')
             url: '/paciente',
             templateUrl: 'tpl/paciente.html',
             resolve: load([
-              'angular/controllers/PacienteCtrl.js'
+              'angular/controllers/PacienteCtrl.js',
+              'angular/controllers/DistritoCtrl.js'
             ])
           })
           .state('app.producto', {

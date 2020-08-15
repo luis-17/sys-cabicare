@@ -5,9 +5,11 @@ class Model_paciente extends CI_Model {
 		parent::__construct();
 	}
 	public function m_cargar_paciente($paramPaginate){
-		$this->db->select("id AS pacienteId, pa.nombres, pa.apellidoPaterno, pa.apellidoMaterno, pa.tipoDocumento, pa.numeroDocumento,
+		$this->db->select("pa.id AS pacienteId, pa.nombres, pa.apellidoPaterno, pa.apellidoMaterno, 
+		pa.tipoDocumento, pa.numeroDocumento, pa.medioContacto, pa.distritoId, di.nombre AS distrito,
 		pa.sexo, pa.fechaNacimiento, pa.celular, pa.email, pa.alergias, pa.operador, pa.antecedentes, pa.createdAt", FALSE);
 		$this->db->from('paciente pa');
+		$this->db->join('distrito di', 'pa.distritoId = di.id','left');
 		$this->db->where('pa.estado', 1);
 		// $this->db->where('pa.idempresaadmin', $this->sessionFactur['idempresaadmin']);
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
@@ -29,6 +31,7 @@ class Model_paciente extends CI_Model {
 	public function m_count_paciente($paramPaginate=FALSE){
 		$this->db->select('COUNT(*) AS contador');
 		$this->db->from('paciente pa');
+		$this->db->join('distrito di', 'pa.distritoId = di.id','left');
 		$this->db->where('pa.estado', 1);
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
 			foreach ($paramPaginate['searchColumn'] as $key => $value) {
@@ -44,12 +47,13 @@ class Model_paciente extends CI_Model {
 	public function m_cargar_paciente_por_numero_documento($datos)
 	{
 		$this->db->select("
-			id AS pacienteId,
+			pa.id AS pacienteId,
 			pa.nombres,
 			pa.apellidoPaterno,
 			pa.apellidoMaterno,
 			pa.tipoDocumento,
 			pa.numeroDocumento,
+			pa.medioContacto,
 			pa.sexo,
 			pa.fechaNacimiento,
 			pa.celular,
@@ -57,9 +61,12 @@ class Model_paciente extends CI_Model {
 			pa.alergias,
 			pa.operador,
 			pa.antecedentes,
+			pa.distritoId, 
+			di.nombre AS distrito,
 			concat_ws(' ', pa.nombres, pa.apellidoPaterno, pa.apellidoMaterno) AS paciente
 		", FALSE);
 		$this->db->from('paciente pa');
+		$this->db->join('distrito di', 'pa.distritoId = di.id','left');
 		$this->db->where('pa.numeroDocumento', $datos['numeroDocumento']);
 		$this->db->limit('1');
 		return $this->db->get()->row_array();
@@ -68,13 +75,14 @@ class Model_paciente extends CI_Model {
 	public function m_cargar_paciente_por_id($datos)
 	{
 		$this->db->select("
-			id AS pacienteId,
+			pa.id AS pacienteId,
 			pa.nombres,
 			pa.apellidoPaterno,
 			pa.apellidoMaterno,
 			pa.tipoDocumento,
 			pa.numeroDocumento,
 			pa.sexo,
+			pa.medioContacto,
 			pa.fechaNacimiento,
 			pa.celular,
 			pa.email,
@@ -114,6 +122,8 @@ class Model_paciente extends CI_Model {
 			'fechaNacimiento' => empty($datos['fecha_nacimiento']) ? NULL : darFormatoYMD($datos['fecha_nacimiento']),
 			'tipoSangre'=> empty($datos['tipo_sangre']) ? NULL : strtoupper($datos['tipo_sangre']),
 			'sexo' => $datos['sexo']['id'],
+			'medioContacto' => $datos['medioContacto']['id'],
+			'distritoId' => empty($datos['distrito']) ? NULL : $datos['distrito']['id'],
 			'operador' => $datos['operador']['id'],
 			'alergias' => empty($datos['alergias']) ? NULL : $datos['alergias'],
 			'antecedentes' => empty($datos['antecedentes']) ? NULL : $datos['antecedentes'],
@@ -136,6 +146,8 @@ class Model_paciente extends CI_Model {
 			'fechaNacimiento' => empty($datos['fecha_nacimiento']) ? NULL : darFormatoYMD($datos['fecha_nacimiento']),
 			'tipoSangre'=> empty($datos['tipo_sangre']) ? NULL : strtoupper($datos['tipo_sangre']),
 			'sexo' => $datos['sexo']['id'],
+			'medioContacto' => $datos['medioContacto']['id'],
+			'distritoId' => empty($datos['distrito']) ? NULL : $datos['distrito']['id'],
 			'operador' => $datos['operador']['id'],
 			'alergias' => empty($datos['alergias']) ? NULL : $datos['alergias'],
 			'antecedentes' => empty($datos['antecedentes']) ? NULL : $datos['antecedentes'],

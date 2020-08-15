@@ -25,9 +25,19 @@ app.controller('RegistroAtencionCtrl', [
 			{ id: '', descripcion: '--Seleccione tipo de diagnóstico--' },
 			{ id: 'PRESUNTIVO', descripcion: 'PRESUNTIVO' },
 			{ id: 'DEFINITIVO', descripcion: 'DEFINITIVO' }
+		];
+		$scope.fArr.listaTipoImg = [
+			{ id: '', descripcion: '--Seleccione tipo de imagen--' },
+			{ id: 'COLPOSCOPIO', descripcion: 'COLPOSCOPIO' },
+			{ id: 'ECOGRAFO', descripcion: 'ECOGRAFO' }
+    ];
+    $scope.fArr.listaGestando = [
+			{ id: '2', descripcion: 'NO' },
+			{ id: '1', descripcion: 'SI' }
     ];
 		$scope.fData = {}
 		$scope.fData.temporal = {};
+		$scope.fData.temporalImg = {};
 		$scope.metodos.listaMedico = function(myCallback) {
 			var myCallback = myCallback || function() { };
 			UsuarioServices.sListarMedicoCbo().then(function(rpta) {
@@ -44,8 +54,11 @@ app.controller('RegistroAtencionCtrl', [
 			$scope.fData = rpta.datos;
 			$scope.fData.temporal = {};
 			$scope.fData.temporal.tipoDiagnostico = $scope.fArr.listaTipoDiagnostico[0];
+			$scope.fData.temporalImg = {};
+			$scope.fData.temporalImg.tipoImagen = $scope.fArr.listaTipoImg[0];
 			$scope.getPaginationServerSideDet(true);
 			$scope.getPaginationServerSideRec();
+			$scope.getPaginationServerSideImg();
 			//BINDEO MEDICO
 			var myCallBackCC = function() {
 				var objIndex = $scope.fArr.listaMedico.filter(function(obj) {
@@ -53,7 +66,17 @@ app.controller('RegistroAtencionCtrl', [
 				}).shift();
 				$scope.fData.medico = objIndex;
 			}
-			$scope.metodos.listaMedico(myCallBackCC);
+      $scope.metodos.listaMedico(myCallBackCC);
+
+      //BINDEO GESTANDO
+      var objIndexCp = $scope.fArr.listaGestando.filter(function(obj) {
+        return obj.id == $scope.fData.gestando.id;
+      }).shift();
+      $scope.fData.gestando = $scope.fArr.listaGestando[0];
+      if(objIndexCp){
+        $scope.fData.gestando = objIndexCp;
+      }
+      
 
 		});
 		/* CALCULO DE IMC */
@@ -77,8 +100,14 @@ app.controller('RegistroAtencionCtrl', [
 			$scope.fData.imc = (parseFloat($scope.fData.peso) / (parseFloat(talla*talla))).toFixed(2);
 		}
 		$scope.grabarAtencionMedica = function(){
-			$scope.fData.diagnostico = $scope.gridOptions.data;
-			if(!($scope.fData.diagnostico.length > 0)){
+      $scope.fData.diagnostico = $scope.gridOptions.data;
+      var tieneConsulta = false;
+      angular.forEach($scope.fData.detalle, function(row, key) {
+        if (row.tipoProductoId == 1) { // consulta
+          tieneConsulta = true;
+        }
+      });
+			if(!($scope.fData.diagnostico.length > 0) && tieneConsulta){
 				pinesNotifications.notify({
 					title: 'Advertencia.',
 					text: 'Debe seleccionar al menos un diagnóstico.',
@@ -106,6 +135,101 @@ app.controller('RegistroAtencionCtrl', [
 					delay: 5000
 				});
 			});
+		}
+		// IMAGENES
+		$scope.gridOptionsImg = {
+			rowHeight: 30,
+			enableGridMenu: false,
+			enableColumnMenus: false,
+			enableRowSelection: false,
+			enableSelectAll: false,
+			enableFiltering: false,
+			enableSorting: false,
+			enableFullRowSelection: false,
+			enableCellEdit: false,
+			multiSelect: false,
+			data: [],
+			columnDefs: [
+				{ field: 'idimagen', name: 'id', displayName: 'ID', minWidth: 80, width: 80, visible: false },
+				{ field: 'tipoImagen', name: 'tipoImagen', minWidth: 120,
+          cellTemplate:'<div class="ui-grid-cell-contents text-left ">'+ '{{ COL_FIELD.descripcion }}</div>',  displayName: 'TIPO IMAGEN' },
+				{ field: 'descripcion', name: 'descripcion', displayName: 'DESCRIPCIÓN', minWidth: 120 },
+				{ field: 'srcImagen', name: 'srcImagen', displayName: 'LINK IMAGEN', minWidth: 120 },
+				{
+					field: 'eliminar', name: 'eliminar', displayName: '', width: 50,
+					cellTemplate: '<button class="btn btn-default btn-sm text-danger btn-action" ng-click="grid.appScope.btnQuitarDeLaCestaImg(row);$event.stopPropagation();"> <i class="fa fa-trash" tooltip-placement="left" uib-tooltip="ELIMINAR!"></i> </button>'
+				}
+			],
+			onRegisterApi: function (gridApi) {
+				$scope.gridApi = gridApi;
+			}
+		};
+		$scope.getPaginationServerSideImg = function (loader) {
+			if (loader) {
+				blockUI.start('Procesando información...');
+			}
+			var arrParams = {
+				datos: {
+					idcita: $scope.fData.id
+				}
+			};
+			RegistroAtencionService.sGetDetalleImagenes(arrParams).then(function (rpta) {
+				if (rpta.datos.length == 0) {
+					rpta.paginate = { totalRows: 0 };
+				}
+				$scope.gridOptionsImg.data = rpta.datos;
+				if (loader) {
+					blockUI.stop();
+				}
+			});
+		};
+		$scope.agregarItemImagen = function(){
+			// if ($scope.fData.temporalImg.tipoImagen == null ){
+			// 	pinesNotifications.notify({
+			// 		title: 'Advertencia.',
+			// 		text: 'Debe seleccionar un tipo de imagen.',
+			// 		type: 'warning',
+			// 		delay: 5000
+			// 	});
+			// 	return;
+			// }
+
+			if ($scope.fData.temporalImg.tipoImagen.id == null ||
+				$scope.fData.temporalImg.tipoImagen.id == "" ||
+				$scope.fData.temporalImg.tipoImagen.id < 0)
+			{
+				pinesNotifications.notify({
+					title: 'Advertencia.',
+					text: 'El tipo de imagen no es válido.',
+					type: 'warning',
+					delay: 5000
+				});
+				return;
+			}
+			blockUI.start("Registrando imagen...");
+			// $scope.fData.detalle = $scope.gridOptionsRec.data;
+			RegistroAtencionService.sRegistrarImagen($scope.fData.temporalImg).then(function (rpta) {
+				if (rpta.flag === 1) {
+					var pTitle = 'OK!';
+					var pType = 'success';
+					// $scope.fData.idreceta = rpta.idreceta;
+				} else {
+					var pTitle = 'Advertencia!';
+					var pType = 'warning';
+				}
+				blockUI.stop();
+				pinesNotifications.notify({
+					title: pTitle,
+					text: rpta.message,
+					type: pType,
+					delay: 5000
+				});
+				$scope.getPaginationServerSideImg();
+			});
+			// $scope.fData.temporalImg.iddiagnostico = null;
+			// $scope.fData.temporalImg.codigo = null;
+			// $scope.fData.temporalImg.diagnostico = null;
+			$scope.fData.temporalImg.tipoImagen = $scope.fArr.listaTipoImg[0];
 		}
 
 		// DIAGNOSTICO
@@ -302,6 +426,7 @@ app.controller('RegistroAtencionCtrl', [
 				}
 			});
 		};
+		
 		$scope.grabarReceta = function () {
 			blockUI.start("Registrando receta...");
 			$scope.fData.detalle = $scope.gridOptionsRec.data;
@@ -392,6 +517,7 @@ app.service("RegistroAtencionService", function ($http, $q, handleBehavior){
 		sGetDetalleReceta: sGetDetalleReceta,
 		sRegistrarAtencion: sRegistrarAtencion,
 		sRegistrarReceta: sRegistrarReceta,
+		sGetDetalleImagenes: sGetDetalleImagenes,
 	});
 	function sGetCitaById(datos) {
 		var request = $http({
@@ -421,6 +547,14 @@ app.service("RegistroAtencionService", function ($http, $q, handleBehavior){
 		var request = $http({
 			method: "post",
 			url: angular.patchURLCI + "Cita/registrar_receta",
+			data: datos
+		});
+		return (request.then(handleBehavior.success, handleBehavior.error));
+	}
+	function sGetDetalleImagenes(datos) {
+		var request = $http({
+			method: "post",
+			url: angular.patchURLCI + "Cita/listar_detalle_imagenes",
 			data: datos
 		});
 		return (request.then(handleBehavior.success, handleBehavior.error));

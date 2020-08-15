@@ -29,6 +29,7 @@ class Model_cita extends CI_Model {
 			ci.observaciones,
 			ci.estado,
 			ci.medioContacto,
+			ci.gestando,
 			ci.metodoPago,
 			ci.numOperacion,
 			concat_ws(' ', pa.nombres, pa.apellidoPaterno, pa.apellidoMaterno) AS paciente,
@@ -36,6 +37,7 @@ class Model_cita extends CI_Model {
 			pa.numeroDocumento,
 			ci.medicoId,
 			concat_ws(' ', us.nombres, us.apellidos) AS medico,
+			ci.anotacionesPago
 		", FALSE);
 		$this->db->from('cita ci');
 		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
@@ -191,6 +193,7 @@ class Model_cita extends CI_Model {
 			ci.observaciones,
 			ci.estado,
 			ci.medioContacto,
+			ci.gestando,
 			concat_ws(' ', pa.nombres, pa.apellidoPaterno, pa.apellidoMaterno) AS paciente,
 			pa.numeroDocumento,
 			ci.medicoId,
@@ -273,6 +276,7 @@ class Model_cita extends CI_Model {
 			ci.perimetroAbdominal,
 			ci.observaciones,
 			ci.medioContacto,
+			ci.gestando,
 			ci.estado,
 			concat_ws(' ', pa.nombres, pa.apellidoPaterno, pa.apellidoMaterno) AS paciente,
 			pa.tipoDocumento,
@@ -364,7 +368,20 @@ class Model_cita extends CI_Model {
 		$this->db->insert('recetamedicamento', $datos);
 		return $this->db->insert_id();
 	}
-
+	public function m_cargar_detalle_imagenes($data)
+	{
+		$this->db->select("
+			im.id,
+			im.citaId,
+			im.tipoImagen,
+			im.srcImagen,
+			im.fechaSubida,
+			im.descripcion
+		", FALSE);
+		$this->db->from('imagen im');
+		$this->db->where('im.citaId', $data['idcita']);
+		return $this->db->get()->result_array();
+	}
 	public function m_cargar_detalle_receta($data)
 	{
 		$this->db->select("

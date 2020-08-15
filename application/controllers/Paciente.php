@@ -7,7 +7,7 @@ class Paciente extends CI_Controller {
 	{
 		parent::__construct();
 		$this->load->helper(array('security','imagen_helper','otros_helper','fechas_helper'));
-		$this->load->model(array('model_paciente'));
+		$this->load->model(array('model_paciente', 'model_distrito'));
 		//cache
 		$this->output->set_header("Cache-Control: no-store, no-cache, must-revalidate, no-transform, max-age=0, post-check=0, pre-check=0");
 		$this->output->set_header("Pragma: no-cache");
@@ -60,6 +60,10 @@ class Paciente extends CI_Controller {
 					'nombres' => strtoupper($row['nombres']),
 					'apellido_paterno' => strtoupper($row['apellidoPaterno']),
 					'apellido_materno' => strtoupper($row['apellidoMaterno']),
+					'distrito' => array(
+						'id'=> $row['distritoId'],
+						'descripcion'=> strtoupper($row['distrito'])
+					),
 					'tipo_documento'=> array(
 						'id'=> $row['tipoDocumento'],
 						'descripcion'=> $strTipoDoc
@@ -68,6 +72,10 @@ class Paciente extends CI_Controller {
 					'sexo'=> array(
 						'id'=> $row['sexo'],
 						'descripcion'=> $row['desc_sexo']
+					),
+					'medioContacto'=> array(
+						'id'=> $row['medioContacto'],
+						'descripcion'=> $row['medioContacto']
 					),
 					'edad' => devolverEdad($row['fechaNacimiento']),
 					'fecha_nacimiento' => darFormatoDMY($row['fechaNacimiento']),

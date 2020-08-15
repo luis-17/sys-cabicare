@@ -11,6 +11,10 @@
 			<label class="control-label mb-n"> N° de Operación </label>
 			<input type="text" class="form-control input-sm" ng-model="fDataMP.numOperacion" placeholder="Ingrese número de operación" tabindex="50" />
 		</div>
+		<div class="form-group col-md-12 mb-md">
+			<label class="control-label mb-n"> Anotaciones </label>
+			<textarea class="form-control input-sm" ng-model="fDataMP.anotacionesPago" placeholder="Anotaciones" tabindex="200" rows="5"></textarea>
+		</div>
 	</form>
 </div>
 <div class="modal-footer">

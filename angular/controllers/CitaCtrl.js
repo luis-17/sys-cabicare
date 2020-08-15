@@ -59,12 +59,12 @@ app.controller('CitaCtrl',
 			{ id: 'F', descripcion: 'FEMENINO' }
     ];
     $scope.fArr.listaMedioContacto = [
-		{ id: '', descripcion: '--Seleccione medio de contacto--' },
-		{ id: 'POR RECOMENDACION', descripcion: 'POR RECOMENDACION' },
-		{ id: 'POR GOOGLE', descripcion: 'POR GOOGLE' },
-		{ id: 'POR FACEBOOK', descripcion: 'POR FACEBOOK' },
-		{ id: 'POR INSTAGRAM', descripcion: 'POR INSTAGRAM' },
-		{ id: 'POR OTRAS REDES SOCIALES', descripcion: 'POR OTRAS REDES SOCIALES' }
+			{ id: '', descripcion: '--Seleccione medio de contacto--' },
+			{ id: 'POR RECOMENDACION', descripcion: 'POR RECOMENDACION' },
+			{ id: 'POR GOOGLE', descripcion: 'POR GOOGLE' },
+			{ id: 'POR FACEBOOK', descripcion: 'POR FACEBOOK' },
+			{ id: 'POR INSTAGRAM', descripcion: 'POR INSTAGRAM' },
+			{ id: 'POR OTRAS REDES SOCIALES', descripcion: 'POR OTRAS REDES SOCIALES' }
     ];
     $scope.fArr.listaMetodoPago = [
 			{ id: '', descripcion: '--Seleccione método de pago--' },

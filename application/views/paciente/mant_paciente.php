@@ -9,7 +9,7 @@
 		</div>
 		<div class="form-group col-md-6 mb-md">
 			<label class="control-label mb-n"> N° de Documento: <small class="text-danger">(*)</small> </label>
-			<input type="text" class="form-control input-sm" ng-model="fData.num_documento" placeholder="Ingrese N° de Documento" required tabindex="30" maxlength="8" minlength="8" />
+			<input type="text" class="form-control input-sm" ng-model="fData.num_documento" placeholder="Ingrese N° de Documento" required tabindex="30" maxlength="15" minlength="8" />
 		</div>
 		<div class="form-group col-md-6 mb-md">
 			<label class="control-label mb-n"> Nombres: <small class="text-danger">(*)</small> </label>
@@ -42,6 +42,15 @@
 		<div class="form-group col-md-6 mb-md">
 			<label class="control-label mb-n"> Celular: </label>
 			<input type="text" class="form-control input-sm" ng-model="fData.celular" placeholder="Ingrese celular" tabindex="80" />
+		</div>
+		<div class="form-group col-md-6 mb-md ">
+			<label class="control-label mb-n"> Distrito <small class="text-danger">(*)</small> </label>
+            <select class="form-control input-sm" ng-model="fData.distrito" ng-options="item as item.descripcion for item in fArr.listaDistrito" 
+            	required tabindex="90" ></select>
+		</div>
+		<div class="form-group col-md-6">
+			<label class="control-label"> Medio de Contacto <span class="text-danger">*</span>: </label>
+			<select class="form-control input-sm" ng-model="fData.medioContacto" ng-options="item as item.descripcion for item in fArr.listaMedioContacto" required tabindex="90" ></select>
 		</div>
 		<div class="form-group col-md-6 mb-md">
 			<label class="control-label mb-n"> E-mail: </label>

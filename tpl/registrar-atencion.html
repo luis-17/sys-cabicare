@@ -121,11 +121,21 @@
 								</div>
                 <input type="text" class="form-control input-xs" ng-model="fData.perimetroAbdominal" placeholder="Perímetro Abdominal">
               </div>
-						</div>
+            </div>
+            <div class="col-xs-12 form-inline mb-sm pl-xs">
+              <div class="form-group col-md-2 col-sm-6 col-xs-12 mb-xs">
+								<div class=" mb-n">
+									<label class="m-n text-blue"> ¿Gestando?</label>
+                </div>
+                <select class="form-control input-xs"
+									ng-model="fData.gestando"
+									ng-options="item as item.descripcion for item in fArr.listaGestando"
+									required
+								></select>
+              </div>
+            </div>
 					</fieldset>
-
 				</div>
-
 				<uib-tabset active="0">
 					<uib-tab index="$index" ng-repeat="item in fData.detalle" heading="{{ item.producto }}">
             <div class="row" style="margin-right: 0px !important;margin-left: 0px !important;">
@@ -212,7 +222,7 @@
 						</div>
 					</uib-tab>
 
-					<uib-tab index="receta" heading="RECETA">
+					<uib-tab index="10" heading="RECETA">
 						<div class="row" style="margin-right: 0px !important;margin-left: 0px !important;">
 							<div class="form-group mb-md col-sm-6">
 								<label class="control-label minotaur-label mb-xs"> Medicamento </label>
@@ -260,13 +270,62 @@
 								</button>
 							</div>
 						</div>
+					</uib-tab>
 
-						<!-- <div class="row">
-							<div class="block mt text-center">
-								
+					<uib-tab index="20" heading="IMAGENES">
+						<div class="row" style="margin-right: 0px !important;margin-left: 0px !important;">
+							<div class="form-group mb-md col-sm-4">
+								<label class="control-label minotaur-label mb-xs"> Tipo Imagen </label>
+								<select
+									class="form-control input-xs"
+									ng-model="fData.temporalImg.tipoImagen"
+									ng-options="item as item.descripcion for item in fArr.listaTipoImg"
+									required
+								></select>
+								<!-- <input type="text" class="form-control input-sm" ng-model="fData.temporalImg.tipoImagen"> -->
 							</div>
-						</div> -->
+							<div class="form-group mb-md col-sm-4">
+								<label class="control-label minotaur-label mb-xs"> Cargar Imagen </label>
+								<div class="fileinput fileinput-new" data-provides="fileinput" style="width: 100%;">
+									<div class="fileinput-preview thumbnail mb20" data-trigger="fileinput" style="width: 100%; text-align: center;">
+										<img ng-if="fData.temporalImg.srcImagen" ng-src="{{ app.name + 'assets/dinamic/imagenes/' + fData.temporalImg.srcImagen }}" />
+									</div>
+									<div>
+										<a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput">Quitar</a> 
+										<span class="btn btn-default btn-file"><span class="fileinput-new">Seleccionar imagen</span> 
+											<span class="fileinput-exists">Cambiar</span> 
+											<input type="file" name="file" file-model="fData.temporalImg.srcImagen_blob" /> 
+										</span>
+									</div>
+								</div>
+							</div>
+							<div class="form-group mb-md col-sm-4">
+								<label class="control-label minotaur-label mb-xs"> Observaciones </label>
+								<textarea class="form-control" rows="3" ng-model="fData.temporalImg.observaciones"></textarea>	
+							</div>
 
+							<div class="form-group col-md-1 mb-md  mt-xs">
+								<button class="btn btn-success btn-sm mt-md" style="width: 100%;"
+									ng-click="agregarItemImagen()"
+									ng-disabled="fData.temporalImg.tipoImagen == null  || fData.temporalImg.srcImagen == '' || fData.temporalImg.observaciones == ''"
+								>AGREGAR</button>
+							</div>
+
+							<div class="col-xs-12">
+								<div ui-grid="gridOptionsImg" ui-grid-auto-resize ui-grid-resize-columns ui-grid-edit
+									class="grid table-responsive fs-mini-grid" ng-style="getTableHeight();"></div>
+							</div>
+							<!-- <div class="col-sm-12 mb-lg text-center">
+								<button ng-if="fSessionCI.usuarioId == fData.medicoId && fSessionCI.keyPerfil == 'key_med'" 
+									class="btn btn-success btn-sm" ng-click="grabarImagenes(); $event.preventDefault();">
+									<i class="fa fa-edit"></i> Grabar
+								</button>
+								<button ng-if="fSessionCI.keyPerfil == 'key_root'" 
+									class="btn btn-success btn-sm" ng-click="grabarImagenes(); $event.preventDefault();">
+									<i class="fa fa-edit"></i> Grabar
+								</button>
+							</div> -->
+						</div>
 					</uib-tab>
         </uib-tabset>
         <div class="col-xs-12 block pt mb text-center" style="border-top: 1px solid #e0e0e0;">

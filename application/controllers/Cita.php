@@ -74,12 +74,13 @@ class Cita extends CI_Controller {
 						'medico' => $row['medico']
 					),
 					'total' => $row['total'],
-          			'medioContacto'=> array(
+          'medioContacto'=> array(
 						'id'=> $row['medioContacto'],
 						'descripcion'=> $row['medioContacto']
-         			 ),
-          			'numOperacion'=> $row['numOperacion'],
-          			'metodoPago'=> array(
+         	),
+					'numOperacion'=> $row['numOperacion'],
+					'anotacionesPago'=> $row['anotacionesPago'],
+          'metodoPago'=> array(
 						'id'=> $row['metodoPago'],
 						'descripcion'=> $row['metodoPago']
 					),
@@ -262,25 +263,19 @@ class Cita extends CI_Controller {
 		$rowCita['medico'] = array(
 			'id'=> $rowCita['medicoId'],
 			'descripcion'=> $rowCita['medico'],
+    );
+    $rowCita['gestando'] = array(
+			'id'=> $rowCita['gestando'],
+			'descripcion'=> $rowCita['gestando'] == 1 ? 'SI' : 'NO',
 		);
-
-
 		$arrData['datos'] = $rowCita;
-    	$arrData['message'] = '';
-    	$arrData['flag'] = 1;
+    $arrData['message'] = '';
+    $arrData['flag'] = 1;
 		$this->output
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 	}
 
-	/**
-	 * Método que lista los productos de una cita.
-	 * Vista Calendario
-	 *
-	 * @Creado: 17-06-2020
-	 * @author Ing. Ruben Guevara <rguevarac@hotmail.es>
-	 * @return void
-	 */
 	public function listar_detalle_cita()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
@@ -297,18 +292,10 @@ class Cita extends CI_Controller {
 		$this->load->view('cita/cita_formView');
 	}
 
-  public function ver_popup_form_metodo_pago(){
-		$this->load->view('cita/metodo_pago_formView');
-  }
+	public function ver_popup_form_metodo_pago(){
+			$this->load->view('cita/metodo_pago_formView');
+	}
 
-	/**
-	 * Método para registrar una reserva de Cita, puede ser Por Confirmar o Confirmada
-	 * Tambien se registra el detalle, es decir productos de la cita
-	 *
-	 * @Creado 14-06-2020
-	 * @author Ing. Ruben Guevara <rguevarac@hotmail.es>
-	 * @return void
-	 */
 	public function registrar()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
@@ -351,14 +338,14 @@ class Cita extends CI_Controller {
 		    return;
 		}
 
-		if (empty($allInputs['medioContacto']['id'])) {
-				$arrData['flag'] = 0;
-				$arrData['message'] = 'Debe seleccionar medio de contacto.';
-				$this->output
-				->set_content_type('application/json')
-				->set_output(json_encode($arrData));
-				return;
-		}
+		// if (empty($allInputs['medioContacto']['id'])) {
+		// 		$arrData['flag'] = 0;
+		// 		$arrData['message'] = 'Debe seleccionar medio de contacto.';
+		// 		$this->output
+		// 		->set_content_type('application/json')
+		// 		->set_output(json_encode($arrData));
+		// 		return;
+		// }
 
 		$hora_inicio_calendar = strtotime('07:00:00');
 		$hora_fin_calendar = strtotime('23:00:00');
@@ -423,15 +410,6 @@ class Cita extends CI_Controller {
 		    ->set_output(json_encode($arrData));
 	}
 
-	/**
-	 * Método para editar una reserva de Cita
-	 * Tambien se registra o edita el detalle, depediendo si se agrega nuevos items,
-	 * se cambia de precio o se eliminan items
-	 *
-	 * @Creado 19-06-2020
-	 * @author Ing. Ruben Guevara <rguevarac@hotmail.es>
-	 * @return void
-	 */
 	public function editar()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
@@ -464,14 +442,14 @@ class Cita extends CI_Controller {
 		    ->set_output(json_encode($arrData));
 		    return;
     	}
-    	if (empty($allInputs['medioContacto']['id'])) {
-			$arrData['flag'] = 0;
-			$arrData['message'] = 'Debe seleccionar medio de contacto.';
-			$this->output
-		    ->set_content_type('application/json')
-		    ->set_output(json_encode($arrData));
-		    return;
-		}
+    	// if (empty($allInputs['medioContacto']['id'])) {
+		// 	$arrData['flag'] = 0;
+		// 	$arrData['message'] = 'Debe seleccionar medio de contacto.';
+		// 	$this->output
+		//     ->set_content_type('application/json')
+		//     ->set_output(json_encode($arrData));
+		//     return;
+		// }
 
 		$hora_inicio_calendar = strtotime('07:00:00');
 		$hora_fin_calendar = strtotime('23:00:00');
@@ -544,14 +522,7 @@ class Cita extends CI_Controller {
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 	}
-	/**
-	 * Método para editar la fecha y/o hora de la cita.
-	 * Proviene de arrastar y soltar una cita en el calendario
-	 *
-	 * @Creado 21-06-2020
-	 * @author Ing. Ruben Guevara <rguevarac@hotmail.es>
-	 * @return void
-	 */
+	
 	public function mover_cita()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
@@ -584,9 +555,9 @@ class Cita extends CI_Controller {
 			$arrData['message'] = 'Ha ocurrido un error actualizando la cita';
 
 			$data = array(
-		// 'id' => $allInputs['id'],
 				'metodoPago' => $allInputs['metodoPago']['id'],
-				'numOperacion' => empty($allInputs['numOperacion']) ? NULL : $allInputs['numOperacion']
+				'numOperacion' => empty($allInputs['numOperacion']) ? NULL : $allInputs['numOperacion'],
+				'anotacionesPago' => empty($allInputs['anotacionesPago']) ? NULL : $allInputs['anotacionesPago'],
 			);
 
 			$this->db->trans_start();
@@ -638,7 +609,8 @@ class Cita extends CI_Controller {
 
 		$data = array(
 			'fechaAtencion' => date('Y-m-d H:i:s'),
-      		'estado' => 3,
+      'estado' => 3,
+      'gestando' => empty($allInputs['gestando']) ? NULL : $allInputs['gestando']['id'],
 			'updatedAt' => date('Y-m-d H:i:s'),
 			'peso' => $allInputs['peso'],
 			'talla' => $allInputs['talla'],
@@ -664,16 +636,19 @@ class Cita extends CI_Controller {
 				$this->model_cita->m_editar_detalle($data_det, $row['id']);
 			}
 			// eliminar diagnosticos y crearlos denuevo
-			$this->model_diagnostico->m_eliminar($allInputs['id']);
-			foreach ($allInputs['diagnostico'] as $row) {
-				$data_det = array(
-					'citaId'=> $allInputs['id'],
-					'diagnosticoId' 	=> $row['iddiagnostico'],
-					'tipoDiagnostico' 	=> $row['tipoDiagnostico']['id'],
-					'createdAt'		=> date('Y-m-d H:i:s')
-				);
-				$this->model_diagnostico->m_registrar_diagnostico($data_det);
-			}
+      $this->model_diagnostico->m_eliminar($allInputs['id']);
+      if(!empty($allInputs['diagnostico'])){
+        foreach ($allInputs['diagnostico'] as $row) {
+          $data_det = array(
+            'citaId'=> $allInputs['id'],
+            'diagnosticoId' 	=> $row['iddiagnostico'],
+            'tipoDiagnostico' 	=> $row['tipoDiagnostico']['id'],
+            'createdAt'		=> date('Y-m-d H:i:s')
+          );
+          $this->model_diagnostico->m_registrar_diagnostico($data_det);
+        }
+      }
+			
 			$arrData['message'] = 'Se registraron los datos correctamente.';
 			$arrData['flag'] = 1;
 		}
@@ -740,7 +715,7 @@ class Cita extends CI_Controller {
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
 		$arrData['message'] = '';
-    	$arrData['flag'] = 0;
+    $arrData['flag'] = 0;
 
 		$arrData['datos'] = $this->model_cita->m_cargar_detalle_receta($allInputs['datos']);
 
@@ -748,7 +723,15 @@ class Cita extends CI_Controller {
 		$this->output
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
-
-
+	}
+	public function listar_detalle_imagenes()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$arrData['message'] = '';
+    $arrData['flag'] = 0;
+		$arrData['datos'] = $this->model_cita->m_cargar_detalle_imagenes($allInputs['datos']);
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
 	}
 }

@@ -142,7 +142,7 @@ angular.module('app')
               $scope.fConfigSys.valores = [true,false,true,false,true,false,false];
             }
             if($scope.fSessionCI.keyPerfil == 'key_med'){
-              $scope.fConfigSys.valores = [true,false,false,false,false,true,false];
+              $scope.fConfigSys.valores = [false,false,false,false,false,true,false];
             }
             // $scope.getListaEmpresasSession();
             $scope.logIn();

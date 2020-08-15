@@ -74,7 +74,9 @@ class Model_producto extends CI_Model {
 			'nombre' => strtoupper($datos['nombre']),
 			'precio' => $datos['precio'],
 			'procedencia' => $datos['procedencia']['id'],
-			'estado' => 1
+			'estado' => 1,
+			'updatedAt' => date("Y-m-d H:i:s"),
+			'createdAt' => date("Y-m-d H:i:s")
 		);
 		return $this->db->insert('producto', $data);
 	}
@@ -84,6 +86,7 @@ class Model_producto extends CI_Model {
 		$data = array(
 			'tipoProductoId' => $datos['tipo_producto']['id'],
 			'nombre' => strtoupper($datos['nombre']),
+			'updatedAt' => date("Y-m-d H:i:s"),
       'precio' => $datos['precio'],
       'procedencia' => $datos['procedencia']['id'],
 		);

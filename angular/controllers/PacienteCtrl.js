@@ -2,10 +2,12 @@ app.controller('PacienteCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$
   'PacienteFactory',
   'ModalReporteFactory',
   'PacienteServices',
+  'DistritoServices',
   function($scope, $filter, $uibModal, $bootbox, $log, $timeout, pinesNotifications, uiGridConstants, blockUI,
   PacienteFactory,
   ModalReporteFactory,
-  PacienteServices
+  PacienteServices,
+  DistritoServices
   ) {
     $scope.metodos = {}; // contiene todas las funciones
     $scope.fArr = {}; // contiene todos los arrays generados por las funciones
@@ -14,6 +16,21 @@ app.controller('PacienteCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$
       $scope.gridOptions.enableFiltering = !$scope.gridOptions.enableFiltering;
       $scope.gridApi.core.notifyDataChange( uiGridConstants.dataChange.COLUMN );
     };
+    $scope.metodos.listaDistritos = function(myCallback) {
+      var myCallback = myCallback || function() { };
+      DistritoServices.sListarCbo().then(function(rpta) {
+        $scope.fArr.listaDistrito = rpta.datos;
+        myCallback();
+      });
+    };
+    $scope.fArr.listaMedioContacto = [
+			{ id: '', descripcion: '--Seleccione medio de contacto--' },
+			{ id: 'POR RECOMENDACION', descripcion: 'POR RECOMENDACION' },
+			{ id: 'POR GOOGLE', descripcion: 'POR GOOGLE' },
+			{ id: 'POR FACEBOOK', descripcion: 'POR FACEBOOK' },
+			{ id: 'POR INSTAGRAM', descripcion: 'POR INSTAGRAM' },
+			{ id: 'POR OTRAS REDES SOCIALES', descripcion: 'POR OTRAS REDES SOCIALES' }
+    ];
     $scope.fArr.listaTipoDocumento = [
       {id : '0', descripcion:'--Seleccione tipo--'},
       {id: 'DNI', descripcion: 'DOCUMENTO NACIONAL DE IDENTIDAD'},
@@ -277,12 +294,19 @@ app.factory("PacienteFactory", function($uibModal, pinesNotifications, blockUI, 
           $scope.cancel = function () {
             $uibModalInstance.dismiss('cancel');
           }
+          // bindeo distrito
+          var myCallBackDT = function() {
+            $scope.fArr.listaDistrito.splice(0,0,{ id : '0', descripcion:'--Seleccione distrito--'});
+            $scope.fData.distrito = $scope.fArr.listaDistrito[0];
+          }
+          $scope.metodos.listaDistritos(myCallBackDT);
           // $scope.fArr.listaTipoDocumento.splice(0,0,{ id : '0', descripcion:'--Seleccione tipo documento--'});
           $scope.fData.tipo_documento = $scope.fArr.listaTipoDocumento[0];
           // $scope.fArr.listaSexo.splice(0,0,{ id : '0', descripcion:'--Seleccione sexo--'});
           $scope.fData.sexo = $scope.fArr.listaSexo[0];
           // $scope.fArr.listaTipoDocumento.splice(0,0,{ id : '0', descripcion:'--Seleccione tipo documento--'});
           $scope.fData.operador = $scope.fArr.listaOperadores[0];
+          $scope.fData.medioContacto = $scope.fArr.listaMedioContacto[0];
           // var myCallBackCC = function() {
           //   $scope.fArr.listaTipoPaciente.splice(0,0,{ id : '0', descripcion:'--Seleccione tipo paciente--'});
           //   $scope.fData.tipo_paciente = $scope.fArr.listaTipoProducto[0];
@@ -343,6 +367,14 @@ app.factory("PacienteFactory", function($uibModal, pinesNotifications, blockUI, 
           $scope.cancel = function () {
             $uibModalInstance.dismiss('cancel');
           }
+          //BINDEO DISTRITO
+          var myCallBackDT = function() {
+            var objIndex = $scope.fArr.listaDistrito.filter(function(obj) {
+              return obj.id == $scope.fData.distrito.id;
+            }).shift();
+            $scope.fData.distrito = objIndex;
+          }
+          $scope.metodos.listaDistritos(myCallBackDT);
           //BINDEO DE TIPO DOCUMENTO
           var objIndexTD = $scope.fArr.listaTipoDocumento.filter(function(obj) {
             return obj.id == $scope.fData.tipo_documento.id;
@@ -359,6 +391,11 @@ app.factory("PacienteFactory", function($uibModal, pinesNotifications, blockUI, 
             return obj.id == $scope.fData.sexo.id;
           }).shift();
           $scope.fData.sexo = objIndexSx;
+          //BINDEO MEDIO CONTACTO
+          var objIndexCp = $scope.fArr.listaMedioContacto.filter(function(obj) {
+            return obj.id == $scope.fData.medioContacto.id;
+          }).shift();
+          $scope.fData.medioContacto = objIndexCp;
           // var myCallBackCC = function() {
           //   var objIndex = $scope.fArr.listaTipoProducto.filter(function(obj) {
           //     return obj.id == $scope.fData.tipo_producto.id;
