@@ -152,6 +152,9 @@ angular.module('app')
             }else{
               $scope.reloadPage();
             }
+            if($scope.fSessionCI.keyPerfil == 'key_med'){
+              $location.path('/app/atencion-medica');
+            }
           }else{
             $scope.fSessionCI = {};
             $scope.fConfigSys = {};
