@@ -244,6 +244,7 @@ app.factory("UsuarioFactory", function($uibModal, pinesNotifications, blockUI, U
           }
           $scope.metodos.listaPerfil(myCallBackCC);
           $scope.modoEdit = true;
+          $scope.bloqueCambioClave = false;
           $scope.aceptar = function () {
             blockUI.start('Procesando información...');
             console.log('aqui');
@@ -308,6 +309,7 @@ app.factory("UsuarioFactory", function($uibModal, pinesNotifications, blockUI, U
           }
           $scope.metodos.listaPerfil(myCallBackCC);
           $scope.modoEdit = false;
+          $scope.bloqueCambioClave = false;
           $scope.aceptar = function () {
             blockUI.start('Procesando información...');
             UsuarioServices.sEditar($scope.fData).then(function (rpta) {

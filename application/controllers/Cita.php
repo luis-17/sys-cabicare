@@ -4,7 +4,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Cita extends CI_Controller {
 	public function __construct(){
     parent::__construct();
-		$this->load->helper(array('fechas_helper', 'otros_helper'));
+		$this->load->helper(array('fechas_helper', 'otros_helper', 'imagen_helper'));
 		$this->load->model(array('model_cita', 'model_diagnostico'));
 
 		$this->output->set_header("Cache-Control: no-store, no-cache, must-revalidate, no-transform, max-age=0, post-check=0, pre-check=0");
@@ -721,8 +721,8 @@ class Cita extends CI_Controller {
 
 
 		$this->output
-		    ->set_content_type('application/json')
-		    ->set_output(json_encode($arrData));
+			->set_content_type('application/json')
+			->set_output(json_encode($arrData));
 	}
 	public function listar_detalle_imagenes()
 	{
@@ -730,6 +730,83 @@ class Cita extends CI_Controller {
 		$arrData['message'] = '';
     $arrData['flag'] = 0;
 		$arrData['datos'] = $this->model_cita->m_cargar_detalle_imagenes($allInputs['datos']);
+		foreach ($arrData['datos'] as $key => $row) {
+			$arrData['datos'][$key]['srcImagen'] = array(
+				'link' => URL_PREVIEW.'assets/dinamic/imagenes/'.$row['srcImagen'],
+				'texto' => 'Ver Documento'
+			);
+		}
+		$this->output
+			->set_content_type('application/json')
+			->set_output(json_encode($arrData));
+	}
+	public function registrar_imagen()
+	{
+		// $allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$allInputs = array();
+		$arrData['message'] = 'No se pudo registrar los datos';
+		$arrData['flag'] = 0;
+
+		// VALIDACIONES
+		if( empty($this->input->post('citaId')) ){
+			$arrData['message'] = 'No ha seleccionado la cita correctamente. Recargue la página y vuelva a intentarlo.';
+			$arrData['flag'] = 0;
+			$this->output
+				->set_content_type('application/json')
+				->set_output(json_encode($arrData));
+			return;
+		}
+		if( empty($_FILES['srcImagen_blob']) ){
+			$arrData['message'] = 'No ha cargado un archivo para subir. Cargue el archivo para seguir con el proceso.';
+			$arrData['flag'] = 0;
+			$this->output
+				->set_content_type('application/json')
+				->set_output(json_encode($arrData));
+			return;
+		}
+
+		$allInputs['citaId'] = $this->input->post('citaId');
+		$allInputs['tipoImagen'] = $this->input->post('tipoImagen');
+		// $allInputs['tipoImagen'] = $allInputs['tipoImagen'];
+		$allInputs['descripcion'] = $this->input->post('descripcion');
+		$allInputs['fechaSubida'] = date('Y-m-d H:i:s');
+		// $data = array(
+		// 	'citaId' 				=> $allInputs['citaId'],
+		// 	'descripcion'		=> empty($allInputs['descripcion']) ? NULL : nl2br($allInputs['descripcion']),
+		// 	'tipoImagen'		=> nl2br($allInputs['tipoImagen']),
+		// 	'fechaReceta'		=> date('Y-m-d H:i:s'),
+		// 	'estado' 				=> 1,
+		// 	'createdAt'			=> date('Y-m-d H:i:s'),
+		// 	'updatedAt'			=> date('Y-m-d H:i:s')
+		// );
+		$this->db->trans_start();
+		if( !empty($_FILES['srcImagen_blob']) ){
+			$extension = pathinfo($_FILES['srcImagen_blob']['name'], PATHINFO_EXTENSION);
+			$nuevoNombreArchivo = strtotime("now").'-'.$allInputs['tipoImagen'].'.'.$extension;
+			if( subir_fichero('assets/dinamic/imagenes','srcImagen_blob',$nuevoNombreArchivo) ){
+				$allInputs['srcImagen'] = $nuevoNombreArchivo;
+			}
+			if($this->model_cita->m_agregar_imagen($allInputs) ){
+				$arrData['message'] = 'Se agregaron los datos correctamente.';
+				$arrData['flag'] = 1;
+				// $arrData['idreceta'] = $allInputs['idreceta'];
+			}
+		}
+		$this->db->trans_complete();
+		$this->output
+			->set_content_type('application/json')
+			->set_output(json_encode($arrData));
+	}
+	public function quitar_imagen()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$arrData['message'] = 'No se pudo quitar los datos';
+		$arrData['flag'] = 0;
+		// $allInputs['username'] = $this->sessionFactur['username'];
+		if( $this->model_cita->m_quitar_imagen($allInputs) ){
+			$arrData['message'] = 'Se quitaron los datos correctamente';
+    		$arrData['flag'] = 1;
+		}
 		$this->output
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));

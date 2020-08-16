@@ -42,6 +42,17 @@
 				<input autocomplete="off" type="password" class="form-control input-sm" ng-model="fData.password" placeholder="Repita contraseña" tabindex="130" />
 			</div>
 		</div>
+		<div class="form-group col-md-6 mb-md" ng-show="!modoEdit">
+			<label class="control-label mb-n"> ¿Desea cambiar clave?: </label>
+			<input type="checkbox" ng-model="fData.checkCambioClave" ng-checked="" >
+			<!-- <input type="text" class="form-control input-sm" autocomplete="off" ng-model="fData.username" placeholder="Ingrese usuario" required tabindex="100" /> -->
+		</div>
+		<div ng-show="fData.checkCambioClave">
+			<div class="form-group col-md-6 mb-md">
+				<label class="control-label mb-n"> Ingrese nueva contraseña: <small class="text-danger">(*)</small> </label>
+				<input autocomplete="off" type="password" class="form-control input-sm" ng-model="fData.password" placeholder="Registre contraseña" tabindex="150" />
+			</div>
+		</div>
 	</form>
 </div>
 <div class="modal-footer">

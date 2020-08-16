@@ -359,6 +359,11 @@ class Model_cita extends CI_Model {
 		$this->db->insert('receta', $data);
 		return $this->db->insert_id();
 	}
+	public function m_agregar_imagen($data)
+	{
+		return $this->db->insert('imagen', $data);
+		// return $this->db->insert_id();
+	}
 	public function m_editar_receta($data, $id)
 	{
 		$this->db->where('id',$id);
@@ -416,4 +421,9 @@ class Model_cita extends CI_Model {
 		$this->db->where('re.estado', 1);
 		return $this->db->get()->result_array();
 	}
+	public function m_quitar_imagen($data)
+	{
+		$this->db->where('id', $data['id']);
+		return $this->db->delete('imagen');
+  	}
 }

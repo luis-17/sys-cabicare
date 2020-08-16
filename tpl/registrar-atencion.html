@@ -274,25 +274,25 @@
 
 					<uib-tab index="20" heading="IMAGENES">
 						<div class="row" style="margin-right: 0px !important;margin-left: 0px !important;">
-							<div class="form-group mb-md col-sm-4">
+							<div class="form-group mb-md col-sm-3">
 								<label class="control-label minotaur-label mb-xs"> Tipo Imagen </label>
 								<select
-									class="form-control input-xs"
+									class="form-control"
 									ng-model="fData.temporalImg.tipoImagen"
 									ng-options="item as item.descripcion for item in fArr.listaTipoImg"
 									required
 								></select>
 								<!-- <input type="text" class="form-control input-sm" ng-model="fData.temporalImg.tipoImagen"> -->
 							</div>
-							<div class="form-group mb-md col-sm-4">
+							<div class="form-group mb-md col-sm-3">
 								<label class="control-label minotaur-label mb-xs"> Cargar Imagen </label>
 								<div class="fileinput fileinput-new" data-provides="fileinput" style="width: 100%;">
 									<div class="fileinput-preview thumbnail mb20" data-trigger="fileinput" style="width: 100%; text-align: center;">
 										<img ng-if="fData.temporalImg.srcImagen" ng-src="{{ app.name + 'assets/dinamic/imagenes/' + fData.temporalImg.srcImagen }}" />
 									</div>
 									<div>
-										<a href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput">Quitar</a> 
-										<span class="btn btn-default btn-file"><span class="fileinput-new">Seleccionar imagen</span> 
+										<a id="quitarImg" href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput">Quitar</a> 
+										<span class="btn btn-default btn-file"><span class="fileinput-new">Seleccionar archivo</span> 
 											<span class="fileinput-exists">Cambiar</span> 
 											<input type="file" name="file" file-model="fData.temporalImg.srcImagen_blob" /> 
 										</span>
@@ -304,10 +304,10 @@
 								<textarea class="form-control" rows="3" ng-model="fData.temporalImg.observaciones"></textarea>	
 							</div>
 
-							<div class="form-group col-md-1 mb-md  mt-xs">
+							<div class="form-group col-md-2 mb-md mt-xs">
 								<button class="btn btn-success btn-sm mt-md" style="width: 100%;"
 									ng-click="agregarItemImagen()"
-									ng-disabled="fData.temporalImg.tipoImagen == null  || fData.temporalImg.srcImagen == '' || fData.temporalImg.observaciones == ''"
+									ng-disabled="fData.temporalImg.tipoImagen == null  || fData.temporalImg.srcImagen == ''"
 								>AGREGAR</button>
 							</div>
 

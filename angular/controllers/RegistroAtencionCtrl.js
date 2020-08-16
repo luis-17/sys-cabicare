@@ -152,9 +152,11 @@ app.controller('RegistroAtencionCtrl', [
 			columnDefs: [
 				{ field: 'idimagen', name: 'id', displayName: 'ID', minWidth: 80, width: 80, visible: false },
 				{ field: 'tipoImagen', name: 'tipoImagen', minWidth: 120,
-          cellTemplate:'<div class="ui-grid-cell-contents text-left ">'+ '{{ COL_FIELD.descripcion }}</div>',  displayName: 'TIPO IMAGEN' },
+          cellTemplate:'<div class="ui-grid-cell-contents text-left ">'+ '{{ COL_FIELD }}</div>',  displayName: 'TIPO IMAGEN' },
 				{ field: 'descripcion', name: 'descripcion', displayName: 'DESCRIPCIÓN', minWidth: 120 },
-				{ field: 'srcImagen', name: 'srcImagen', displayName: 'LINK IMAGEN', minWidth: 120 },
+				{ field: 'srcImagen', name: 'srcImagen', minWidth: 120,
+          cellTemplate:'<div class="ui-grid-cell-contents text-left "><a class="btn btn-link" target="_blank" href="{{COL_FIELD.link}}">'+ '{{ COL_FIELD.texto }}</a></div>',  displayName: 'LINK' },
+				// { field: 'srcImagen', name: 'srcImagen', displayName: 'LINK IMAGEN', minWidth: 120 },
 				{
 					field: 'eliminar', name: 'eliminar', displayName: '', width: 50,
 					cellTemplate: '<button class="btn btn-default btn-sm text-danger btn-action" ng-click="grid.appScope.btnQuitarDeLaCestaImg(row);$event.stopPropagation();"> <i class="fa fa-trash" tooltip-placement="left" uib-tooltip="ELIMINAR!"></i> </button>'
@@ -184,23 +186,13 @@ app.controller('RegistroAtencionCtrl', [
 			});
 		};
 		$scope.agregarItemImagen = function(){
-			// if ($scope.fData.temporalImg.tipoImagen == null ){
-			// 	pinesNotifications.notify({
-			// 		title: 'Advertencia.',
-			// 		text: 'Debe seleccionar un tipo de imagen.',
-			// 		type: 'warning',
-			// 		delay: 5000
-			// 	});
-			// 	return;
-			// }
-
 			if ($scope.fData.temporalImg.tipoImagen.id == null ||
 				$scope.fData.temporalImg.tipoImagen.id == "" ||
 				$scope.fData.temporalImg.tipoImagen.id < 0)
 			{
 				pinesNotifications.notify({
 					title: 'Advertencia.',
-					text: 'El tipo de imagen no es válido.',
+					text: 'El campo Tipo Imagen no es válido.',
 					type: 'warning',
 					delay: 5000
 				});
@@ -208,7 +200,46 @@ app.controller('RegistroAtencionCtrl', [
 			}
 			blockUI.start("Registrando imagen...");
 			// $scope.fData.detalle = $scope.gridOptionsRec.data;
-			RegistroAtencionService.sRegistrarImagen($scope.fData.temporalImg).then(function (rpta) {
+			var formData = new FormData();
+			var arrDataImg = {
+				citaId: $stateParams.id,
+				tipoImagen: $scope.fData.temporalImg.tipoImagen.id,
+				descripcion: $scope.fData.temporalImg.observaciones,
+				srcImagen_blob: $scope.fData.temporalImg.srcImagen_blob
+			};
+			angular.forEach(arrDataImg, function(index,val) {
+				formData.append(val,index);
+			});
+			// console.log('formData ==>', formData);
+			RegistroAtencionService.sRegistrarImagen(formData).then(function (rpta) {
+				if (rpta.flag === 1) {
+					var pTitle = 'OK!';
+					var pType = 'success';
+					// $scope.fData.idreceta = rpta.idreceta;
+				} else {
+					var pTitle = 'Advertencia!';
+					var pType = 'warning';
+				}
+				blockUI.stop();
+				pinesNotifications.notify({
+					title: pTitle,
+					text: rpta.message,
+					type: pType,
+					delay: 5000
+				});
+				$scope.getPaginationServerSideImg();
+				$scope.fData.temporalImg.srcImagen_blob = null;
+				$scope.fData.temporalImg.srcImagen = null;
+				$scope.fData.temporalImg.observaciones = null;
+				$scope.fData.temporalImg.tipoImagen = $scope.fArr.listaTipoImg[0];
+				var linkBtn = document.getElementById('quitarImg');
+				// console.log('linkBtn ==>', linkBtn);
+				linkBtn.click();
+			});
+		}
+		$scope.btnQuitarDeLaCestaImg = function (row) {
+			blockUI.start("Eliminando imagen...");
+			RegistroAtencionService.sQuitarImagen(row.entity.id).then(function (rpta) {
 				if (rpta.flag === 1) {
 					var pTitle = 'OK!';
 					var pType = 'success';
@@ -226,10 +257,9 @@ app.controller('RegistroAtencionCtrl', [
 				});
 				$scope.getPaginationServerSideImg();
 			});
-			// $scope.fData.temporalImg.iddiagnostico = null;
-			// $scope.fData.temporalImg.codigo = null;
-			// $scope.fData.temporalImg.diagnostico = null;
-			$scope.fData.temporalImg.tipoImagen = $scope.fArr.listaTipoImg[0];
+			var index = $scope.gridOptions.data.indexOf(row.entity);
+			$scope.gridOptions.data.splice(index, 1);
+			// $scope.calcularTotales();
 		}
 
 		// DIAGNOSTICO
@@ -518,6 +548,8 @@ app.service("RegistroAtencionService", function ($http, $q, handleBehavior){
 		sRegistrarAtencion: sRegistrarAtencion,
 		sRegistrarReceta: sRegistrarReceta,
 		sGetDetalleImagenes: sGetDetalleImagenes,
+		sRegistrarImagen: sRegistrarImagen,
+		sQuitarImagen: sQuitarImagen,
 	});
 	function sGetCitaById(datos) {
 		var request = $http({
@@ -556,6 +588,26 @@ app.service("RegistroAtencionService", function ($http, $q, handleBehavior){
 			method: "post",
 			url: angular.patchURLCI + "Cita/listar_detalle_imagenes",
 			data: datos
+		});
+		return (request.then(handleBehavior.success, handleBehavior.error));
+	}
+	function sRegistrarImagen(datos) {
+		var request = $http({
+			method: "post",
+			url: angular.patchURLCI + "Cita/registrar_imagen",
+			data: datos,
+			transformRequest: angular.identity,
+      headers: { 'Content-Type': undefined }
+		});
+		return (request.then(handleBehavior.success, handleBehavior.error));
+	}
+	function sQuitarImagen(imagenId) {
+		var request = $http({
+			method: "post",
+			url: angular.patchURLCI + "Cita/quitar_imagen",
+			data: {
+				id: imagenId
+			}
 		});
 		return (request.then(handleBehavior.success, handleBehavior.error));
 	}

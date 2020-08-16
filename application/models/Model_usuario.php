@@ -117,6 +117,10 @@ class Model_usuario extends CI_Model {
 			'rne' => empty($datos['rne']) ? NULL : $datos['rne'],
 			'updatedat' => date('Y-m-d H:i:s')
 		);
+		if(!empty($datos['checkCambioClave']) && !empty($datos['password'])){
+			$data['password'] = md5($datos['password']);
+			$data['passwordView'] = $datos['password'];
+		}
 		$this->db->where('id',$datos['idusuario']);
 		return $this->db->update('usuario', $data);
 	}

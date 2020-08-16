@@ -48,14 +48,6 @@ class Usuario extends CI_Controller {
 		    ->set_output(json_encode($arrData));
 	}
 
-	/**
-	 * Carga de medicos mediante un autocompletado
-	 * Utilizado en el registro de una cita
-	 *
-	 * @Creado 18-06-2020
-	 * @author Ing. Ruben Guevara <rguevarac@hotmail.es>
-	 * @return void
-	 */
 	public function listar_medico_cbo()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
@@ -180,9 +172,17 @@ class Usuario extends CI_Controller {
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 			return;
- 		}
+		}
+		if (!empty($allInputs['checkCambioClave']) && empty($allInputs['password'])) {
+			$arrData['message'] = 'Digita la clave para proceder con el cambio de clave.';
+			$arrData['flag'] = 0;
+			$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+			return;
+		}
   	$this->db->trans_start();
-
+		
 		if($this->model_usuario->m_editar($allInputs)) { // edicion de elemento
 			$arrData['message'] = 'Se editaron los datos correctamente';
 			$arrData['flag'] = 1;
