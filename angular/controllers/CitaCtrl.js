@@ -405,7 +405,7 @@ app.controller('CitaCtrl',
 
 		$scope.btnExportarListaExcel = function () {
 			var arrParams = {
-				titulo: 'LISTADO DE ANALISIS',
+				titulo: 'LISTADO DE CITAS',
 				datos: {
 					filtro: $scope.fBusqueda,
 					paginate: paginationOptions,

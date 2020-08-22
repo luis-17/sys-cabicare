@@ -300,7 +300,7 @@ class CentralReportes extends CI_Controller {
     //   foreach ($allInputs['filas'] as $key => $row) {
     //     $arrIds['arrIds'][] = $row['idatencionocupacional'];
     //   }
-    // } 
+    // }
     //var_dump($arrIds); exit();
     //$arrIds = array($allInputs['num_acto_medico']);
     $listaAtenciones = $this->model_cita->m_cargar_detalle_cita_atendida_por_paciente($allInputs);
@@ -364,6 +364,280 @@ class CentralReportes extends CI_Controller {
       $this->pdf->Cell(30,6,'Aún no tiene atenciones registradas.');
     }
     
+    $arrData['message'] = 'ERROR';
+    $arrData['flag'] = 2;
+    $timestamp = date('YmdHis');
+    if($this->pdf->Output( 'F','assets/dinamic/pdfTemporales/tempPDF_'. $timestamp .'.pdf' )){
+      $arrData['message'] = 'OK';
+      $arrData['flag'] = 1;
+    }
+    $arrData = array(
+      'urlTempPDF'=> 'assets/dinamic/pdfTemporales/tempPDF_'. $timestamp .'.pdf'
+    );
+    $this->output
+        ->set_content_type('application/json')
+        ->set_output(json_encode($arrData));
+  }
+
+  public function reporte_produccion_medico()
+  {
+    $allInputs = json_decode(trim($this->input->raw_input_stream),true); 
+    $this->pdf = new Fpdfext();
+    mostrar_plantilla_pdf($this->pdf,$allInputs['titulo'],FALSE,$allInputs['tituloAbv']);
+
+    $this->pdf->SetFont('Arial','',8); 
+    $this->pdf->AddPage('L','A4');
+    $this->pdf->AliasNbPages();
+    $this->pdf->SetFont('Arial','B',8);
+    $this->pdf->Cell(40,5,'DESDE');
+    $this->pdf->Cell(2,5,':'); 
+    $this->pdf->SetFont('Arial','',8);
+    $this->pdf->Cell(40,5,$allInputs['desde']); 
+    $this->pdf->Ln();
+    $this->pdf->SetFont('Arial','B',8);
+    $this->pdf->Cell(40,5,'HASTA');
+    $this->pdf->Cell(2,5,':'); 
+    $this->pdf->SetFont('Arial','',8);
+    $this->pdf->Cell(40,5,$allInputs['hasta']);
+    $this->pdf->Ln();
+
+    $this->pdf->SetFont('Arial','B',8);
+    $this->pdf->Cell(40,5,'PROFESIONAL');
+    $this->pdf->Cell(2,5,':'); 
+    $this->pdf->SetFont('Arial','',8);
+    $this->pdf->Cell(0,5,$allInputs['medico']['descripcion']);
+    $this->pdf->Ln();
+    // $this->pdf->Ln();
+
+    $fill = TRUE;
+    $headerDetalle = array('N°', 'FECHA AT.', 'PACIENTE', 'N° DOC.', 'TIPO PROD.', 'PRODUCTO', 'M. PAGO', 'PRECIO');
+    $this->pdf->SetAligns(array('L', 'C', 'L', 'C', 'L', 'R', 'C', 'R'));
+    $this->pdf->SetWidths(array(5, 22, 70, 20, 28, 85, 30, 25));
+    if($allInputs['tipoReporte']['id'] === 'RPP'){
+      $headerDetalle = array('N°', 'PRODUCTO', 'CANTIDAD', 'MONTO');
+      $this->pdf->SetAligns(array('L', 'C', 'R', 'R'));
+      $this->pdf->SetWidths(array(5, 90, 30, 40));
+    }
+    
+    $wDetalle = $this->pdf->GetWidths();
+    $this->pdf->Ln();
+    $this->pdf->SetFont('Arial','B',9);
+    $this->pdf->SetFillColor(224,235,255);
+    // $fill = TRUE;
+    for($i=0;$i<count($headerDetalle);$i++)
+      $this->pdf->Cell($wDetalle[$i],7,utf8_decode($headerDetalle[$i]),1,0,'C',TRUE);
+    $this->pdf->Ln();
+    $this->pdf->SetFillColor(243,247,255);
+
+    $i = 0;
+    $totalAtenciones = 0;
+    // $totalFactura = 0; 
+    $fill = FALSE;
+    if($allInputs['tipoReporte']['id'] === 'DET'){
+      $lista = $this->model_cita->m_obtener_produccion_medicos($allInputs);
+      $this->pdf->SetFont('Arial','',8);
+      foreach ($lista as $key => $row) {
+        $this->pdf->Row( 
+          array( 
+            ++$i,
+            formatoFechaReporte3($row['fechaAtencion']),
+            utf8_decode($row['paciente']),
+            $row['numeroDocumento'],
+            utf8_decode($row['tipo_producto']),
+            utf8_decode($row['producto']),
+            utf8_decode($row['metodoPago']),
+            'S/. '.number_format(round($row['precioReal'],2),2)
+          )
+          ,$fill
+        );
+        $fill = !$fill;
+        $totalAtenciones += $row['precioReal'];
+      }
+    }
+    if($allInputs['tipoReporte']['id'] === 'RPP'){
+      $lista = $this->model_cita->m_obtener_produccion_medicos_group_producto($allInputs);
+      $this->pdf->SetFont('Arial','',8);
+      foreach ($lista as $key => $row) {
+        $this->pdf->Row( 
+          array( 
+            ++$i,
+            utf8_decode($row['producto']),
+            $row['contador'],
+            'S/. '.number_format(round($row['total'],2),2)
+          )
+          ,$fill
+        );
+        $fill = !$fill;
+        $totalAtenciones += $row['total'];
+      }
+    }
+    if($allInputs['tipoReporte']['id'] === 'DET'){
+      $this->pdf->SetWidths(array(260, 25));
+      $this->pdf->SetFont('Arial','B',12);
+      $this->pdf->SetFillColor(224,235,255);
+      $this->pdf->SetAligns(array('R', 'R'));
+      $arrBolds = array('B', 'B');
+      $this->pdf->Row( 
+        array( 
+          'TOTAL:',
+          number_format(round($totalAtenciones,2),2),
+          // '',
+          // '',
+          // ''
+        ),TRUE,0,$arrBolds
+      );
+    }
+    if($allInputs['tipoReporte']['id'] === 'RPP'){
+      $this->pdf->SetWidths(array(125, 40));
+      $this->pdf->SetFont('Arial','B',12);
+      $this->pdf->SetFillColor(224,235,255);
+      $this->pdf->SetAligns(array('R', 'R'));
+      $arrBolds = array('B', 'B');
+      $this->pdf->Row( 
+        array( 
+          'TOTAL:',
+          number_format(round($totalAtenciones,2),2),
+          // '',
+          // '',
+          // ''
+        ),TRUE,0,$arrBolds
+      );
+    }
+
+    $arrData['message'] = 'ERROR';
+    $arrData['flag'] = 2;
+    $timestamp = date('YmdHis');
+    if($this->pdf->Output( 'F','assets/dinamic/pdfTemporales/tempPDF_'. $timestamp .'.pdf' )){
+      $arrData['message'] = 'OK';
+      $arrData['flag'] = 1;
+    }
+    $arrData = array(
+      'urlTempPDF'=> 'assets/dinamic/pdfTemporales/tempPDF_'. $timestamp .'.pdf'
+    );
+    $this->output
+        ->set_content_type('application/json')
+        ->set_output(json_encode($arrData));
+  }
+
+  public function reporte_produccion_general()
+  {
+    $allInputs = json_decode(trim($this->input->raw_input_stream),true); 
+    $this->pdf = new Fpdfext();
+    mostrar_plantilla_pdf($this->pdf,$allInputs['titulo'],FALSE,$allInputs['tituloAbv']);
+
+    $this->pdf->SetFont('Arial','',8); 
+    $this->pdf->AddPage('L','A4');
+    $this->pdf->AliasNbPages();
+    $this->pdf->SetFont('Arial','B',8);
+    $this->pdf->Cell(40,5,'DESDE');
+    $this->pdf->Cell(2,5,':'); 
+    $this->pdf->SetFont('Arial','',8);
+    $this->pdf->Cell(40,5,$allInputs['desde']); 
+    $this->pdf->Ln();
+    $this->pdf->SetFont('Arial','B',8);
+    $this->pdf->Cell(40,5,'HASTA');
+    $this->pdf->Cell(2,5,':'); 
+    $this->pdf->SetFont('Arial','',8);
+    $this->pdf->Cell(40,5,$allInputs['hasta']);
+    $this->pdf->Ln();
+    // $this->pdf->Ln();
+
+    $fill = TRUE;
+    $headerDetalle = array('N°', 'FECHA AT.', 'MEDICO', 'PACIENTE', 'N° DOC.', 'TIPO PROD.', 'PRODUCTO', 'PRECIO');
+    $this->pdf->SetAligns(array('L', 'C', 'L', 'L', 'C', 'L', 'L', 'R'));
+    $this->pdf->SetWidths(array(5, 22, 40, 65, 20, 28, 75, 25));
+    if($allInputs['tipoReporte']['id'] === 'RPP'){
+      $headerDetalle = array('N°', 'PRODUCTO', 'CANTIDAD', 'MONTO');
+      $this->pdf->SetAligns(array('L', 'C', 'R', 'R'));
+      $this->pdf->SetWidths(array(5, 90, 30, 40));
+    }
+
+    $wDetalle = $this->pdf->GetWidths();
+    $this->pdf->Ln();
+    $this->pdf->SetFont('Arial','B',9);
+    $this->pdf->SetFillColor(224,235,255);
+    // $fill = TRUE;
+    for($i=0;$i<count($headerDetalle);$i++)
+      $this->pdf->Cell($wDetalle[$i],7,utf8_decode($headerDetalle[$i]),1,0,'C',TRUE);
+    $this->pdf->Ln();
+    $this->pdf->SetFillColor(243,247,255);
+
+    $i = 0;
+    $totalAtenciones = 0;
+    // $totalFactura = 0; 
+    $fill = FALSE;
+    if($allInputs['tipoReporte']['id'] === 'DET'){
+      $lista = $this->model_cita->m_obtener_produccion_general($allInputs);
+      $this->pdf->SetFont('Arial','',8);
+      foreach ($lista as $key => $row) {
+        $this->pdf->Row( 
+          array( 
+            ++$i,
+            formatoFechaReporte3($row['fechaAtencion']),
+            utf8_decode($row['nombreMedico']),
+            utf8_decode($row['paciente']),
+            $row['numeroDocumento'],
+            utf8_decode($row['tipo_producto']),
+            utf8_decode($row['producto']),
+            // utf8_decode($row['metodoPago']),
+            'S/. '.number_format(round($row['precioReal'],2),2)
+          )
+          ,$fill
+        );
+        $fill = !$fill;
+        $totalAtenciones += $row['precioReal'];
+      }
+    }
+    if($allInputs['tipoReporte']['id'] === 'RPP'){
+      $lista = $this->model_cita->m_obtener_produccion_general_group_producto($allInputs);
+      $this->pdf->SetFont('Arial','',8);
+      foreach ($lista as $key => $row) {
+        $this->pdf->Row( 
+          array( 
+            ++$i,
+            utf8_decode($row['producto']),
+            $row['contador'],
+            'S/. '.number_format(round($row['total'],2),2)
+          )
+          ,$fill
+        );
+        $fill = !$fill;
+        $totalAtenciones += $row['total'];
+      }
+    }
+    if($allInputs['tipoReporte']['id'] === 'DET'){
+      $this->pdf->SetWidths(array(255, 25));
+      $this->pdf->SetFont('Arial','B',12);
+      $this->pdf->SetFillColor(224,235,255);
+      $this->pdf->SetAligns(array('R', 'R'));
+      $arrBolds = array('B', 'B');
+      $this->pdf->Row( 
+        array( 
+          'TOTAL:',
+          number_format(round($totalAtenciones,2),2),
+          // '',
+          // '',
+          // ''
+        ),TRUE,0,$arrBolds
+      );
+    }
+    if($allInputs['tipoReporte']['id'] === 'RPP'){
+      $this->pdf->SetWidths(array(125, 40));
+      $this->pdf->SetFont('Arial','B',12);
+      $this->pdf->SetFillColor(224,235,255);
+      $this->pdf->SetAligns(array('R', 'R'));
+      $arrBolds = array('B', 'B');
+      $this->pdf->Row( 
+        array( 
+          'TOTAL:',
+          number_format(round($totalAtenciones,2),2),
+          // '',
+          // '',
+          // ''
+        ),TRUE,0,$arrBolds
+      );
+    }
+
     $arrData['message'] = 'ERROR';
     $arrData['flag'] = 2;
     $timestamp = date('YmdHis');

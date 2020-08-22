@@ -109,11 +109,19 @@ angular.module('app')
           .state('app.registrar-atencion', {
             url: '/registrar-atencion/{id}',
             templateUrl: 'tpl/registrar-atencion.html',
-
             resolve: load([
               'angular/controllers/RegistroAtencionCtrl.js',
               'angular/controllers/DiagnosticoCtrl.js',
               'angular/controllers/UsuarioCtrl.js'
+            ])
+          })
+          .state('app.central-reportes', {
+            url: '/central-reportes',
+            templateUrl: 'tpl/central-reportes.html',
+            resolve: load([
+              'angular/controllers/CentralReportesCtrl.js',
+              'angular/controllers/UsuarioCtrl.js'
+              // 'angular/controllers/UsuarioCtrl.js'
             ])
           });
 

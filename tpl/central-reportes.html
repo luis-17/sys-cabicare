@@ -1,0 +1,138 @@
+<div class="bg-light lter b-b wrapper-md">
+    <h1 class="m-n font-thin h3"> Central de Reportes </h1>
+</div>
+<div class="container-fluid central-reportes" ng-controller="CentralReportesCtrl">
+    <div class="row">
+        <div class="col-lg-8 col-md-7 col-sm-12 modulos">
+            <div class="panel panel-info" >
+                <div class="panel-heading">
+                    <h5 class="m-n"> MODULOS </h5>
+                </div>
+                <div class="panel-body">
+                    <accordion close-others="oneAtATime" class="accordion-default" >
+                        <accordion-group ng-repeat="(key, obj) in fArr.listaEstadisticas" heading="{{obj.textReporte}}" class="col-md-12 col-sm-12 col-xs-12 p-n show" is-open="obj.open" style="visibility: visible;" > 
+                            <div ng-repeat="(keyDet, objDet) in obj.reportes" class="col-lg-2 col-md-4 col-sm-6 col-xs-12 heightFixed120" > 
+                                <div class="item block text-center item-reporte" ng-click="selectReport(objDet)" ng-class="{selected: objDet.id == selectedReport.id}">
+                                    <div> 
+                                        <i class="fa text-primary" ng-class="{ 'fa-file-text-o': objDet.tipoCuadro == 'report' , 'fa-bar-chart-o': objDet.tipoCuadro == 'graph' }"></i> 
+                                    </div>
+                                    <p class="text-center pl-xs pr-xs">{{ objDet.name }}</p> 
+                                </div>
+                            </div>
+                        </accordion-group>
+                    </accordion>
+                    <div class="waterMarkEmptyData" ng-show="showDivEmptyData"> No se encontraron reportes para el usuario. </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-5 col-sm-12 filtros">
+            <div class="panel panel-info" data-widget='{"id" : "wiget10000"}'>
+                <div class="panel-heading">
+                    <div class="panel-ctrls button-icon" data-actions-container="" data-action-colorpicker=''> </div> 
+                    <h5 class="m-n"> FILTROS DE BUSQUEDA </h5> 
+                </div>
+                <div class="panel-body pl-n pr-n pb-n" style="min-height: 254px;"> 
+                    <div class="row" ng-hide="selectedReport.id">
+                        <div class="col-md-12 col-sm-12 col-xs-12"> 
+                            <div class="waterMarkEmptyData" style="font-size: 22px;" > Seleccione un reporte... </div>
+                        </div>
+                    </div>
+                    <ul class="demo-btns list-unstyled" ng-show="selectedReport.id" style="min-height: 200px;">
+                        <li class="col-md-3 col-xs-12 form-group" 
+                            ng-show="selectedReport.id=='AM-PRODMED' || selectedReport.id=='AM-PRODGEN'"> 
+                            <label> DESDE </label>
+                            <div class="input-group">
+                              <input
+                                type="text"
+                                ng-model="fBusqueda.desde"
+                                class="form-control input-sm mask"
+                                data-inputmask="'alias': 'dd-mm-yyyy'"
+                                style="width: 80px;" /> 
+                                <!-- <input type="text" class="form-control input-sm" ng-model="fBusqueda.desde" data-inputmask="'alias': 'dd-mm-yyyy'" tabindex="3" style="width: 80px;" /> -->
+                            </div>
+                        </li>
+                        <li class="col-md-3 col-xs-12 form-group" 
+                            ng-show="selectedReport.id=='AM-PRODMED' || selectedReport.id=='AM-PRODGEN'"> 
+                            <label> HASTA </label> 
+                            <div class="input-group" > 
+                                <input type="text" 
+                                class="form-control input-sm mask" 
+                                ng-model="fBusqueda.hasta" 
+                                data-inputmask="'alias': 'dd-mm-yyyy'"
+                                style="width: 80px;" /> 
+                            </div>
+                        </li>
+                        <!-- <li class="col-md-6 col-xs-12 form-group" ng-show="selectedReport.id=='CE-REEDS' || selectedReport.id=='CE-IOM' || selectedReport.id=='FAR-CMMA'"> 
+                            <label> DESDE MES </label>  
+                            <div class="input-group" style="width: 100%;"> 
+                                <select class="form-control input-sm mb" ng-options="item.id as item.mes for item in listaMeses" ng-model="fBusqueda.mesDesdeCbo" style="width: 50%;"> </select> 
+                                <select class="form-control input-sm mb" ng-options="item.id as item.ano for item in listaAnos" ng-model="fBusqueda.anioDesdeCbo" style="width: 50%;"> </select>
+                            </div>
+                        </li>
+                        <li class="col-md-6 col-xs-12 form-group" ng-show="selectedReport.id=='FAR-CMMA'"> 
+                            <label> HASTA MES </label>  
+                            <div class="input-group" style="width: 100%;"> 
+                                <select class="form-control input-sm mb" ng-options="item.id as item.mes for item in listaMeses" ng-model="fBusqueda.mesHastaCbo" style="width: 50%;"> </select> 
+                                <select class="form-control input-sm mb" ng-options="item.id as item.ano for item in listaAnos" ng-model="fBusqueda.anioHastaCbo" style="width: 50%;"> </select>
+                            </div>
+                        </li> -->
+                        <li class="col-md-6 col-xs-12 form-group"
+                            ng-if="selectedReport.id=='CE-REVD'     || selectedReport.id=='FAR-IVM' || selectedReport.id=='FAR-IMU'
+                                || selectedReport.id=='CE-RSEX'     || selectedReport.id=='RH-RVC'  || selectedReport.id=='RH-PLAN' 
+                                || (selectedReport.id=='CE-RSOL' && fBusqueda.modalidadTiempo.id == 'meses') 
+                                || (selectedReport.id=='CE-RSME' && fBusqueda.modalidadTiempo.id == 'meses') "> 
+                            <label> MES / AÑO </label>  
+                            <div class="input-group" style="width: 100%;"> 
+                                <select class="form-control input-sm mb" ng-options="item as item.mes for item in listaMeses" ng-model="fBusqueda.mes" style="width: 50%;"> </select> 
+                                <select class="form-control input-sm mb" ng-options="item.id as item.ano for item in listaAnos" ng-model="fBusqueda.anioDesdeCbo" style="width: 50%;"> </select>
+                            </div>
+                        </li>
+                        <li class="col-md-6 col-sm-6 form-group" 
+                            ng-show="selectedReport.id=='AM-PRODMED'"> 
+                            <label> MEDICO </label> 
+                            <select tabindex="50" class="form-control input-sm mb" ng-model="fBusqueda.medico" 
+                              ng-options="item as item.descripcion for item in fArr.listaMedico" > </select> 
+                        </li> 
+                        <!-- <li class="col-md-12 col-sm-12 form-group" ng-show="selectedReport.id=='CE-IOM'">
+                            <label> PRODUCTO </label> 
+                            <div isteven-multi-select 
+                                input-model="listadoProductos" helper-elements="filter none all" translation="$parent.localLang" output-model="fBusqueda.productosSeleccionados" button-label="icon name" item-label="icon name maker" tick-property="ticked">
+                            </div>
+                            <p class="help-block">Seleccione los productos que desea agregar</p>
+                        </li> -->
+                        <li class="col-md-6 col-sm-6 form-group" 
+                            ng-show="selectedReport.id=='AM-PRODMED' || selectedReport.id=='AM-PRODGEN'"> 
+                            <label> ORIGEN PROD. </label> 
+                            <select tabindex="50" class="form-control input-sm mb" ng-model="fBusqueda.origen" 
+                              ng-options="item as item.descripcion for item in fArr.listaOrigen" > </select> 
+                        </li>
+                        <li class="col-md-6 col-sm-6 form-group" 
+                            ng-show="selectedReport.id=='AM-PRODMED' || selectedReport.id=='AM-PRODGEN'"> 
+                            <label> TIPO REPORTE </label> 
+                            <select tabindex="50" class="form-control input-sm mb" ng-model="fBusqueda.tipoReporte" 
+                              ng-options="item as item.descripcion for item in fArr.listaTipoReporte" > </select> 
+                        </li>
+                        <li class="col-md-6 col-sm-6 form-group" 
+                            ng-show="(selectedReport.id=='AM-PRODMED' || selectedReport.id=='AM-PRODGEN') && (fBusqueda.tipoReporte.id =='RPP')"> 
+                            <label> ORDENADO POR: </label> 
+                            <select tabindex="50" class="form-control input-sm mb" ng-model="fBusqueda.orden" 
+                              ng-options="item as item.descripcion for item in fArr.listaOrden" > </select> 
+                        </li>
+                        <li class="col-md-6 col-sm-6 form-group" ng-show="selectedReport.id=='VT-DC'"> 
+                            <label> SALIDA </label> 
+                            <div class="input-group">
+                                <input type="radio" ng-model="fBusqueda.salida" value="pdf" checked /> PDF 
+                                <input type="radio" ng-model="fBusqueda.salida" value="excel"  /> EXCEL 
+                            </div>
+                        </li>
+                    </ul>
+                    <div class="row" style="width: 100%; " ng-show="selectedReport.id"> 
+                        <div class="col-md-12 col-sm-12 col-xs-12" style="border: 1px solid #f1f3f4;margin-left: 16px;"> 
+                            <button type="button" class="btn btn-primary pull-right m" ng-click="btnConsultarReporte();"> <i class="fa fa-refresh"></i> PROCESAR </button> 
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> <!-- container-fluid --> 

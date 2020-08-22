@@ -132,9 +132,9 @@ form.edit-form input, form.edit-form select {
 .text-warning{
   color: #f0ad4e !important;
 }
-.text-primary{
+/* .text-primary{
   color: #428bca !important;
-}
+} */
 .label-primary {
   background-color: #7266ba;
 }
@@ -637,4 +637,38 @@ input:focus:hover:-webkit-autofill {
 }
 .fileinput.input-group > .btn-file {
   z-index: 1;
+}
+/* REPORTES */
+.list-unstyled {
+	list-style: none;
+}
+.waterMarkEmptyData{
+  font-size: 22px;
+  text-align: center;
+  margin: auto;
+  display: block;
+  margin-top: 10px;
+  color: #bbbbbb;
+  font-weight: bold;
+}
+.central-reportes .modulos i{
+  font-size: 45px;
+}
+.central-reportes .modulos{
+  margin-top: 14px;
+}
+.central-reportes .modulos .item{
+  padding-top: 8px;
+}
+.central-reportes .modulos .item.selected{
+  box-shadow: inset 0 1px 10px 0px;
+  padding-top: 8px;
+}
+.central-reportes .filtros{
+  margin-top: 14px;
+}
+.central-reportes .modulos .item p{
+  padding-bottom: 6px;
+  margin: 5px 0;
+  line-height: 1;
 }
