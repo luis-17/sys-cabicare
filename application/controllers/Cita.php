@@ -156,6 +156,7 @@ class Cita extends CI_Controller {
 					'imc' =>  $row['imc'],
 					'apuntesCita' =>  $row['apuntesCita'],
 					'frecuenciaCardiaca' =>  $row['frecuenciaCardiaca'],
+					'presionArterial'	=> $row['presionArterial'],
 					'temperaturaCorporal' =>  $row['temperaturaCorporal'],
           'medico' => array(
 						'id' => $row['medicoId'],
@@ -222,6 +223,7 @@ class Cita extends CI_Controller {
 					'apuntesCita' =>  $row['apuntesCita'],
 					'frecuenciaCardiaca' =>  $row['frecuenciaCardiaca'],
 					'temperaturaCorporal' =>  $row['temperaturaCorporal'],
+					'presionArterial'	=> $row['presionArterial'],
 					'medico' => array(
 						'id' => $row['medicoId'],
 						'medico' => $row['medico']
@@ -377,12 +379,13 @@ class Cita extends CI_Controller {
 			'peso'					=> empty($allInputs['peso']) ? NULL : $allInputs['peso'],
 			'talla'					=> empty($allInputs['talla']) ? NULL : $allInputs['talla'],
 			'imc'					=> empty($allInputs['imc']) ? NULL : $allInputs['imc'],
-			'frecuenciaCardiaca'	=> empty($allInputs['frecuenciaCardiaca']) ? NULL : $allInputs['frecuenciaCardiaca'],
+			// 'frecuenciaCardiaca'	=> empty($allInputs['frecuenciaCardiaca']) ? NULL : $allInputs['frecuenciaCardiaca'],
+			'presionArterial'	=> empty($allInputs['presionArterial']) ? NULL : $allInputs['presionArterial'],
 			'temperaturaCorporal'	=> empty($allInputs['temperaturaCorporal']) ? NULL : $allInputs['temperaturaCorporal'],
 			'perimetroAbdominal'	=> empty($allInputs['perimetroAbdominal']) ? NULL : $allInputs['perimetroAbdominal'],
 			'observaciones'			=> empty($allInputs['observaciones']) ? NULL : $allInputs['observaciones'],
-      		'estado'				=> $allInputs['tipoCita'],
-      		'medioContacto'			=> empty($allInputs['medioContacto']) ? NULL : $allInputs['medioContacto']['id'],
+      'estado'				=> $allInputs['tipoCita'],
+      'medioContacto'			=> empty($allInputs['medioContacto']) ? NULL : $allInputs['medioContacto']['id'],
 			'createdAt'				=> date('Y-m-d H:i:s'),
 			'updatedAt'				=> date('Y-m-d H:i:s')
 		);
@@ -478,7 +481,8 @@ class Cita extends CI_Controller {
 			'peso'					=> empty($allInputs['peso']) ? NULL : $allInputs['peso'],
 			'talla'					=> empty($allInputs['talla']) ? NULL : $allInputs['talla'],
 			'imc'					=> empty($allInputs['imc']) ? NULL : $allInputs['imc'],
-			'frecuenciaCardiaca'	=> empty($allInputs['frecuenciaCardiaca']) ? NULL : $allInputs['frecuenciaCardiaca'],
+			// 'frecuenciaCardiaca'	=> empty($allInputs['frecuenciaCardiaca']) ? NULL : $allInputs['frecuenciaCardiaca'],
+			'presionArterial'	=> empty($allInputs['presionArterial']) ? NULL : $allInputs['presionArterial'],
 			'temperaturaCorporal'	=> empty($allInputs['temperaturaCorporal']) ? NULL : $allInputs['temperaturaCorporal'],
 			'perimetroAbdominal'	=> empty($allInputs['perimetroAbdominal']) ? NULL : $allInputs['perimetroAbdominal'],
 			'observaciones'			=> empty($allInputs['observaciones']) ? NULL : $allInputs['observaciones'],
@@ -615,10 +619,10 @@ class Cita extends CI_Controller {
 			'peso' => $allInputs['peso'],
 			'talla' => $allInputs['talla'],
 			'imc' => $allInputs['imc'],
-			'presionArterual' => $allInputs['presionArterual'],
+			'presionArterial' => $allInputs['presionArterial'],
 			'frecuenciaCardiaca' => $allInputs['frecuenciaCardiaca'],
 			'temperaturaCorporal' => $allInputs['temperaturaCorporal'],
-			'perimetroAbdominal' => $allInputs['perimetroAbdominal'],
+			// 'perimetroAbdominal' => $allInputs['perimetroAbdominal'],
 		);
 		if ($this->sessionFactur['keyPerfil'] == 'key_root' && $allInputs['medico']['id']) {
 			$data['medicoId'] = $allInputs['medico']['id'];
@@ -629,8 +633,13 @@ class Cita extends CI_Controller {
 
 			foreach ($allInputs['detalle'] as $row) {
 				$data_det = array(
-					'informe' 	=> $row['informe'],
-					'observaciones' 	=> $row['observaciones'],
+					'informe' 	=> ($row['informe']),
+					'observaciones' 	=> ($row['observaciones']),
+					'motivoConsulta' => ($row['motivoConsulta']),
+					'antecedentesFamiliares' => ($row['antecedentesFamiliares']),
+					'examenFisico' => ($row['examenFisico']),
+					'antecedentesPersonales' => ($row['antecedentesPersonales']),
+					'plan' => ($row['plan']),
 					'updatedAt'		=> date('Y-m-d H:i:s')
 				);
 				$this->model_cita->m_editar_detalle($data_det, $row['id']);

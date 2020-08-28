@@ -22,7 +22,7 @@ class Model_cita extends CI_Model {
 			ci.peso,
 			ci.talla,
 			ci.imc,
-			ci.presionArterual,
+			ci.presionArterial,
 			ci.frecuenciaCardiaca,
 			ci.temperaturaCorporal,
 			ci.perimetroAbdominal,
@@ -101,7 +101,7 @@ class Model_cita extends CI_Model {
 			ci.peso,
 			ci.talla,
 			ci.imc,
-			ci.presionArterual,
+			ci.presionArterial,
 			ci.frecuenciaCardiaca,
 			ci.temperaturaCorporal,
 			ci.perimetroAbdominal,
@@ -186,7 +186,7 @@ class Model_cita extends CI_Model {
 			ci.peso,
 			ci.talla,
 			ci.imc,
-			ci.presionArterual,
+			ci.presionArterial,
 			ci.frecuenciaCardiaca,
 			ci.temperaturaCorporal,
 			ci.perimetroAbdominal,
@@ -197,7 +197,7 @@ class Model_cita extends CI_Model {
 			concat_ws(' ', pa.nombres, pa.apellidoPaterno, pa.apellidoMaterno) AS paciente,
 			pa.numeroDocumento,
 			ci.medicoId,
-			concat_ws(' ', us.nombres, us.apellidos) AS medico,
+			concat_ws(' ', us.nombres, us.apellidos) AS medico
 		", FALSE);
 		$this->db->from('cita ci');
 		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
@@ -218,6 +218,11 @@ class Model_cita extends CI_Model {
 			cp.precioReal AS precio,
 			cp.informe,
 			cp.observaciones,
+			cp.motivoConsulta,
+			cp.antecedentesFamiliares,
+			cp.examenFisico,
+			cp.antecedentesPersonales,
+			cp.plan,
 			cp.estado
 		", FALSE);
 		$this->db->from('citaproducto cp');
@@ -242,6 +247,11 @@ class Model_cita extends CI_Model {
 			cp.precioReal AS precio,
 			cp.informe,
 			cp.observaciones,
+			cp.motivoConsulta,
+			cp.antecedentesFamiliares,
+			cp.examenFisico,
+			cp.antecedentesPersonales,
+			cp.plan,
 			cp.estado
 		", FALSE);
 		$this->db->from('cita ci');
@@ -271,7 +281,7 @@ class Model_cita extends CI_Model {
 			ci.peso,
 			ci.talla,
 			ci.imc,
-			ci.presionArterual,
+			ci.presionArterial,
 			ci.frecuenciaCardiaca,
 			ci.temperaturaCorporal,
 			ci.perimetroAbdominal,

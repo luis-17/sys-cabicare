@@ -115,11 +115,17 @@
 								</div>
                 <input type="text" class="form-control input-xs" ng-model="fData.frecuenciaCardiaca" placeholder="Frecuencia Cardiaca">
               </div>
-              <div class="form-group col-md-2 col-sm-6 col-xs-12 mb-xs">
+              <!-- <div class="form-group col-md-2 col-sm-6 col-xs-12 mb-xs">
 								<div class=" mb-n">
 									<label class="m-n text-blue"> Perímetro Abdominal </label>
 								</div>
                 <input type="text" class="form-control input-xs" ng-model="fData.perimetroAbdominal" placeholder="Perímetro Abdominal">
+							</div> -->
+							<div class="form-group col-md-2 col-sm-6 col-xs-12 mb-xs">
+								<div class=" mb-n">
+									<label class="m-n text-blue"> Presión arterial </label>
+								</div>
+                <input type="text" class="form-control input-xs" ng-model="fData.presionArterial" placeholder="Presión Arterial">
               </div>
             </div>
             <div class="col-xs-12 form-inline mb-sm pl-xs">
@@ -153,17 +159,47 @@
 							</div>
 						</div>
 						<div class="row" style="margin-right: 0px !important;margin-left: 0px !important;">
-							<div class="form-group col-sm-6">
+							<div class="form-group col-sm-6" ng-if="item.tipoProductoId == 1">
+								<div class=" mb-n">
+									<label class="m-n text-blue"> Motivo de Consulta: </label>
+								</div>
+								<textarea name="motivoConsulta" id="" cols="30" rows="2" ng-model="item.motivoConsulta" style="width: 100%;"></textarea>
+							</div>
+							<div class="form-group col-sm-6" ng-if="item.tipoProductoId == 1">
+								<div class=" mb-n">
+									<label class="m-n text-blue"> Antecedentes Familiares: </label>
+								</div>
+								<textarea name="antecedentesFamiliares" id="" cols="30" rows="2" ng-model="item.antecedentesFamiliares" style="width: 100%;"></textarea>
+							</div>
+							<div class="form-group col-sm-6" ng-if="item.tipoProductoId == 1">
+								<div class=" mb-n">
+									<label class="m-n text-blue"> Examen Físico: </label>
+								</div>
+								<textarea name="examenFisico" id="" cols="30" rows="4" ng-model="item.examenFisico" style="width: 100%;"></textarea>
+							</div>
+							<div class="form-group col-sm-6" ng-if="item.tipoProductoId == 1">
+								<div class=" mb-n">
+									<label class="m-n text-blue"> Antecedentes Personales (médicos, quirúrgicos y ginecobstétricos): </label>
+								</div>
+								<textarea name="antecedentesPersonales" id="" cols="30" rows="4" ng-model="item.antecedentesPersonales" style="width: 100%;"></textarea>
+							</div>
+							<div class="form-group col-sm-6" ng-if="item.tipoProductoId == 1">
+								<div class=" mb-n">
+									<label class="m-n text-blue"> Plan: </label>
+								</div>
+								<textarea name="plan" id="" cols="30" rows="4" ng-model="item.plan" style="width: 100%;"></textarea>
+							</div>
+							<div class="form-group col-sm-6" ng-if="item.tipoProductoId != 1">
 								<div class=" mb-n">
 									<label class="m-n text-blue"> Informe: </label>
 								</div>
-								<textarea name="informe" id="" cols="30" rows="5" ng-model="item.informe" style="width: 100%;"></textarea>
+								<textarea name="informe" id="" cols="30" rows="4" ng-model="item.informe" style="width: 100%;"></textarea>
 							</div>
 							<div class="form-group col-sm-6">
 								<div class=" mb-n">
 									<label class="m-n text-blue"> Observaciones: </label>
 								</div>
-								<textarea name="observaciones" id="" cols="30" rows="5" ng-model="item.observaciones" style="width: 100%;"></textarea>
+								<textarea name="observaciones" id="" cols="30" rows="4" ng-model="item.observaciones" style="width: 100%;"></textarea>
 							</div>
             </div>
 						<div ng-if="item.tipoProductoId == 1" class="row mb pt" style="margin-right: 0px !important;margin-left: 0px !important;border-top: 1px solid #e0e0e0;">

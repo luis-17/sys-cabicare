@@ -170,8 +170,17 @@
 						ng-model="fData.temperaturaCorporal"
 						placeholder="Temperatura Corporal"
 					>
-	            </div>
+							</div>
 				<div class="form-group col-md-3">
+					<label for="name" class="control-label minotaur-label">Presión Arterial: </label>
+					<input
+						type="text"
+						class="form-control input-sm"
+						ng-model="fData.presionArterial"
+						placeholder="Presión Arterial"
+					>
+	      </div>
+				<!-- <div class="form-group col-md-3">
 					<label for="name" class="control-label minotaur-label">Frecuencia Cardiaca: </label>
 					<input
 						type="text"
@@ -179,7 +188,7 @@
 						ng-model="fData.frecuenciaCardiaca"
 						placeholder="Frecuencia Cardiaca"
 					>
-	            </div>
+	      </div> -->
 			</div>
 			<hr>
 			<div class="row">
