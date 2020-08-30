@@ -1,5 +1,8 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+// var_dump('dir ==> ', __DIR__ . '/twilio-php-main/src/Twilio/autoload.php');
+require __DIR__ . '/twilio-php-main/src/Twilio/autoload.php';
+use Twilio\Rest\Client;
 
 class Cita extends CI_Controller {
 	public function __construct(){
@@ -274,8 +277,8 @@ class Cita extends CI_Controller {
     $arrData['message'] = '';
     $arrData['flag'] = 1;
 		$this->output
-		    ->set_content_type('application/json')
-		    ->set_output(json_encode($arrData));
+			->set_content_type('application/json')
+			->set_output(json_encode($arrData));
 	}
 
 	public function listar_detalle_cita()
@@ -340,15 +343,6 @@ class Cita extends CI_Controller {
 		    return;
 		}
 
-		// if (empty($allInputs['medioContacto']['id'])) {
-		// 		$arrData['flag'] = 0;
-		// 		$arrData['message'] = 'Debe seleccionar medio de contacto.';
-		// 		$this->output
-		// 		->set_content_type('application/json')
-		// 		->set_output(json_encode($arrData));
-		// 		return;
-		// }
-
 		$hora_inicio_calendar = strtotime('07:00:00');
 		$hora_fin_calendar = strtotime('23:00:00');
 
@@ -403,6 +397,28 @@ class Cita extends CI_Controller {
 					'updatedAt'		=> date('Y-m-d H:i:s')
 				);
 				$this->model_cita->m_registrar_detalle($data_det);
+			}
+			// ENVIO DE SMS CONFIRMACION DE CITA
+			if($allInputs['tipoCita'] == '2'){
+
+				// Include the bundled autoload from the Twilio PHP Helper Library
+				
+				// Your Account SID and Auth Token from twilio.com/console
+				$account_sid = 'AC5b85a8872a4e63168a8d8a51bc9e336f';
+				$auth_token = '4f51ad999cf609d2fad3c7f9259ae31e';
+				// In production, these should be environment variables. E.g.:
+				// $auth_token = $_ENV["TWILIO_ACCOUNT_SID"]
+				// A Twilio number you own with SMS capabilities
+				$twilio_number = "+18442780963";
+				$client = new Client($account_sid, $auth_token);
+				$client->messages->create(
+						// Where to send a text message (your cell phone?)
+						'+51992566985',
+						array(
+								'from' => $twilio_number,
+								'body' => 'I sent this message in under 10 minutes!'
+						)
+				);
 			}
 			$arrData['message'] = 'Se registraron los datos correctamente';
 			$arrData['flag'] = 1;
@@ -517,6 +533,28 @@ class Cita extends CI_Controller {
 
 			foreach ($allInputs['eliminados'] as $row_el) {
 				$this->model_cita->m_eliminar_detalle($row_el);
+			}
+			// ENVIO DE SMS CONFIRMACION DE CITA
+			if($allInputs['tipoCita'] == '2'){
+
+				// Include the bundled autoload from the Twilio PHP Helper Library
+				
+				// Your Account SID and Auth Token from twilio.com/console
+				$account_sid = 'AC5b85a8872a4e63168a8d8a51bc9e336f';
+				$auth_token = '4f51ad999cf609d2fad3c7f9259ae31e';
+				// In production, these should be environment variables. E.g.:
+				// $auth_token = $_ENV["TWILIO_ACCOUNT_SID"]
+				// A Twilio number you own with SMS capabilities
+				$twilio_number = "+18442780963";
+				$client = new Client($account_sid, $auth_token);
+				$client->messages->create(
+						// Where to send a text message (your cell phone?)
+						'+51992566985',
+						array(
+								'from' => $twilio_number,
+								'body' => 'I sent this message in under 10 minutes!'
+						)
+				);
 			}
 			$arrData['message'] = 'Se registraron los datos correctamente.';
 			$arrData['flag'] = 1;
