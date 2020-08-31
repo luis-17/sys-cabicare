@@ -404,8 +404,8 @@ class Cita extends CI_Controller {
 				// Include the bundled autoload from the Twilio PHP Helper Library
 				
 				// Your Account SID and Auth Token from twilio.com/console
-				$account_sid = 'AC5b85a8872a4e63168a8d8a51bc9e336f';
-				$auth_token = '4f51ad999cf609d2fad3c7f9259ae31e';
+				$account_sid = TW_SID;
+				$auth_token = TW_TOKEN;
 				// In production, these should be environment variables. E.g.:
 				// $auth_token = $_ENV["TWILIO_ACCOUNT_SID"]
 				// A Twilio number you own with SMS capabilities
