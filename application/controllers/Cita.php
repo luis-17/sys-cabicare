@@ -409,7 +409,7 @@ class Cita extends CI_Controller {
 				// In production, these should be environment variables. E.g.:
 				// $auth_token = $_ENV["TWILIO_ACCOUNT_SID"]
 				// A Twilio number you own with SMS capabilities
-				$twilio_number = "+18442780963";
+				$twilio_number = TW_NUMBER; // "+18442780963";
 				$client = new Client($account_sid, $auth_token);
 				$client->messages->create(
 						// Where to send a text message (your cell phone?)
@@ -545,7 +545,7 @@ class Cita extends CI_Controller {
 				// In production, these should be environment variables. E.g.:
 				// $auth_token = $_ENV["TWILIO_ACCOUNT_SID"]
 				// A Twilio number you own with SMS capabilities
-				$twilio_number = "+18442780963";
+				$twilio_number = TW_NUMBER;
 				$client = new Client($account_sid, $auth_token);
 				$client->messages->create(
 						// Where to send a text message (your cell phone?)
