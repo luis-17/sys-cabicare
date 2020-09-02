@@ -399,25 +399,22 @@ class Cita extends CI_Controller {
 				$this->model_cita->m_registrar_detalle($data_det);
 			}
 			// ENVIO DE SMS CONFIRMACION DE CITA
-			if($allInputs['tipoCita'] == '2'){
-
-				// Include the bundled autoload from the Twilio PHP Helper Library
-				
-				// Your Account SID and Auth Token from twilio.com/console
+			// if($allInputs['tipoCita'] == '2'){
+			if(
+				$allInputs['tipoCita'] == '2' && 
+				strtotime($allInputs['fecha']) > strtotime(date("Y-m-d"))
+			){
 				$account_sid = TW_SID;
 				$auth_token = TW_TOKEN;
-				// In production, these should be environment variables. E.g.:
-				// $auth_token = $_ENV["TWILIO_ACCOUNT_SID"]
-				// A Twilio number you own with SMS capabilities
 				$twilio_number = TW_NUMBER; // "+18442780963";
 				$client = new Client($account_sid, $auth_token);
 				$client->messages->create(
-						// Where to send a text message (your cell phone?)
-						'+51992566985',
-						array(
-								'from' => $twilio_number,
-								'body' => 'I sent this message in under 10 minutes!'
-						)
+					'+51992566985',
+					array(
+							'from' => $twilio_number,
+							'body' => 'Su cita se ha reservado con éxito en CABICARE con el Dr. '.$allInputs['medico']['medico'].' el '.$allInputs['fecha'].' - '.$allInputs['hora_desde'].'. 
+								Recuerde asistir 20 minutos antes. Para cualquier cambio de cita contáctenos. "Contigo en todas tus etapas".'
+					)
 				);
 			}
 			$arrData['message'] = 'Se registraron los datos correctamente';
@@ -460,15 +457,7 @@ class Cita extends CI_Controller {
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 		    return;
-    	}
-    	// if (empty($allInputs['medioContacto']['id'])) {
-		// 	$arrData['flag'] = 0;
-		// 	$arrData['message'] = 'Debe seleccionar medio de contacto.';
-		// 	$this->output
-		//     ->set_content_type('application/json')
-		//     ->set_output(json_encode($arrData));
-		//     return;
-		// }
+    }
 
 		$hora_inicio_calendar = strtotime('07:00:00');
 		$hora_fin_calendar = strtotime('23:00:00');
@@ -509,6 +498,7 @@ class Cita extends CI_Controller {
 
 
 		$this->db->trans_start();
+		$fCita = $this->model_cita->m_obtener_cita($allInputs['id']);
 		if($this->model_cita->m_editar($data, $allInputs['id'])) {
 			foreach ($allInputs['detalle'] as $row) {
 				if( empty($row['id']) ){ //si es nuevo se registra
@@ -535,24 +525,21 @@ class Cita extends CI_Controller {
 				$this->model_cita->m_eliminar_detalle($row_el);
 			}
 			// ENVIO DE SMS CONFIRMACION DE CITA
-			if($allInputs['tipoCita'] == '2'){
-
-				// Include the bundled autoload from the Twilio PHP Helper Library
-				
-				// Your Account SID and Auth Token from twilio.com/console
+			if(
+				$allInputs['tipoCita'] == '2' && 
+				trim($fCita['estado']) != trim($allInputs['tipoCita']) && 
+				strtotime($allInputs['fecha']) > strtotime(date("Y-m-d"))
+			){
 				$account_sid = TW_SID;
 				$auth_token = TW_TOKEN;
-				// In production, these should be environment variables. E.g.:
-				// $auth_token = $_ENV["TWILIO_ACCOUNT_SID"]
-				// A Twilio number you own with SMS capabilities
 				$twilio_number = TW_NUMBER;
 				$client = new Client($account_sid, $auth_token);
 				$client->messages->create(
-						// Where to send a text message (your cell phone?)
 						'+51992566985',
 						array(
 								'from' => $twilio_number,
-								'body' => 'I sent this message in under 10 minutes!'
+								'body' => 'Su cita se ha reservado con éxito en CABICARE con el Dr. '.$allInputs['medico']['medico'].' el '.$allInputs['fecha'].' - '.$allInputs['hora_desde'].'. 
+									Recuerde asistir 20 minutos antes. Para cualquier cambio de cita contáctenos. "Contigo en todas tus etapas".'
 						)
 				);
 			}
@@ -857,5 +844,10 @@ class Cita extends CI_Controller {
 		$this->output
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
+	}
+
+	public function enviarSMSCitas()
+	{
+		// $lista = $this->model_cita->m_obtener
 	}
 }

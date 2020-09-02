@@ -12,7 +12,7 @@ app.controller('CitaCtrl',
 	'ModalReporteFactory',
 	'ReservaCitasFactory',
 	'CitaServices',
-
+	'DistritoServices',
 	function (
 		$scope,
 		$filter,
@@ -26,8 +26,8 @@ app.controller('CitaCtrl',
 		blockUI,
 		ModalReporteFactory,
 		ReservaCitasFactory,
-		CitaServices
-
+		CitaServices,
+		DistritoServices
 	) {
 		$scope.metodos = {}; // contiene todas las funciones
 		$scope.fArr = {}; // contiene todos los arrays generados por las funciones
@@ -35,6 +35,14 @@ app.controller('CitaCtrl',
 
 		moment.tz.add('America/Lima|LMT -05 -04|58.A 50 40|0121212121212121|-2tyGP.o 1bDzP.o zX0 1aN0 1cL0 1cN0 1cL0 1PrB0 zX0 1O10 zX0 6Gp0 zX0 98p0 zX0|11e6');
 
+		$scope.metodos.listaDistritos = function(myCallback) {
+      var myCallback = myCallback || function() { };
+      DistritoServices.sListarCbo().then(function(rpta) {
+        $scope.fArr.listaDistrito = rpta.datos;
+        myCallback();
+      });
+		};
+		
 		$scope.fArr.listaTipoCita = [
 			{ id: '1', descripcion: 'POR CONFIRMAR' },
 			{ id: '2', descripcion: 'CONFIRMADA' }
