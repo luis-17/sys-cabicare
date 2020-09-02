@@ -266,8 +266,9 @@ class Model_cita extends CI_Model {
 		return $this->db->get()->result_array();
 	}
 	public function m_obtener_cita($citaId) {
-		$this->db->select("ci.estado");
+		$this->db->select("ci.estado, pa.celular");
 		$this->db->from('cita ci');
+		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
 		$this->db->where('ci.id', $citaId);
 		$this->db->limit('1');
 		return $this->db->get()->row_array();

@@ -399,23 +399,26 @@ class Cita extends CI_Controller {
 				$this->model_cita->m_registrar_detalle($data_det);
 			}
 			// ENVIO DE SMS CONFIRMACION DE CITA
-			// if($allInputs['tipoCita'] == '2'){
 			if(
 				$allInputs['tipoCita'] == '2' && 
 				strtotime($allInputs['fecha']) > strtotime(date("Y-m-d"))
 			){
-				$account_sid = TW_SID;
-				$auth_token = TW_TOKEN;
-				$twilio_number = TW_NUMBER; // "+18442780963";
-				$client = new Client($account_sid, $auth_token);
-				$client->messages->create(
-					'+51992566985',
-					array(
-							'from' => $twilio_number,
-							'body' => 'Su cita se ha reservado con éxito en CABICARE con el Dr. '.$allInputs['medico']['medico'].' el '.$allInputs['fecha'].' - '.$allInputs['hora_desde'].'. 
-								Recuerde asistir 20 minutos antes. Para cualquier cambio de cita contáctenos. "Contigo en todas tus etapas".'
-					)
-				);
+				$dataPac = array('id' => $allInputs['pacienteId']);
+				$fPaciente = $this->model_paciente->m_cargar_paciente_por_id($dataPac);
+				if (!empty($fPaciente) && !empty($fPaciente['celular'])) {
+					$account_sid = TW_SID;
+					$auth_token = TW_TOKEN;
+					$twilio_number = TW_NUMBER; // "+18442780963";
+					$client = new Client($account_sid, $auth_token);
+					$client->messages->create(
+						'+51'.$fPaciente['celular'],
+						array(
+								'from' => $twilio_number,
+								'body' => 'Su cita se ha reservado con éxito en CABICARE con el Dr. '.$allInputs['medico']['medico'].' el '.date('d-m-Y',strtotime($allInputs['fecha'])).' - '.date('H:i', strtotime($allInputs['hora_desde'])).'. 
+									Recuerde asistir 20 minutos antes. Para cualquier cambio de cita contactenos. "Contigo en todas tus etapas".'
+						)
+					);
+				}
 			}
 			$arrData['message'] = 'Se registraron los datos correctamente';
 			$arrData['flag'] = 1;
@@ -491,8 +494,8 @@ class Cita extends CI_Controller {
 			'temperaturaCorporal'	=> empty($allInputs['temperaturaCorporal']) ? NULL : $allInputs['temperaturaCorporal'],
 			'perimetroAbdominal'	=> empty($allInputs['perimetroAbdominal']) ? NULL : $allInputs['perimetroAbdominal'],
 			'observaciones'			=> empty($allInputs['observaciones']) ? NULL : $allInputs['observaciones'],
-      		'estado'				=> $allInputs['tipoCita'],
-      		'medioContacto'			=> empty($allInputs['medioContacto']) ? NULL : $allInputs['medioContacto']['id'],
+			'estado'				=> $allInputs['tipoCita'],
+			'medioContacto'			=> empty($allInputs['medioContacto']) ? NULL : $allInputs['medioContacto']['id'],
 			'updatedAt'				=> date('Y-m-d H:i:s')
 		);
 
@@ -530,18 +533,22 @@ class Cita extends CI_Controller {
 				trim($fCita['estado']) != trim($allInputs['tipoCita']) && 
 				strtotime($allInputs['fecha']) > strtotime(date("Y-m-d"))
 			){
-				$account_sid = TW_SID;
-				$auth_token = TW_TOKEN;
-				$twilio_number = TW_NUMBER;
-				$client = new Client($account_sid, $auth_token);
-				$client->messages->create(
-						'+51992566985',
+				// $dataPac = array('id' => $allInputs['pacienteId']);
+				// $fPaciente = $this->model_paciente->m_cargar_paciente_por_id($dataPac);
+				if (!empty($fCita['celular'])) {
+					$account_sid = TW_SID;
+					$auth_token = TW_TOKEN;
+					$twilio_number = TW_NUMBER; // "+18442780963";
+					$client = new Client($account_sid, $auth_token);
+					$client->messages->create(
+						'+51'.$fCita['celular'],
 						array(
 								'from' => $twilio_number,
-								'body' => 'Su cita se ha reservado con éxito en CABICARE con el Dr. '.$allInputs['medico']['medico'].' el '.$allInputs['fecha'].' - '.$allInputs['hora_desde'].'. 
-									Recuerde asistir 20 minutos antes. Para cualquier cambio de cita contáctenos. "Contigo en todas tus etapas".'
+								'body' => 'Su cita se ha reservado con éxito en CABICARE con el Dr. '.$allInputs['medico']['medico'].' el '.date('d-m-Y',strtotime($allInputs['fecha'])).' - '.date('H:i', strtotime($allInputs['hora_desde'])).'. 
+									Recuerde asistir 20 minutos antes. Para cualquier cambio de cita contactenos. "Contigo en todas tus etapas".'
 						)
-				);
+					);
+				}
 			}
 			$arrData['message'] = 'Se registraron los datos correctamente.';
 			$arrData['flag'] = 1;
