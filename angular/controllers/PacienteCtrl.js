@@ -116,7 +116,7 @@ app.controller('PacienteCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$
             'pa.id' : grid.columns[1].filters[0].term,
             'pa.tipoDocumento' : grid.columns[2].filters[0].term,
             'pa.numeroDocumento' : grid.columns[3].filters[0].term,
-            'pa-nombres' : grid.columns[4].filters[0].term,
+            'pa.nombres' : grid.columns[4].filters[0].term,
             'pa.apellidoPaterno' : grid.columns[5].filters[0].term,
             'pa.apellidoMaterno' : grid.columns[6].filters[0].term,
             'pa.fechaNacimiento' : grid.columns[7].filters[0].term,
