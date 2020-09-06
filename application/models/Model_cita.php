@@ -588,7 +588,7 @@ class Model_cita extends CI_Model {
 		$this->db->where('ci.smsEnviadoCita', 'POR_ENVIAR');
 		$this->db->where('ci.fechaCita = DATE(NOW())');
 		$this->db->where('DATE_SUB(ci.horaDesde, INTERVAL 3 HOUR) < TIME(NOW())');
-		$this->db->where('ci.horaDesde < TIME(NOW())');
+		$this->db->where('ci.horaDesde > TIME(NOW())');
 		return $this->db->get()->result_array();
 	}
 	public function m_registrar_log_sms($data)
