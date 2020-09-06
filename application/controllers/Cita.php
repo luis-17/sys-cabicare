@@ -459,7 +459,7 @@ class Cita extends CI_Controller {
 			$this->output
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
-		    return;
+		  return;
     }
 
 		$hora_inicio_calendar = strtotime('07:00:00');
@@ -855,6 +855,40 @@ class Cita extends CI_Controller {
 
 	public function enviarSMSCitas()
 	{
-		// $lista = $this->model_cita->m_obtener
+		$lista = $this->model_cita->m_obtener_citas_sin_sms();
+		$contador = 0;
+		foreach ($lista as $row) {
+			// $dataPac = array('id' => $allInputs['pacienteId']);
+			// $fPaciente = $this->model_paciente->m_cargar_paciente_por_id($dataPac);
+			if (!empty($row['celular'])) {
+				$account_sid = TW_SID;
+				$auth_token = TW_TOKEN;
+				$twilio_number = TW_NUMBER; // "+18442780963";
+				$client = new Client($account_sid, $auth_token);
+				$body = 'Le recordamos que su cita ha sido confirmada en CABICARE con el Dr. '.$row['medico'].' el dia '.date('d-m-Y',strtotime($row['fechaCita'])).' - '.date('H:i', strtotime($row['horaDesde'])).'. 
+				"Contigo en todas tus etapas".';
+				$client->messages->create(
+					'+51'.$row['celular'],
+					array(
+							'from' => $twilio_number,
+							'body' => $body,
+					)
+				);
+				// almacenar log
+				$dataLog = array(
+					'citaId'=> $row['id'],
+					'celular'=> $row['celular'],
+					'fechaEnvio'=> date('Y-m-d H:i:s'),
+					'contenido'=> $body
+				);
+				$this->model_cita->m_actualizar_cita_sms($row['id']);
+				$this->model_cita->m_registrar_log_sms($dataLog);
+				$contador ++;
+			}
+		}
+		$arrResponse = array('Mensaje'=> 'Ejecución de tarea terminada. Se enviaron '.$contador.' mensajes.');
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrResponse));
 	}
 }

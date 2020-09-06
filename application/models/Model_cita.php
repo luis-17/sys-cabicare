@@ -568,4 +568,31 @@ class Model_cita extends CI_Model {
 		}
 		return $this->db->get()->result_array();
 	}
+	public function m_actualizar_cita_sms($idcita)
+	{
+		$data = array(
+			'smsEnviadoCita' => 'ENVIADO'
+		);
+		$this->db->where('id', $idcita);
+		return $this->db->update('cita', $data);
+	}
+	public function m_obtener_citas_sin_sms()
+	{
+		$this->db->select("ci.id, pa.celular, concat_ws(' ', us.nombres, us.apellidos) AS medico, ci.fechaCita, ci.horaDesde", FALSE);
+		$this->db->from('cita ci');
+		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
+		$this->db->join('usuario us', 'ci.medicoId = us.id','left');
+		$this->db->where('pa.estado', 1);
+		$this->db->where('ci.estado', 2); // confirmada
+
+		$this->db->where('ci.smsEnviadoCita', 'POR ENVIAR');
+		$this->db->where('ci.fechaCita = DATE(NOW())');
+		$this->db->where('DATE_SUB(ci.horaDesde, INTERVAL 3 HOUR) < TIME(NOW())');
+		return $this->db->get()->result_array();
+	}
+	public function m_registrar_log_sms($data)
+	{
+		$this->db->insert('logenviosms', $data);
+		return $this->db->insert_id();
+	}
 }
