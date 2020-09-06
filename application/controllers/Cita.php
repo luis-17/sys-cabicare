@@ -536,7 +536,7 @@ class Cita extends CI_Controller {
 			){
 				// $dataPac = array('id' => $allInputs['pacienteId']);
 				// $fPaciente = $this->model_paciente->m_cargar_paciente_por_id($dataPac);
-				if (!empty($fCita['celular']) &&  && strlen($fCita['celular']) == 9) {
+				if (!empty($fCita['celular']) && strlen($fCita['celular']) == 9) {
 					$account_sid = TW_SID;
 					$auth_token = TW_TOKEN;
 					$twilio_number = TW_NUMBER; // "+18442780963";
