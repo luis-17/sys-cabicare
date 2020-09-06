@@ -379,7 +379,8 @@ class Cita extends CI_Controller {
 			'perimetroAbdominal'	=> empty($allInputs['perimetroAbdominal']) ? NULL : $allInputs['perimetroAbdominal'],
 			'observaciones'			=> empty($allInputs['observaciones']) ? NULL : $allInputs['observaciones'],
       'estado'				=> $allInputs['tipoCita'],
-      'medioContacto'			=> empty($allInputs['medioContacto']) ? NULL : $allInputs['medioContacto']['id'],
+			'medioContacto'			=> empty($allInputs['medioContacto']) ? NULL : $allInputs['medioContacto']['id'],
+			'smsEnviadoCita'	=> 'POR_ENVIAR',
 			'createdAt'				=> date('Y-m-d H:i:s'),
 			'updatedAt'				=> date('Y-m-d H:i:s')
 		);
@@ -405,7 +406,7 @@ class Cita extends CI_Controller {
 			){
 				$dataPac = array('id' => $allInputs['pacienteId']);
 				$fPaciente = $this->model_paciente->m_cargar_paciente_por_id($dataPac);
-				if (!empty($fPaciente) && !empty($fPaciente['celular'])) {
+				if (!empty($fPaciente) && !empty($fPaciente['celular']) && strlen($fPaciente['celular']) == 9 ) {
 					$account_sid = TW_SID;
 					$auth_token = TW_TOKEN;
 					$twilio_number = TW_NUMBER; // "+18442780963";
@@ -535,7 +536,7 @@ class Cita extends CI_Controller {
 			){
 				// $dataPac = array('id' => $allInputs['pacienteId']);
 				// $fPaciente = $this->model_paciente->m_cargar_paciente_por_id($dataPac);
-				if (!empty($fCita['celular'])) {
+				if (!empty($fCita['celular']) &&  && strlen($fCita['celular']) == 9) {
 					$account_sid = TW_SID;
 					$auth_token = TW_TOKEN;
 					$twilio_number = TW_NUMBER; // "+18442780963";

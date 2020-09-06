@@ -68,6 +68,7 @@ class Model_paciente extends CI_Model {
 		$this->db->from('paciente pa');
 		$this->db->join('distrito di', 'pa.distritoId = di.id','left');
 		$this->db->where('pa.numeroDocumento', $datos['numeroDocumento']);
+		$this->db->where('pa.estado', 1);
 		$this->db->limit('1');
 		return $this->db->get()->row_array();
 	}

@@ -585,7 +585,7 @@ class Model_cita extends CI_Model {
 		$this->db->where('pa.estado', 1);
 		$this->db->where('ci.estado', 2); // confirmada
 
-		$this->db->where('ci.smsEnviadoCita', 'POR ENVIAR');
+		$this->db->where('ci.smsEnviadoCita', 'POR_ENVIAR');
 		$this->db->where('ci.fechaCita = DATE(NOW())');
 		$this->db->where('DATE_SUB(ci.horaDesde, INTERVAL 3 HOUR) < TIME(NOW())');
 		return $this->db->get()->result_array();
