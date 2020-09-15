@@ -62,6 +62,9 @@ class Cita extends CI_Controller {
 					'horaHasta' => darFormatoHora($row['horaHasta']),
 					'fechaCita' => darFormatoDMY($row['fechaCita']),
 					'fecha' => $row['fechaCita'],
+					'fechaUltimaRegla' => darFormatoDMY($row['fechaUltimaRegla']),
+					'fechaProbableParto' => darFormatoFecha($row['fechaProbableParto']),
+					'semanaGestacion' => $row['semanaGestacion'],
 					'tipoDocumento' =>  $row['tipoDocumento'],
 					'numeroDocumento' =>  $row['numeroDocumento'],
 					'paciente' =>  $row['paciente'],
@@ -150,6 +153,9 @@ class Cita extends CI_Controller {
 					'horaHasta' => darFormatoHora($row['horaHasta']),
 					'fechaCita' => darFormatoDMY($row['fechaCita']),
 					'fecha' => $row['fechaCita'],
+					'fechaUltimaRegla' => darFormatoDMY($row['fechaUltimaRegla']),
+					'fechaProbableParto' => darFormatoFecha($row['fechaProbableParto']),
+					'semanaGestacion' => $row['semanaGestacion'],
 					'edad' =>  $row['edad'],
 					'tipoDocumento' =>  $row['tipoDocumento'],
 					'numeroDocumento' =>  $row['numeroDocumento'],
@@ -185,6 +191,86 @@ class Cita extends CI_Controller {
 		    ->set_output(json_encode($arrData));
 	}
 
+	public function listar_otras_atenciones()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		// $paramPaginate = $allInputs['paginate'];
+		$paramDatos = $allInputs['datos'];
+		$lista = $this->model_cita->m_cargar_atenciones_paciente($paramDatos);
+		$arrListado = array();
+		if(empty($lista)){
+			$arrData['flag'] = 0;
+			$arrData['datos'] = $arrListado;
+			$arrData['paginate']['totalRows'] = 0;
+    	$arrData['message'] = '';
+			$this->output
+				->set_content_type('application/json')
+				->set_output(json_encode($arrData));
+			return;
+		}
+		// $fCount = $this->model_cita->m_count_atenciones_pacientes($paramPaginate,$paramDatos);
+
+		foreach ($lista as $row) {
+
+			if ( $row['estado'] == 2 ){
+				$clase = 'label-primary';
+				$estado = 'CONFIRMADO';
+			}elseif ( $row['estado'] == 3 ) {
+				$clase = 'label-success';
+				$estado = 'ATENDIDO';
+			}elseif ( $row['estado'] == 0 ) {
+				$clase = 'label-default';
+				$estado = 'ANULADO';
+			}else {
+				$clase = '';
+				$estado = '';
+			}
+			array_push(
+				$arrListado,
+				array(
+					'id' => $row['id'],
+					'horaDesde' => darFormatoHora($row['horaDesde']),
+					'horaHasta' => darFormatoHora($row['horaHasta']),
+					'fechaCita' => darFormatoDMY($row['fechaCita']),
+					'fecha' => $row['fechaCita'],
+					'fechaUltimaRegla' => darFormatoDMY($row['fechaUltimaRegla']),
+					'fechaProbableParto' => darFormatoFecha($row['fechaProbableParto']),
+					'semanaGestacion' => $row['semanaGestacion'],
+					'edad' =>  $row['edad'],
+					'tipoDocumento' =>  $row['tipoDocumento'],
+					'numeroDocumento' =>  $row['numeroDocumento'],
+					'paciente' =>  $row['paciente'],
+					'peso' =>  $row['peso'],
+					'talla' =>  $row['talla'],
+					'imc' =>  $row['imc'],
+					'apuntesCita' =>  $row['apuntesCita'],
+					'frecuenciaCardiaca' =>  $row['frecuenciaCardiaca'],
+					'presionArterial'	=> $row['presionArterial'],
+					'temperaturaCorporal' =>  $row['temperaturaCorporal'],
+          'medico' => array(
+						'id' => $row['medicoId'],
+						'medico' => $row['medico']
+					),
+					'username'=> $row['username'],
+					'estado' => array(
+						'string' => $estado,
+						'clase' =>$clase,
+						'bool' =>$row['estado']
+					)
+				)
+			);
+		}
+
+		$arrData['datos'] = $arrListado;
+		// $arrData['paginate']['totalRows'] = $fCount['contador'];
+		$arrData['message'] = '';
+		$arrData['flag'] = 1;
+
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+	}
+
 	public function listar_citas()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
@@ -201,7 +287,6 @@ class Cita extends CI_Controller {
 		}
 
 		foreach ($lista as $row) {
-
 			if ( $row['estado'] == 1 ){
 				$clases = 'b-warning';
 			}elseif ( $row['estado'] == 2 ){
@@ -218,6 +303,9 @@ class Cita extends CI_Controller {
 					'horaDesde' => $row['horaDesde'],
 					'horaHasta' => $row['horaHasta'],
 					'fecha' => $row['fechaCita'],
+					'fechaUltimaRegla' => darFormatoDMY($row['fechaUltimaRegla']),
+					'fechaProbableParto' => darFormatoFecha($row['fechaProbableParto']),
+					'semanaGestacion' => $row['semanaGestacion'],
 					'numeroDocumento' =>  $row['numeroDocumento'],
 					'paciente' =>  $row['paciente'],
 					'peso' =>  $row['peso'],
@@ -231,7 +319,7 @@ class Cita extends CI_Controller {
 						'id' => $row['medicoId'],
 						'medico' => $row['medico']
 					),
-          			'medioContacto'=> array(
+          'medioContacto'=> array(
 						'id'=> $row['medioContacto'],
 						'descripcion'=> $row['medioContacto']
 					),
@@ -262,6 +350,7 @@ class Cita extends CI_Controller {
 		$rowCita = $this->model_cita->m_cargar_cita_por_id($allInputs);
 		// var_dump('<pre>', $rowCita);
 		$rowCita['detalle'] = $this->model_cita->m_cargar_detalle_cita($allInputs);
+		$rowCita['fechaUltimaRegla'] = date('d-m-Y',strtotime($rowCita['fechaUltimaRegla']));
 		$rowCita['edad'] = devolverEdad($rowCita['fechaNacimiento']) . ' años';
 		$rowCita['peso'] = empty($rowCita['peso'])? NULL : $rowCita['peso'];
 		$rowCita['talla'] = empty($rowCita['talla'])? NULL : $rowCita['talla'];
@@ -364,9 +453,9 @@ class Cita extends CI_Controller {
 			'pacienteId'			=> $allInputs['pacienteId'],
 			'usuarioId'				=> $this->sessionFactur['usuarioId'],
 			'sedeId'				=> $allInputs['sede']['id'],
-			'fechaCita'				=> Date('Y-m-d',strtotime($allInputs['fecha'])),
-			'horaDesde' 			=> Date('H:i',$horadesde),
-			'horaHasta' 			=> Date('H:i',$horahasta),
+			'fechaCita'				=> date('Y-m-d',strtotime($allInputs['fecha'])),
+			'horaDesde' 			=> date('H:i',$horadesde),
+			'horaHasta' 			=> date('H:i',$horahasta),
 			'apuntesCita'			=> empty($allInputs['apuntesCita'])? NULL : $allInputs['apuntesCita'],
 			'medicoId'				=> empty($allInputs['medico']) ? NULL : $allInputs['medico']['id'],
 			'total'					=> $allInputs['total_a_pagar'],
@@ -402,7 +491,7 @@ class Cita extends CI_Controller {
 			// ENVIO DE SMS CONFIRMACION DE CITA
 			if(
 				$allInputs['tipoCita'] == '2' && 
-				strtotime($allInputs['fecha']) > strtotime(date("Y-m-d"))
+				strtotime($allInputs['fecha']) > strtotime(date("Y-m-d")) && STAGE === 'PROD'
 			){
 				$dataPac = array('id' => $allInputs['pacienteId']);
 				$fPaciente = $this->model_paciente->m_cargar_paciente_por_id($dataPac);
@@ -647,7 +736,10 @@ class Cita extends CI_Controller {
 		$data = array(
 			'fechaAtencion' => date('Y-m-d H:i:s'),
       'estado' => 3,
-      'gestando' => empty($allInputs['gestando']) ? NULL : $allInputs['gestando']['id'],
+			'gestando' => empty($allInputs['gestando']) ? NULL : $allInputs['gestando']['id'],
+			'fechaUltimaRegla' => date('Y-m-d',strtotime($allInputs['fechaUltimaRegla'])),
+			'fechaProbableParto' => $allInputs['fechaProbableParto'],
+			'semanaGestacion' => $allInputs['semanaGestacion'],
 			'updatedAt' => date('Y-m-d H:i:s'),
 			'peso' => $allInputs['peso'],
 			'talla' => $allInputs['talla'],
@@ -854,6 +946,64 @@ class Cita extends CI_Controller {
 		    ->set_output(json_encode($arrData));
 	}
 
+	public function calcular_semana_gestacion($fur = FALSE, $param = FALSE) 
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$arrListado = array();
+		if(empty($fur)) { 
+			if( empty($param) ){
+				$fur = $allInputs['fur'];
+			}else{
+				return;
+			}
+		}
+		$arrData['flag'] = 0; 
+		$arrFur = explode("-", $fur); // var_dump($arrFur); exit(); 
+		if( is_numeric($arrFur[1]) && is_numeric($arrFur[0]) && is_numeric($arrFur[2]) ){
+			if(checkdate($arrFur[1], $arrFur[0], $arrFur[2])){ 
+				$desde = date('Y-m-d',strtotime("$fur"));
+				$hasta = date('Y-m-d');
+				$arrListado['diasTranscurridos'] = get_dias_transcurridos($desde,$hasta);
+				if($arrListado['diasTranscurridos'] && $arrListado['diasTranscurridos'] > 0){
+					$arrListado['semanasTranscurridas'] = ($arrListado['diasTranscurridos'] / 7);
+				}
+				$arrListado['semanasTranscurridas'] = round($arrListado['semanasTranscurridas'],0);
+		    	$arrData['datos'] = $arrListado;
+		    	$arrData['message'] = '';
+		    	$arrData['flag'] = 1;
+			}
+		}
+		if(empty($arrListado['semanasTranscurridas'])){ 
+			$arrData['flag'] = 0; 
+		}
+		$this->output
+			->set_content_type('application/json')
+			->set_output(json_encode($arrData));
+	}
+
+	public function calcular_FPP()
+	{
+		// CALCULO DE LA FECHA PROBABLE DE PARTO 
+		// FPP = FUR + 1 año - 3 meses + 7 días
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$arrListado = array();
+		$fur = $allInputs['fur'];
+		$arrData['flag'] = 1; 
+		// $arrFur = explode("-", $fur); // var_dump($arrFur); exit(); 
+		$furMasUnAnio = date('Y-m-d',strtotime("$fur+1year")); 
+		$furMasUnAnioMenosTresMeses = date('Y-m-d',strtotime("$furMasUnAnio-3months")); 
+		$fpp = date('Y-m-d',strtotime("$furMasUnAnioMenosTresMeses+7days"));
+		$arrListado['fpp'] = $fpp;
+		if(empty($fpp)){ 
+			$arrData['flag'] = 0; 
+		}else{
+			$arrData['datos'] = $arrListado; 
+		}
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+	}
+
 	public function enviarSMSCitas()
 	{
 		$lista = $this->model_cita->m_obtener_citas_sin_sms();
@@ -861,7 +1011,7 @@ class Cita extends CI_Controller {
 		foreach ($lista as $row) {
 			// $dataPac = array('id' => $allInputs['pacienteId']);
 			// $fPaciente = $this->model_paciente->m_cargar_paciente_por_id($dataPac);
-			if (!empty($row['celular'])) {
+			if (!empty($row['celular']) && STAGE === 'PROD') {
 				$account_sid = TW_SID;
 				$auth_token = TW_TOKEN;
 				$twilio_number = TW_NUMBER; // "+18442780963";

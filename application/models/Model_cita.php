@@ -32,6 +32,9 @@ class Model_cita extends CI_Model {
 			ci.gestando,
 			ci.metodoPago,
 			ci.numOperacion,
+			ci.fechaUltimaRegla,
+			ci.fechaProbableParto,
+			ci.semanaGestacion,
 			concat_ws(' ', pa.nombres, pa.apellidoPaterno, pa.apellidoMaterno) AS paciente,
 			pa.tipoDocumento,
 			pa.numeroDocumento,
@@ -62,7 +65,6 @@ class Model_cita extends CI_Model {
 		}
 		return $this->db->get()->result_array();
 	}
-
 	public function m_count_citas_en_grilla($paramPaginate,$paramDatos){
 		$desde = $this->db->escape(darFormatoYMD($paramDatos['fechaDesde']));
  		$hasta = $this->db->escape(darFormatoYMD($paramDatos['fechaHasta']));
@@ -84,6 +86,7 @@ class Model_cita extends CI_Model {
 		$fData = $this->db->get()->row_array();
 		return $fData;
 	}
+
 	public function m_cargar_atenciones_en_grilla($paramPaginate,$paramDatos){
 		$desde = $this->db->escape(darFormatoYMD($paramDatos['fechaDesde']));
  		$hasta = $this->db->escape(darFormatoYMD($paramDatos['fechaHasta']));
@@ -110,6 +113,9 @@ class Model_cita extends CI_Model {
 			ci.medioContacto,
 			ci.metodoPago,
 			ci.numOperacion,
+			ci.fechaUltimaRegla,
+			ci.fechaProbableParto,
+			ci.semanaGestacion,
 			concat_ws(' ', pa.nombres, pa.apellidoPaterno, pa.apellidoMaterno) AS paciente,
 			pa.tipoDocumento,
 			pa.numeroDocumento,
@@ -144,7 +150,6 @@ class Model_cita extends CI_Model {
 		}
 		return $this->db->get()->result_array();
 	}
-
 	public function m_count_atenciones_en_grilla($paramPaginate,$paramDatos){
 		$desde = $this->db->escape(darFormatoYMD($paramDatos['fechaDesde']));
  		$hasta = $this->db->escape(darFormatoYMD($paramDatos['fechaHasta']));
@@ -167,6 +172,55 @@ class Model_cita extends CI_Model {
 		$fData = $this->db->get()->row_array();
 		return $fData;
 	}
+
+	// atenciones de paciente
+	public function m_cargar_atenciones_paciente($paramDatos){
+		$this->db->select("
+			ci.id,
+			ci.pacienteId,
+			ci.usuarioId,
+			ci.sedeId,
+			ci.fechaAtencion,
+			ci.fechaCita,
+			ci.horaDesde,
+			ci.horaHasta,
+			ci.apuntesCita,
+			ci.total,
+			ci.peso,
+			ci.talla,
+			ci.imc,
+			ci.presionArterial,
+			ci.frecuenciaCardiaca,
+			ci.temperaturaCorporal,
+			ci.perimetroAbdominal,
+			ci.observaciones,
+			ci.estado,
+			ci.medioContacto,
+			ci.metodoPago,
+			ci.numOperacion,
+			ci.fechaUltimaRegla,
+			ci.fechaProbableParto,
+			ci.semanaGestacion,
+			concat_ws(' ', pa.nombres, pa.apellidoPaterno, pa.apellidoMaterno) AS paciente,
+			pa.tipoDocumento,
+			pa.numeroDocumento,
+			ci.medicoId,
+			concat_ws(' ', us.nombres, us.apellidos) AS medico,
+			uscr.username
+		", FALSE);
+		// $this->db->select("DATE_PART('YEAR',AGE(pa.fechaNacimiento)) AS edad",FALSE);
+		// $this->db->select("EXTRACT(YEAR FROM AGE(pa.fechaNacimiento)) AS edad",FALSE);
+		$this->db->select("FLOOR(DATEDIFF(NOW(), pa.fechaNacimiento)/365) AS edad", FALSE);
+		$this->db->from('cita ci');
+		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
+		$this->db->join('usuario us', 'ci.medicoId = us.id','left');
+		$this->db->join('usuario uscr', 'ci.usuarioId = uscr.id');
+		$this->db->where_in('ci.estado', array(3));
+		$this->db->where('pa.estado', 1);
+		$this->db->where('pa.id', $paramDatos['idpaciente']);
+		return $this->db->get()->result_array();
+	}
+
 	public function m_cargar_citas($datos){
 		$arrEstados = array(1, 2, 3);
 		if ($datos['origen'] === 'ate') {
@@ -179,6 +233,9 @@ class Model_cita extends CI_Model {
 			ci.sedeId,
 			ci.fechaAtencion,
 			ci.fechaCita,
+			ci.fechaUltimaRegla,
+			ci.fechaProbableParto,
+			ci.semanaGestacion,
 			ci.horaDesde,
 			ci.horaHasta,
 			ci.apuntesCita,
@@ -230,7 +287,7 @@ class Model_cita extends CI_Model {
 		$this->db->join('tipoproducto tp', 'pr.tipoProductoId = tp.id');
 		$this->db->where('cp.citaId', $datos['id']);
 		$this->db->where('cp.estado', 1);
-		$this->db->where('pr.tipoProductoId <>', 4);
+		// $this->db->where('pr.tipoProductoId <>', 4);
 		$this->db->order_by('pr.tipoProductoId', 'ASC');
 		$this->db->order_by('cp.id', 'ASC');
 		return $this->db->get()->result_array();
@@ -281,6 +338,9 @@ class Model_cita extends CI_Model {
 			ci.sedeId,
 			ci.fechaAtencion,
 			ci.fechaCita,
+			ci.fechaUltimaRegla,
+			ci.fechaProbableParto,
+			ci.semanaGestacion,
 			ci.horaDesde,
 			ci.horaHasta,
 			ci.apuntesCita,
@@ -320,7 +380,6 @@ class Model_cita extends CI_Model {
 		$this->db->limit('1');
 		return $this->db->get()->row_array();
 	}
-
 
 	public function m_registrar($data)
 	{

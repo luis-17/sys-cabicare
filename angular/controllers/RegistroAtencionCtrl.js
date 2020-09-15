@@ -59,6 +59,7 @@ app.controller('RegistroAtencionCtrl', [
 			$scope.getPaginationServerSideDet(true);
 			$scope.getPaginationServerSideRec();
 			$scope.getPaginationServerSideImg();
+			$scope.getPaginationServerSideOA();
 			//BINDEO MEDICO
 			var myCallBackCC = function() {
 				var objIndex = $scope.fArr.listaMedico.filter(function(obj) {
@@ -79,6 +80,24 @@ app.controller('RegistroAtencionCtrl', [
       
 
 		});
+		
+		/* CALCULO FUR FPP */
+		$scope.calculateSemanaGestacion = function () { 
+			var arrData = { 
+				'fur' : $scope.fData.fechaUltimaRegla
+			}
+			RegistroAtencionService.sCalcularSemanaGestacion(arrData).then(function (rpta) { 
+				if( rpta.flag == 1 ){
+					$scope.fData.semanaGestacion = rpta.datos.semanasTranscurridas;
+				}
+			});
+			RegistroAtencionService.sCalcularFPP(arrData).then(function (rpta) { 
+				if( rpta.flag == 1 ){
+					$scope.fData.fechaProbableParto = rpta.datos.fpp;
+				}
+			});
+		}
+
 		/* CALCULO DE IMC */
 		$scope.calcularIMC = function(){
 			$scope.fData.imc = null;
@@ -539,17 +558,94 @@ app.controller('RegistroAtencionCtrl', [
 			}
 			ModalReporteFactory.getPopupReporte(arrParams);
 		}
+
+		// OTRAS ATENCIONES
+		$scope.mySelectionGridOA = [];
+		$scope.gridOptionsOA = {
+			rowHeight: 30,
+			paginationPageSizes: [100, 500, 1000],
+			paginationPageSize: 100,
+			useExternalPagination: true,
+			useExternalSorting: true,
+			useExternalFiltering: true,
+			enableGridMenu: true,
+			enableSelectAll: true,
+			enableFiltering: false,
+			enableRowSelection: true,
+			enableFullRowSelection: true,
+			multiSelect: false,
+			// data: [],
+			columnDefs: [
+				{ field: 'id', name: 'ci.id', displayName: 'ID', width: '75', sort: { direction: uiGridConstants.DESC } },
+				{ field: 'fechaCita', name: 'fechaCita', displayName: 'Fecha Atención', minWidth: 100, width: 100, enableFiltering: false },
+				{ field: 'horaDesde', name: 'horaDesde', displayName: 'Hora', minWidth: 100, width: 100, enableFiltering: false },
+				{ field: 'username', name: 'username', displayName: 'Usuario Registro', minWidth: 90, width: 115, visible: false },
+				{ field: 'tipoDocumento', name: 'tipoDocumento', displayName: 'Tipo Doc.', minWidth: 90, width: 115, visible: false },
+				{ field: 'numeroDocumento', name: 'numeroDocumento', displayName: 'Nº Documento', minWidth: 90, width: 115, visible: false },
+				{ field: 'paciente', name: 'paciente', displayName: 'Paciente', minWidth: 100, visible: false },
+				{ field: 'edad', name: 'edad', displayName: 'Edad', width: 64, enableFiltering: false, visible: false },
+				{ field: 'medico', name: 'medico', width: 130, cellTemplate:'<div class="ui-grid-cell-contents text-left ">'+ '{{ COL_FIELD.medico }}</div>',  displayName: 'Médico' },
+				{ field: 'total', name: 'total', displayName: 'Total', minWidth: 100, width: 100, visible: false },
+				{ field: 'estado', type: 'object', name: 'estado', displayName: 'Estado', maxWidth: 200, enableFiltering: false,
+					cellTemplate: '<label style="box-shadow: 1px 1px 0 black; margin: 6px auto; display: block; width: 120px;" class="label {{ COL_FIELD.clase }} ">{{ COL_FIELD.string }}</label>'
+				}
+			],
+			onRegisterApi: function (gridApiOA) {
+				$scope.gridApiOA = gridApiOA;
+				gridApiOA.selection.on.rowSelectionChanged($scope, function (row) {
+					$scope.mySelectionGridOA = gridApiOA.selection.getSelectedRows();
+				});
+			}
+		};
+		$scope.getPaginationServerSideOA = function (loader) {
+			if (loader) {
+				blockUI.start('Procesando información...');
+			}
+			var arrParams = {
+				datos: {
+					idpaciente: $scope.fData.pacienteId
+				}
+			};
+			RegistroAtencionService.sGetOtrasAtenciones(arrParams).then(function (rpta) {
+				if (rpta.datos.length == 0) {
+					rpta.paginate = { totalRows: 0 };
+				}
+				$scope.gridOptionsOA.data = rpta.datos;
+				// $scope.calcularTotales();
+				if (loader) {
+					blockUI.stop();
+				}
+			});
+			$scope.mySelectionGridOA = [];
+		};
+
+		$scope.btnImprimirFichaAtencion = function (event) {
+      var arrParams = {
+        titulo: 'FICHA DE ATENCION',
+        url: angular.patchURLCI+'CentralReportes/report_ficha_atencion',
+        datos: {
+          id: event.id,
+          titulo: 'FICHA DE ATENCION',
+          tituloAbv: 'AM-FAM'
+        },
+        metodo: 'php'
+      };
+      ModalReporteFactory.getPopupReporte(arrParams);
+    }
 	}
 ]);
 app.service("RegistroAtencionService", function ($http, $q, handleBehavior){
 	return({
 		sGetCitaById: sGetCitaById,
 		sGetDetalleReceta: sGetDetalleReceta,
+		sGetOtrasAtenciones: sGetOtrasAtenciones,
 		sRegistrarAtencion: sRegistrarAtencion,
 		sRegistrarReceta: sRegistrarReceta,
 		sGetDetalleImagenes: sGetDetalleImagenes,
 		sRegistrarImagen: sRegistrarImagen,
 		sQuitarImagen: sQuitarImagen,
+		sCalcularSemanaGestacion: sCalcularSemanaGestacion,
+		sCalcularFPP: sCalcularFPP,
 	});
 	function sGetCitaById(datos) {
 		var request = $http({
@@ -563,6 +659,14 @@ app.service("RegistroAtencionService", function ($http, $q, handleBehavior){
 		var request = $http({
 			method: "post",
 			url: angular.patchURLCI + "Cita/listar_detalle_receta",
+			data: datos
+		});
+		return (request.then(handleBehavior.success, handleBehavior.error));
+	}
+	function sGetOtrasAtenciones(datos) {
+		var request = $http({
+			method: "post",
+			url: angular.patchURLCI + "Cita/listar_otras_atenciones",
 			data: datos
 		});
 		return (request.then(handleBehavior.success, handleBehavior.error));
@@ -610,5 +714,21 @@ app.service("RegistroAtencionService", function ($http, $q, handleBehavior){
 			}
 		});
 		return (request.then(handleBehavior.success, handleBehavior.error));
+	}
+	function sCalcularSemanaGestacion (datos) {
+		var request = $http({ 
+				method : "post",
+				url : angular.patchURLCI+"Cita/calcular_semana_gestacion", 
+				data : datos
+		});
+		return (request.then( handleSuccess,handleError ));
+	}
+	function sCalcularFPP (datos) {
+		var request = $http({ 
+					method : "post",
+					url : angular.patchURLCI+"Cita/calcular_FPP", 
+					data : datos
+		});
+		return (request.then( handleSuccess,handleError ));
 	}
 });

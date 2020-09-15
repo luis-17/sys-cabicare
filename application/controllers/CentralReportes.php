@@ -104,7 +104,7 @@ class CentralReportes extends CI_Controller {
       
       $this->pdf->SetFont('Arial','',8);
       
-      $this->pdf->Cell(60,6,formatoConDiaHora($fAtencion['fechaCita']));
+      $this->pdf->Cell(60,6,formatoConDiaHora($fAtencion['fechaCita'].' '.$fAtencion['horaDesde']));
       $this->pdf->Cell(80,6,utf8_decode($edadEnAtencion));
       // $this->pdf->Cell(40,6,utf8_decode('ATENCIÓN AMBULATORIA'));
       // $this->pdf->Cell(60,6,utf8_decode($fAtencion['producto']));

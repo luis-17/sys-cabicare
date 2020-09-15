@@ -138,7 +138,26 @@
 									ng-options="item as item.descripcion for item in fArr.listaGestando"
 									required
 								></select>
-              </div>
+							</div>
+							<div class="form-group col-md-2 col-sm-6 col-xs-12 mb-xs" ng-show="fData.gestando.id == 1">
+								<div class="mb-n">
+									<label class="m-n text-blue"> FUR </label>
+                </div>
+								<input type="text" class="form-control input-xs" input-mask mask-options="{alias: 'dd-mm-yyyy'}" 
+								ng-model="fData.fechaUltimaRegla" ng-blur="calculateSemanaGestacion();"/>
+							</div>
+							<div class="form-group col-md-2 col-sm-6 col-xs-12 mb-xs" ng-show="fData.gestando.id == 1">
+								<div class="mb-n">
+									<label class="m-n text-blue"> Semana de Gestación </label>
+                </div>
+								<input type="text" class="form-control input-xs" ng-model="fData.semanaGestacion" disabled="true"/>
+							</div>
+							<div class="form-group col-md-2 col-sm-6 col-xs-12 mb-xs" ng-show="fData.gestando.id == 1">
+								<div class="mb-n">
+									<label class="m-n text-blue"> FPP </label>
+                </div>
+								<input type="text" class="form-control input-xs" ng-model="fData.fechaProbableParto" disabled="true"/>
+							</div>
             </div>
 					</fieldset>
 				</div>
@@ -351,16 +370,20 @@
 								<div ui-grid="gridOptionsImg" ui-grid-auto-resize ui-grid-resize-columns ui-grid-edit
 									class="grid table-responsive fs-mini-grid" ng-style="getTableHeight();"></div>
 							</div>
-							<!-- <div class="col-sm-12 mb-lg text-center">
-								<button ng-if="fSessionCI.usuarioId == fData.medicoId && fSessionCI.keyPerfil == 'key_med'" 
-									class="btn btn-success btn-sm" ng-click="grabarImagenes(); $event.preventDefault();">
-									<i class="fa fa-edit"></i> Grabar
-								</button>
-								<button ng-if="fSessionCI.keyPerfil == 'key_root'" 
-									class="btn btn-success btn-sm" ng-click="grabarImagenes(); $event.preventDefault();">
-									<i class="fa fa-edit"></i> Grabar
-								</button>
-							</div> -->
+						</div>
+					</uib-tab>
+
+					<uib-tab index="30" heading="OTRAS ATENCIONES">
+						<div class="col-md-12 mt-lg">
+							<button type="button" class="btn m-b-xs btn-success btn-xs pull-left mr-sm"
+                  ng-if="mySelectionGridOA.length == 1 && (mySelectionGridOA[0].estado.bool == 3)"
+                  ng-click='btnImprimirFichaAtencion(mySelectionGridOA[0])'> Imprimir Ficha </button>
+						</div>
+						<div class="row" style="margin-right: 0px !important;margin-left: 0px !important;">
+							<div class="col-xs-12">
+								<div ui-grid="gridOptionsOA" ui-grid-auto-resize ui-grid-resize-columns ui-grid-selection 
+									class="grid table-responsive fs-mini-grid"></div>
+							</div>
 						</div>
 					</uib-tab>
         </uib-tabset>
