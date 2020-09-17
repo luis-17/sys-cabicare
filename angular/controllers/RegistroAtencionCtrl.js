@@ -88,7 +88,7 @@ app.controller('RegistroAtencionCtrl', [
 			}
 			RegistroAtencionService.sCalcularSemanaGestacion(arrData).then(function (rpta) { 
 				if( rpta.flag == 1 ){
-					$scope.fData.semanaGestacion = rpta.datos.semanasTranscurridas;
+					$scope.fData.semanaGestacion = rpta.datos.strSemanasDias;
 				}
 			});
 			RegistroAtencionService.sCalcularFPP(arrData).then(function (rpta) { 

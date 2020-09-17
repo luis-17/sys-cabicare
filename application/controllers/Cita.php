@@ -968,6 +968,8 @@ class Cita extends CI_Controller {
 					$arrListado['semanasTranscurridas'] = ($arrListado['diasTranscurridos'] / 7);
 				}
 				$arrListado['semanasTranscurridas'] = round($arrListado['semanasTranscurridas'],0);
+				$diasResiduo = $arrListado['diasTranscurridos'] - (7 * $arrListado['semanasTranscurridas']);
+				$arrListado['strSemanasDias'] = $arrListado['semanasTranscurridas'].' SEMANAS(S) + '.$diasResiduo.' DIA(S)';
 		    	$arrData['datos'] = $arrListado;
 		    	$arrData['message'] = '';
 		    	$arrData['flag'] = 1;
@@ -992,7 +994,7 @@ class Cita extends CI_Controller {
 		// $arrFur = explode("-", $fur); // var_dump($arrFur); exit(); 
 		$furMasUnAnio = date('Y-m-d',strtotime("$fur+1year")); 
 		$furMasUnAnioMenosTresMeses = date('Y-m-d',strtotime("$furMasUnAnio-3months")); 
-		$fpp = date('Y-m-d',strtotime("$furMasUnAnioMenosTresMeses+7days"));
+		$fpp = date('Y-m-d',strtotime("$furMasUnAnioMenosTresMeses+5days")); // era 7
 		$arrListado['fpp'] = $fpp;
 		if(empty($fpp)){ 
 			$arrData['flag'] = 0; 
