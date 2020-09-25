@@ -874,6 +874,22 @@ class Cita extends CI_Controller {
 			->set_content_type('application/json')
 			->set_output(json_encode($arrData));
 	}
+	public function listar_detalle_lab()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$arrData['message'] = '';
+    $arrData['flag'] = 0;
+		$arrData['datos'] = $this->model_cita->m_cargar_detalle_lab($allInputs['datos']);
+		foreach ($arrData['datos'] as $key => $row) {
+			$arrData['datos'][$key]['srcDocumento'] = array(
+				'link' => URL_PREVIEW.'assets/dinamic/laboratorio/'.$row['srcDocumento'],
+				'texto' => 'Ver Documento'
+			);
+		}
+		$this->output
+			->set_content_type('application/json')
+			->set_output(json_encode($arrData));
+	}
 	public function registrar_imagen()
 	{
 		// $allInputs = json_decode(trim($this->input->raw_input_stream),true);

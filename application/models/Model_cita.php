@@ -464,6 +464,19 @@ class Model_cita extends CI_Model {
 		$this->db->where('im.citaId', $data['idcita']);
 		return $this->db->get()->result_array();
 	}
+	public function m_cargar_detalle_lab($data)
+	{
+		$this->db->select("
+			la.id,
+			la.pacienteId,
+			la.fechaExamen,
+			la.srcDocumento,
+			la.descripcion
+		", FALSE);
+		$this->db->from('laboratorio la');
+		$this->db->where('la.pacienteId', $data['pacienteId']);
+		return $this->db->get()->result_array();
+	}
 	public function m_cargar_detalle_receta($data)
 	{
 		$this->db->select("

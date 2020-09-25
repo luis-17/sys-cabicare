@@ -1184,9 +1184,7 @@ app.factory("ReservaCitasFactory",
 							{ field: 'idproducto', name: 'id', displayName: 'ID', minWidth: 80, width: 80 },
 							{ field: 'producto', name: 'nombre', displayName: 'PRODUCTO', minWidth: 120 },
 							{ field: 'tipoProducto', name: 'tipoProducto', displayName: 'Tipo Producto', minWidth: 120 },
-
 							{ field: 'precio', name: 'precio', displayName: 'PRECIO (S/)', width: 120, enableCellEdit: true, cellClass: 'ui-editCell' },
-
 							{
 								field: 'eliminar', name: 'eliminar', displayName: '', width: 50,
 								cellTemplate: '<button class="btn btn-default btn-sm text-danger btn-action" ng-click="grid.appScope.btnQuitarDeLaCesta(row);$event.stopPropagation();"> <i class="fa fa-trash" tooltip-placement="left" uib-tooltip="ELIMINAR!"></i> </button>'

@@ -167,5 +167,16 @@ class Model_paciente extends CI_Model {
 		$this->db->where('id',$datos['idpaciente']);
 		return $this->db->update('paciente', $data);
 	}
+
+	// laboratorio
+	public function m_agregar_lab($data)
+	{
+		return $this->db->insert('laboratorio', $data);
+	}
+	public function m_quitar_lab($data)
+	{
+		$this->db->where('id', $data['id']);
+		return $this->db->delete('laboratorio');
+	}
 }
 ?>

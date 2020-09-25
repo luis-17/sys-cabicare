@@ -13,8 +13,6 @@ class Paciente extends CI_Controller {
 		$this->output->set_header("Pragma: no-cache");
 		$this->sessionFactur = @$this->session->userdata('sess_cabi_'.substr(base_url(),-20,7));
 		date_default_timezone_set("America/Lima");
-		//if(!@$this->user) redirect ('inicio/login');
-		//$permisos = cargar_permisos_del_usuario($this->user->idusuario);
 	}
 	public function listar_paciente()
 	{
@@ -102,15 +100,6 @@ class Paciente extends CI_Controller {
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 	}
-
-	/**
-	 * Método para buscar un paciente por su número de documento.
-	 * Se utiliza en el registro de una Cita
-	 *
-	 * @Creado 14-06-2020
-	 * @author Ing. Ruben Guevara <rguevarac@hotmail.es>
-	 * @return void
-	 */
 	public function buscar_paciente_por_num_documento()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
@@ -135,6 +124,10 @@ class Paciente extends CI_Controller {
 	public function ver_popup_busqueda_paciente()
 	{
 		$this->load->view('paciente/busq_paciente_popup');
+	}
+	public function ver_popup_laboratorio()
+	{
+		$this->load->view('paciente/popup_laboratorio');
 	}
 	public function registrar()
 	{
@@ -235,4 +228,64 @@ class Paciente extends CI_Controller {
 		    ->set_output(json_encode($arrData));
 	}
 
+	// LABORATORIO
+	public function registrar_laboratorio()
+	{
+		// $allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$allInputs = array();
+		$arrData['message'] = 'No se pudo registrar los datos';
+		$arrData['flag'] = 0;
+		// var_dump($_FILES); exit();
+		// VALIDACIONES
+		if( empty($this->input->post('pacienteId')) ){
+			$arrData['message'] = 'No ha seleccionado al paciente correctamente. Recargue la página y vuelva a intentarlo.';
+			$arrData['flag'] = 0;
+			$this->output
+				->set_content_type('application/json')
+				->set_output(json_encode($arrData));
+			return;
+		}
+		if( empty($_FILES['srcDocumento_blob']) ){
+			$arrData['message'] = 'No ha cargado un archivo para subir. Cargue el archivo para seguir con el proceso.';
+			$arrData['flag'] = 0;
+			$this->output
+				->set_content_type('application/json')
+				->set_output(json_encode($arrData));
+			return;
+		}
+
+		$allInputs['pacienteId'] = $this->input->post('pacienteId');
+		$allInputs['fechaExamen'] = darFormatoYMD($this->input->post('fechaExamen'));
+		$allInputs['descripcion'] = empty($this->input->post('descripcion')) || $this->input->post('descripcion') == 'undefined' || $this->input->post('descripcion') == 'null'  ? NULL : $this->input->post('descripcion');
+		$allInputs['fechaSubida'] = date('Y-m-d H:i:s');
+		$this->db->trans_start();
+		if( !empty($_FILES['srcDocumento_blob']) ){
+			$extension = pathinfo($_FILES['srcDocumento_blob']['name'], PATHINFO_EXTENSION);
+			$nuevoNombreArchivo = strtotime("now").'.'.$extension;
+			if( subir_fichero('assets/dinamic/laboratorio','srcDocumento_blob',$nuevoNombreArchivo) ){
+				$allInputs['srcDocumento'] = $nuevoNombreArchivo;
+			}
+			if($this->model_paciente->m_agregar_lab($allInputs) ){
+				$arrData['message'] = 'Se agregaron los datos correctamente.';
+				$arrData['flag'] = 1;
+			}
+		}
+		$this->db->trans_complete();
+		$this->output
+			->set_content_type('application/json')
+			->set_output(json_encode($arrData));
+	}
+	public function quitar_laboratorio()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$arrData['message'] = 'No se pudo quitar los datos';
+		$arrData['flag'] = 0;
+		if( $this->model_paciente->m_quitar_lab($allInputs) ){
+			$arrData['message'] = 'Se quitaron los datos correctamente';
+    		$arrData['flag'] = 1;
+		}
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+	}
 }

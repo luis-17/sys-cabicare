@@ -168,6 +168,16 @@ app.controller('PacienteCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$
       }
       PacienteFactory.editPacienteModal(arrParams);
     }
+    $scope.btnLaboratorio = function() {
+      var arrParams = {
+        'metodos': $scope.metodos,
+        'mySelectionGrid': $scope.mySelectionGrid,
+        'fArr': $scope.fArr,
+        callback: function() {
+        }
+      }
+      PacienteFactory.verLaboratorio(arrParams);
+    }
     $scope.btnAnular = function() {
       var pMensaje = '¿Realmente desea anular el registro?';
       $bootbox.confirm(pMensaje, function(result) {
@@ -216,7 +226,10 @@ app.service("PacienteServices",function($http, $q, handleBehavior) {
       sAnular: sAnular,
       sBuscarPacientes: sBuscarPacientes,
       sListarPacientesBusqueda: sListarPacientesBusqueda,
-      sListarPacientePorNumDoc: sListarPacientePorNumDoc
+      sListarPacientePorNumDoc: sListarPacientePorNumDoc,
+      sGetDetalleLabs: sGetDetalleLabs,
+      sRegistrarLaboratorio: sRegistrarLaboratorio,
+      sQuitarLaboratorio: sQuitarLaboratorio,
     });
     function sListar(datos) {
       var request = $http({
@@ -273,6 +286,32 @@ app.service("PacienteServices",function($http, $q, handleBehavior) {
             data : datos
       });
       return (request.then(handleBehavior.success,handleBehavior.error));
+    }
+    function sGetDetalleLabs(datos) {
+      var request = $http({
+        method: "post",
+        url: angular.patchURLCI + "Cita/listar_detalle_lab",
+        data: datos
+      });
+      return (request.then(handleBehavior.success, handleBehavior.error));
+    }
+    function sRegistrarLaboratorio(datos) {
+      var request = $http({
+        method: "post",
+        url: angular.patchURLCI + "Paciente/registrar_laboratorio",
+        data: datos,
+        transformRequest: angular.identity,
+        headers: { 'Content-Type': undefined }
+      });
+      return (request.then(handleBehavior.success, handleBehavior.error));
+    }
+    function sQuitarLaboratorio(datos) {
+      var request = $http({
+        method: "post",
+        url: angular.patchURLCI + "Paciente/quitar_laboratorio",
+        data: datos
+      });
+      return (request.then(handleBehavior.success, handleBehavior.error));
     }
 });
 
@@ -425,6 +464,168 @@ app.factory("PacienteFactory", function($uibModal, pinesNotifications, blockUI, 
               pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 2500 });
             });
           }
+        },
+        resolve: {
+          arrParams: function() {
+            return arrParams;
+          }
+        }
+      });
+    },
+    verLaboratorio: function (arrParams) {
+      blockUI.start('Abriendo formulario...');
+			$uibModal.open({
+				templateUrl: angular.patchURLCI + 'Paciente/ver_popup_laboratorio',
+				size: 'md',
+				backdrop: 'static',
+				keyboard: false,
+				controller: function ($scope, $uibModalInstance, arrParams) {
+          blockUI.stop();
+
+          $scope.fDataLab = {};
+          
+          $scope.metodos = arrParams.metodos;
+          $scope.fArr = arrParams.fArr;
+          console.log(arrParams,'arrParams.mySelectionGrid');
+          if( arrParams.mySelectionGrid.length == 1 ){
+            $scope.fDataLab = arrParams.mySelectionGrid[0];
+            console.log($scope.fDataLab ,'$scope.fDataLab ');
+
+          }else{
+            alert('Seleccione una sola fila');
+          }
+          $scope.fDataLab.temporalImg = {};
+          $scope.titleForm = 'Laboratorio';
+
+          $scope.gridOptionsLab = {
+            rowHeight: 30,
+            enableGridMenu: false,
+            enableColumnMenus: false,
+            enableRowSelection: false,
+            enableSelectAll: false,
+            enableFiltering: false,
+            enableSorting: false,
+            enableFullRowSelection: false,
+            enableCellEdit: false,
+            multiSelect: false,
+            data: [],
+            columnDefs: [
+              { field: 'id', name: 'id', displayName: 'ID', minWidth: 80, width: 80, visible: false },
+              { field: 'fechaExamen', name: 'fechaExamen', displayName: 'FECHA EXAMEN', minWidth: 120 },
+              { field: 'descripcion', name: 'descripcion', displayName: 'DESCRIPCIÓN', minWidth: 120 },
+              { field: 'srcDocumento', name: 'srcDocumento', minWidth: 120,
+                cellTemplate:'<div class="ui-grid-cell-contents text-left "><a class="btn btn-link" target="_blank" href="{{COL_FIELD.link}}">'+ '{{ COL_FIELD.texto }}</a></div>',  displayName: 'LINK' },
+              {
+                field: 'eliminar', name: 'eliminar', displayName: '', width: 50,
+                cellTemplate: '<button class="btn btn-default btn-sm text-danger btn-action" ng-click="grid.appScope.btnQuitarDeLaCestaImg(row);$event.stopPropagation();"> <i class="fa fa-trash" tooltip-placement="left" uib-tooltip="ELIMINAR!"></i> </button>'
+              }
+              ],
+            onRegisterApi: function (gridApi) {
+              $scope.gridApi = gridApi;
+            }
+          };
+          $scope.metodos.getPaginationServerSideLab = function (loader) {
+            if (loader) {
+              blockUI.start('Procesando información...');
+            }
+            var arrParams = {
+              datos: {
+                pacienteId: $scope.fDataLab.idpaciente
+              }
+            };
+            PacienteServices.sGetDetalleLabs(arrParams).then(function (rpta) {
+              if (rpta.datos.length == 0) {
+                rpta.paginate = { totalRows: 0 };
+              }
+              $scope.gridOptionsLab.data = rpta.datos;
+              if (loader) {
+                blockUI.stop();
+              }
+            });
+          };
+          $scope.metodos.getPaginationServerSideLab(true);
+          $scope.metodos.getTableHeight = function () {
+						var rowHeight = 30; // your row height
+						var headerHeight = 30; // your header height
+						var cant_filas = 4; // min 4
+						if ($scope.gridOptionsLab.data.length > cant_filas) {
+							var cant_filas = $scope.gridOptionsLab.data.length;
+						}
+						return {
+							height: (cant_filas * rowHeight + headerHeight) + "px"
+						};
+					}
+          $scope.agregarItemImagen = function(){
+            blockUI.start("Registrando laboratorio...");
+            var formData = new FormData();
+            var arrDataImg = {
+              pacienteId: $scope.fDataLab.idpaciente,
+              // tipoImagen: $scope.fDataLab.temporalImg.tipoImagen.id,
+              fechaExamen: $scope.fDataLab.temporalImg.fechaExamen,
+              descripcion: $scope.fDataLab.temporalImg.observaciones,
+              srcDocumento_blob: $scope.fDataLab.temporalImg.srcDocumento_blob
+            };
+            angular.forEach(arrDataImg, function(index,val) {
+              formData.append(val,index);
+            });
+            // console.log('formData ==>', formData);
+            PacienteServices.sRegistrarLaboratorio(formData).then(function (rpta) {
+              if (rpta.flag === 1) {
+                var pTitle = 'OK!';
+                var pType = 'success';
+                // $scope.fDataLab.idreceta = rpta.idreceta;
+              } else {
+                var pTitle = 'Advertencia!';
+                var pType = 'warning';
+              }
+              blockUI.stop();
+              pinesNotifications.notify({
+                title: pTitle,
+                text: rpta.message,
+                type: pType,
+                delay: 5000
+              });
+              $scope.metodos.getPaginationServerSideLab();
+              $scope.fDataLab.temporalImg.srcDocumento_blob = null;
+              $scope.fDataLab.temporalImg.srcDocumento = null;
+              $scope.fDataLab.temporalImg.observaciones = null;
+              // $scope.fDataLab.temporalImg.tipoImagen = $scope.fArr.listaTipoImg[0];
+              var linkBtn = document.getElementById('quitarImg');
+              // console.log('linkBtn ==>', linkBtn);
+              linkBtn.click();
+            });
+          }
+          $scope.btnQuitarDeLaCestaImg = function (row) {
+            blockUI.start("Eliminando imagen...");
+            var arrParams = {
+              id: row.entity.id
+            };
+            PacienteServices.sQuitarLaboratorio(arrParams).then(function (rpta) {
+              if (rpta.flag === 1) {
+                var pTitle = 'OK!';
+                var pType = 'success';
+                // $scope.fData.idreceta = rpta.idreceta;
+              } else {
+                var pTitle = 'Advertencia!';
+                var pType = 'warning';
+              }
+              blockUI.stop();
+              pinesNotifications.notify({
+                title: pTitle,
+                text: rpta.message,
+                type: pType,
+                delay: 5000
+              });
+              $scope.metodos.getPaginationServerSideLab();
+            });
+            var index = $scope.gridOptionsLab.data.indexOf(row.entity);
+            $scope.gridOptionsLab.data.splice(index, 1);
+            // $scope.calcularTotales();
+          }
+          /* BOTONES FINALES */
+					$scope.cancel = function () {
+						$uibModalInstance.dismiss('cancel');
+					}
         },
         resolve: {
           arrParams: function() {

@@ -60,6 +60,7 @@ app.controller('RegistroAtencionCtrl', [
 			$scope.getPaginationServerSideRec();
 			$scope.getPaginationServerSideImg();
 			$scope.getPaginationServerSideOA();
+			$scope.getPaginationServerSideLab();
 			//BINDEO MEDICO
 			var myCallBackCC = function() {
 				var objIndex = $scope.fArr.listaMedico.filter(function(obj) {
@@ -631,7 +632,51 @@ app.controller('RegistroAtencionCtrl', [
         metodo: 'php'
       };
       ModalReporteFactory.getPopupReporte(arrParams);
-    }
+		}
+		
+		// LABORATORIO
+		$scope.gridOptionsLAB = {
+			rowHeight: 30,
+			enableGridMenu: false,
+			enableColumnMenus: false,
+			enableRowSelection: false,
+			enableSelectAll: false,
+			enableFiltering: false,
+			enableSorting: false,
+			enableFullRowSelection: false,
+			enableCellEdit: false,
+			multiSelect: false,
+			data: [],
+			columnDefs: [
+				{ field: 'id', name: 'id', displayName: 'ID', minWidth: 80, width: 80, visible: false },
+				{ field: 'fechaExamen', name: 'fechaExamen', displayName: 'FECHA EXAMEN', minWidth: 120 },
+				{ field: 'descripcion', name: 'descripcion', displayName: 'DESCRIPCIÓN', minWidth: 120 },
+				{ field: 'srcDocumento', name: 'srcDocumento', minWidth: 120,
+          cellTemplate:'<div class="ui-grid-cell-contents text-left "><a class="btn btn-link" target="_blank" href="{{COL_FIELD.link}}">'+ '{{ COL_FIELD.texto }}</a></div>',  displayName: 'LINK' }
+			],
+			onRegisterApi: function (gridApi) {
+				$scope.gridApi = gridApi;
+			}
+		};
+		$scope.getPaginationServerSideLab = function (loader) {
+			if (loader) {
+				blockUI.start('Procesando información...');
+			}
+			var arrParams = {
+				datos: {
+					pacienteId: $scope.fData.pacienteId
+				}
+			};
+			RegistroAtencionService.sGetDetalleLabs(arrParams).then(function (rpta) {
+				if (rpta.datos.length == 0) {
+					rpta.paginate = { totalRows: 0 };
+				}
+				$scope.gridOptionsLAB.data = rpta.datos;
+				if (loader) {
+					blockUI.stop();
+				}
+			});
+		};
 	}
 ]);
 app.service("RegistroAtencionService", function ($http, $q, handleBehavior){
@@ -642,6 +687,7 @@ app.service("RegistroAtencionService", function ($http, $q, handleBehavior){
 		sRegistrarAtencion: sRegistrarAtencion,
 		sRegistrarReceta: sRegistrarReceta,
 		sGetDetalleImagenes: sGetDetalleImagenes,
+		sGetDetalleLabs: sGetDetalleLabs,
 		sRegistrarImagen: sRegistrarImagen,
 		sQuitarImagen: sQuitarImagen,
 		sCalcularSemanaGestacion: sCalcularSemanaGestacion,
@@ -691,6 +737,14 @@ app.service("RegistroAtencionService", function ($http, $q, handleBehavior){
 		var request = $http({
 			method: "post",
 			url: angular.patchURLCI + "Cita/listar_detalle_imagenes",
+			data: datos
+		});
+		return (request.then(handleBehavior.success, handleBehavior.error));
+	}
+	function sGetDetalleLabs(datos) {
+		var request = $http({
+			method: "post",
+			url: angular.patchURLCI + "Cita/listar_detalle_lab",
 			data: datos
 		});
 		return (request.then(handleBehavior.success, handleBehavior.error));
