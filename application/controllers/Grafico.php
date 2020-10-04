@@ -11,10 +11,40 @@ class Grafico extends CI_Controller {
     $this->load->model(array('model_grafico'));
   }
 
+	public function listar_paciente_distrito()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		// PACIENTES ATENDIDOS POR DISTRITO 
+		$arrResult = array();
+		$lista = $this->model_grafico->m_pacientes_por_distrito($allInputs['datos']);
+		foreach ($lista as $key => $row) { 
+			if (!empty($row['nombre'])) {
+				$rowSliced = FALSE;
+				$rowSelected = FALSE;
+				if($key === 0){ 
+					$rowSliced = TRUE;
+					$rowSelected = TRUE;
+				}
+				$arrResult[] = array( 
+					'name'=> $row['nombre'],
+					'y'=> (float)$row['contador'],
+					'sliced'=> $rowSliced,
+					'selected'=> $rowSelected
+				);
+			}
+		}
+		$arrData['datos'] = $arrResult;
+		$arrData['message'] = '';
+		$arrData['flag'] = 1;
+		$this->output
+			->set_content_type('application/json')
+			->set_output(json_encode($arrData));
+	}
+
   public function listar_paciente_recomendacion()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
-		// PACIENTES ATENDIDOS POR GENERO 
+		// PACIENTES ATENDIDOS POR RECOM. 
 		$arrResult = array();
 		$lista = $this->model_grafico->m_pacientes_por_recomendacion($allInputs['datos']); 
 		foreach ($lista as $key => $row) { 

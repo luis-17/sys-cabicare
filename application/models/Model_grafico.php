@@ -5,6 +5,25 @@ class Model_grafico extends CI_Model {
 		parent::__construct();
 	}
 
+	public function m_pacientes_por_distrito($paramDatos){
+		$sql = 'SELECT COUNT(*) AS contador, di.nombre  
+					FROM paciente pa 
+					INNER JOIN distrito di ON pa.distritoId = di.id
+					WHERE pa.estado = 1 
+					AND DATE(pa.createdAt) BETWEEN ? AND ? 
+					GROUP BY di.nombre
+					ORDER BY COUNT(*) DESC
+					LIMIT ?';
+		$query = $this->db->query($sql, 
+			array(
+				darFormatoYMD($paramDatos['inicio']), 
+				darFormatoYMD($paramDatos['fin']),
+				$paramDatos['ultimo']['id']
+			) 
+		); 
+		return $query->result_array();
+	}
+
 	public function m_pacientes_por_recomendacion($paramDatos){
 		$sql = 'SELECT COUNT(*) AS contador, pa.medioContacto 
 					FROM paciente pa 

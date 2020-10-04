@@ -90,7 +90,7 @@
 	    do {
 	    	$diasTranscurridos++;
 	    	$start = strtotime("+ 1 day", $start);
-	    } while($start <= $end);
+	    } while($start < $end);
 	    if($diasTranscurridos < 1) {
 	    	return false;
 	    }
