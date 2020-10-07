@@ -28,6 +28,17 @@ app.controller('DashboardCtrl', [
       { id: 10, descripcion: 'TOP 10' },
       { id: 15, descripcion: 'TOP 15' },
     ];
+    $scope.fArr.listaMC = [
+      { id: 'PC', descripcion: 'POR CANTIDAD' },
+      { id: 'PM', descripcion: 'POR MONTO' }
+    ];
+    $scope.fArr.listaAnio = [
+      { id: 2020, descripcion: '2020' },
+      { id: 2021, descripcion: '2021' },
+      { id: 2022, descripcion: '2022' },
+      { id: 2023, descripcion: '2023' },
+      { id: 2024, descripcion: '2024' },
+    ];
 
     $scope.fBusquedaPR = {};
     $scope.fBusquedaPR.inicio = moment().format('01-MM-YYYY');
@@ -36,6 +47,12 @@ app.controller('DashboardCtrl', [
     $scope.fBusquedaPPM = {};
     $scope.fBusquedaPPM.inicio = moment().format('01-01-YYYY');
     $scope.fBusquedaPPM.fin = moment().format('DD-MM-YYYY');
+
+    $scope.fBusquedaPMM = {};
+    $scope.fBusquedaPMM.anio = $scope.fArr.listaAnio[0];
+    $scope.fBusquedaPMM.mc = $scope.fArr.listaMC[0];
+    // $scope.fBusquedaPMM.inicio = moment().format('01-01-YYYY');
+    // $scope.fBusquedaPMM.fin = moment().format('DD-MM-YYYY');
 
     $scope.fBusquedaPPD = {};
     $scope.fBusquedaPPD.inicio = moment().format('01-01-YYYY');
@@ -177,18 +194,19 @@ app.controller('DashboardCtrl', [
 
     $scope.fData.chartProdMedicoMes = {
       chart: {
-        type: 'column'
+        type: 'column',
+        height: 350
       },
       title: {
         text: 'Producción médico por mes'
       },
       xAxis: {
-        categories: ['Apples', 'Oranges', 'Pears', 'Grapes', 'Bananas']
+        categories: []
       },
       yAxis: {
           min: 0,
           title: {
-              text: 'Total fruit consumption'
+              text: 'Total producción por médico'
           }
       },
       tooltip: {
@@ -196,21 +214,24 @@ app.controller('DashboardCtrl', [
           shared: true
       },
       plotOptions: {
-          column: {
-              stacking: 'percent'
-          }
+        column: {
+            stacking: 'percent'
+        }
       },
-      series: [{
-          name: 'John',
-          data: [5, 3, 4, 7, 2]
-      }, {
-          name: 'Jane',
-          data: [2, 2, 3, 2, 1]
-      }, {
-          name: 'Joe',
-          data: [3, 4, 4, 2, 5]
-      }]
+      series: []
     };
+    $scope.consultarProdMedicoMes = function () {
+			blockUI.start('Procesando información...');
+			var arrParams = {
+				datos: $scope.fBusquedaPMM
+			};
+			GraficoServices.sListarProdMedico(arrParams).then(function (rpta) {
+        $scope.fData.chartProdMedicoMes.xAxis.categories = angular.copy(rpta.datos.categories);
+        $scope.fData.chartProdMedicoMes.series = angular.copy(rpta.datos.series);
+				blockUI.stop();
+			});
+    };
+    $scope.consultarProdMedicoMes();
 }]);
 
 app.service("GraficoServices",function($http, $q, handleBehavior) {
@@ -218,6 +239,7 @@ app.service("GraficoServices",function($http, $q, handleBehavior) {
     sListarPacienteRecom: sListarPacienteRecom,
     sListarPacPorMes: sListarPacPorMes,
     sListarPacPorDist: sListarPacPorDist,
+    sListarProdMedico: sListarProdMedico,
   });
   function sListarPacienteRecom(datos) {
     var request = $http({
@@ -239,6 +261,14 @@ app.service("GraficoServices",function($http, $q, handleBehavior) {
     var request = $http({
       method : "post",
       url: angular.patchURLCI +"Grafico/listar_paciente_distrito",
+      data : datos
+    });
+    return (request.then(handleBehavior.success,handleBehavior.error));
+  }
+  function sListarProdMedico(datos) {
+    var request = $http({
+      method : "post",
+      url: angular.patchURLCI +"Grafico/listar_prod_medico_mes",
       data : datos
     });
     return (request.then(handleBehavior.success,handleBehavior.error));

@@ -119,7 +119,7 @@ if (typeof module !== 'undefined' && typeof exports !== 'undefined' && module.ex
         // var thes = this;
         setTimeout(function () {
             ctrl.chart.setSize( undefined, ctrl.chart.height ); 
-        }, 10);
+        }, 1000);
         ctrl.chart.update(mergedConfig, true);
       }
     };

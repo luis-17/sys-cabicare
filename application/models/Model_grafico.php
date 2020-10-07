@@ -47,12 +47,34 @@ class Model_grafico extends CI_Model {
 					WHERE pa.estado = 1 
 					AND ci.estado IN (2, 3)
 					AND DATE(ci.fechaCita) BETWEEN ? AND ? 
-					GROUP BY MONTHNAME(ci.fechaCita), MONTH ( ci.fechaCita )
+					GROUP BY MONTHNAME(ci.fechaCita), MONTH (ci.fechaCita)
 					ORDER BY MONTH(ci.fechaCita)'; 
 		$query = $this->db->query($sql, 
 			array(
 				darFormatoYMD($paramDatos['inicio']), 
 				darFormatoYMD($paramDatos['fin'])
+			) 
+		); 
+		return $query->result_array();
+	}
+
+	public function m_medico_prod_mes($paramDatos){
+		$sql = 'SELECT 
+						COUNT(*) AS contador, 
+						SUM(ci.total) AS suma, 
+						MONTHNAME(ci.fechaCita) AS mes, 
+						MONTH(ci.fechaCita) AS numMes,
+						us.nombres AS medico
+					FROM cita ci 
+					INNER JOIN usuario us ON ci.medicoId = us.id
+					WHERE us.estado = 1 
+					AND ci.estado IN (2, 3)
+					AND YEAR(ci.fechaCita) = ? 
+					GROUP BY MONTHNAME(ci.fechaCita), MONTH (ci.fechaCita), us.nombres
+					ORDER BY MONTH(ci.fechaCita)'; 
+		$query = $this->db->query($sql, 
+			array(
+				$paramDatos['anio']['id']
 			) 
 		); 
 		return $query->result_array();
