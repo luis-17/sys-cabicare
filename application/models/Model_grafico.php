@@ -71,7 +71,7 @@ class Model_grafico extends CI_Model {
 					AND ci.estado IN (2, 3)
 					AND YEAR(ci.fechaCita) = ? 
 					GROUP BY MONTHNAME(ci.fechaCita), MONTH (ci.fechaCita), us.nombres
-					ORDER BY MONTH(ci.fechaCita)'; 
+					ORDER BY MONTH(ci.fechaCita), us.nombres'; 
 		$query = $this->db->query($sql, 
 			array(
 				$paramDatos['anio']['id']
