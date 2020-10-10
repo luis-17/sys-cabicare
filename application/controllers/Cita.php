@@ -500,14 +500,22 @@ class Cita extends CI_Controller {
 					$auth_token = TW_TOKEN;
 					$twilio_number = TW_NUMBER; // "+18442780963";
 					$client = new Client($account_sid, $auth_token);
+					$body = 'Su cita se ha reservado con éxito en CABICARE con el Dr. '.$allInputs['medico']['medico'].' el '.date('d-m-Y',strtotime($allInputs['fecha'])).' - '.date('H:i', strtotime($allInputs['hora_desde'])).'. Recuerde asistir 20 minutos antes. Para cualquier cambio de cita contactenos. "Contigo en todas tus etapas".';
 					$client->messages->create(
 						'+51'.$fPaciente['celular'],
 						array(
 								'from' => $twilio_number,
-								'body' => 'Su cita se ha reservado con éxito en CABICARE con el Dr. '.$allInputs['medico']['medico'].' el '.date('d-m-Y',strtotime($allInputs['fecha'])).' - '.date('H:i', strtotime($allInputs['hora_desde'])).'. 
-									Recuerde asistir 20 minutos antes. Para cualquier cambio de cita contactenos. "Contigo en todas tus etapas".'
+								'body' => $body
 						)
 					);
+					// almacenar log
+				$dataLog = array(
+					'citaId'=> $citaId,
+					'celular'=> $fPaciente['celular'],
+					'fechaEnvio'=> date('Y-m-d H:i:s'),
+					'contenido'=> $body
+				);
+				$this->model_cita->m_registrar_log_sms($dataLog);
 				}
 			}
 			$arrData['message'] = 'Se registraron los datos correctamente';
