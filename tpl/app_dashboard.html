@@ -90,16 +90,6 @@
         <div class="col-xs-6">
           <div class="panel p col-lg-12">
             <div class="boxform">
-              <!-- <div class="form-group inline">
-                <label> Desde </label>
-                <input type="text" ng-model="fBusquedaPMM.inicio" class="form-control input-xs mask"
-                    placeholder="Fecha Desde" input-mask mask-options="{alias: 'dd-mm-yyyy'}"/>
-              </div>
-              <div class="form-group inline">
-                <label> Hasta </label>
-                <input type="text" ng-model="fBusquedaPMM.fin" class="form-control input-xs mask"
-                    placeholder="Fecha Hasta" input-mask mask-options="{alias: 'dd-mm-yyyy'}"/>
-              </div> -->
               <div class="form-group inline">
                 <label> Monto/Cantidad </label>
                 <select ng-model="fBusquedaPMM.mc" class="form-control input-xs" 
@@ -117,6 +107,28 @@
               </div>
             </div>
             <highchart id="chartProdMedicoMes" config="fData.chartProdMedicoMes" class="col-lg-12"></highchart>
+          </div>
+        </div>
+        <div class="col-xs-12">
+          <div class="panel p col-lg-12">
+            <div class="boxform">
+              <div class="form-group inline">
+                <label> Monto/Cantidad </label>
+                <select ng-model="fBusquedaMMC.mc" class="form-control input-xs" 
+                ng-options="item as item.descripcion for item in fArr.listaMC"> </select>
+              </div>
+              <div class="form-group inline">
+                <label> Año </label>
+                <select ng-model="fBusquedaMMC.anio" class="form-control input-xs" 
+                ng-options="item as item.descripcion for item in fArr.listaAnio"> </select>
+              </div>
+              <div class="form-group inline">
+                <button type="button" class="btn btn-info btn-xs" ng-click="consultarProdMedicoTiempo();">
+                  <i class="fa fa-refresh"></i> PROCESAR
+                </button>
+              </div>
+            </div>
+            <highchart id="chartProdMedicoTiempo" config="fData.chartProdMedicoTiempo" class="col-lg-12"></highchart>
           </div>
         </div>
       </div>

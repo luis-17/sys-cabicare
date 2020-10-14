@@ -156,4 +156,61 @@ class Grafico extends CI_Controller {
 			->set_content_type('application/json')
 			->set_output(json_encode($arrData));
 	}
+
+	public function listar_prod_medico_tiempo()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$arrResult = array();
+		$lista = $this->model_grafico->m_medico_prod_mes($allInputs['datos']);
+		$indexParam = $allInputs['datos']['mc']['id'] === 'PC' ? 'contador' : 'suma';
+		$arrGroupMeses = array();
+		$arrGroupMedicos = array();
+		foreach ($lista as $key => $row) {
+			$arrGroupMeses[$row['mes']] = $row['mes'];
+			$arrGroupMedicos[$row['medico']] = $row['medico'];
+		}
+		$arrGroupMeses = array_values($arrGroupMeses);
+		$arrGroupMedicos = array_values($arrGroupMedicos);
+		$arrDataSeries = array();
+		foreach ($arrGroupMedicos as $key => $value) {
+			array_push($arrDataSeries, array(
+				'name' => $value,
+				'data' => array_pad(array(), count($arrGroupMeses), null)
+			));
+		}
+		foreach($lista as $key => $row) {
+			$perteneceMes = FALSE;
+			$perteneceMed = FALSE;
+			$keyMesSelected = null;
+			foreach($arrGroupMeses as $keyMes => $valMes){
+				if($row['mes'] == $valMes){
+					$perteneceMes = TRUE;
+					$keyMesSelected = $keyMes;
+				}
+			}
+			foreach($arrGroupMedicos as $keyMedi => $valMedi){
+				if($row['medico'] == $valMedi){
+					$perteneceMed = TRUE;
+				}
+			}
+			if($perteneceMed && $perteneceMes){
+				foreach($arrDataSeries as $keySerie => $valSerie){
+					foreach($valSerie['data'] as $keyDetSer => $valDetSerie) {
+						if ($keyDetSer === $keyMesSelected && $valSerie['name'] == $row['medico']) {
+							$arrDataSeries[$keySerie]['data'][$keyDetSer] = (int)$row[$indexParam];
+						}
+					}
+				}
+			}
+		}
+		$arrData['datos'] = array(
+			'categories' => $arrGroupMeses,
+			'series' => $arrDataSeries,
+		);
+		$arrData['message'] = '';
+		$arrData['flag'] = 1;
+		$this->output
+			->set_content_type('application/json')
+			->set_output(json_encode($arrData));
+	}
 }

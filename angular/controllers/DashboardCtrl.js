@@ -51,19 +51,21 @@ app.controller('DashboardCtrl', [
     $scope.fBusquedaPMM = {};
     $scope.fBusquedaPMM.anio = $scope.fArr.listaAnio[0];
     $scope.fBusquedaPMM.mc = $scope.fArr.listaMC[0];
-    // $scope.fBusquedaPMM.inicio = moment().format('01-01-YYYY');
-    // $scope.fBusquedaPMM.fin = moment().format('DD-MM-YYYY');
 
     $scope.fBusquedaPPD = {};
     $scope.fBusquedaPPD.inicio = moment().format('01-01-YYYY');
     $scope.fBusquedaPPD.fin = moment().format('DD-MM-YYYY');
     $scope.fBusquedaPPD.ultimo = $scope.fArr.listaUltimosDist[0];
 
+    $scope.fBusquedaMMC = {};
+    $scope.fBusquedaMMC.anio = $scope.fArr.listaAnio[0];
+    $scope.fBusquedaMMC.mc = $scope.fArr.listaMC[0];
+
     $scope.fData = {};
     $scope.fData.chartMedioContacto = { 
       chart: { 
         type: 'pie',
-        height: 250,
+        height: 350,
       },
       title: {
         text: 'PACIENTES POR MEDIO DE CONTACTO'
@@ -107,7 +109,7 @@ app.controller('DashboardCtrl', [
     $scope.fData.chartPacPorMes = { 
       chart: { 
         type: 'pie',
-        height: 250,
+        height: 350,
       },
       title: {
         text: 'PACIENTES POR MES'
@@ -151,7 +153,7 @@ app.controller('DashboardCtrl', [
     $scope.fData.chartPacPorDist = { 
       chart: { 
         type: 'pie',
-        height: 250,
+        height: 350,
       },
       title: {
         text: 'PACIENTES POR DISTRITO'
@@ -232,6 +234,52 @@ app.controller('DashboardCtrl', [
 			});
     };
     $scope.consultarProdMedicoMes();
+
+    $scope.fData.chartProdMedicoTiempo = {
+      chart: { 
+        type: 'line',
+        height: 350,
+      },
+      title: {
+        text: 'Producción del Médico - Línea de tiempo'
+      },
+      subtitle: {
+        text: 'Fuente: Cabicare'
+      },
+      yAxis: {
+        title: {
+          text: 'Cant. / Monto S/.'
+        }
+      },
+      xAxis: {
+        categories: []
+      },
+      legend: {
+          layout: 'vertical',
+          align: 'right',
+          verticalAlign: 'middle'
+      },
+      plotOptions: {
+        series: {
+          label: {
+            connectorAllowed: false
+          }
+        }
+      },
+      series: []
+    };
+    $scope.consultarProdMedicoTiempo = function () {
+			blockUI.start('Procesando información...');
+			var arrParams = {
+				datos: $scope.fBusquedaMMC
+			};
+			GraficoServices.sListarProdMedicoTiempo(arrParams).then(function (rpta) {
+        $scope.fData.chartProdMedicoTiempo.xAxis.categories = angular.copy(rpta.datos.categories);
+        $scope.fData.chartProdMedicoTiempo.series = angular.copy(rpta.datos.series);
+				blockUI.stop();
+      });
+    };
+    $scope.consultarProdMedicoTiempo();
 }]);
 
 app.service("GraficoServices",function($http, $q, handleBehavior) {
@@ -240,6 +288,7 @@ app.service("GraficoServices",function($http, $q, handleBehavior) {
     sListarPacPorMes: sListarPacPorMes,
     sListarPacPorDist: sListarPacPorDist,
     sListarProdMedico: sListarProdMedico,
+    sListarProdMedicoTiempo: sListarProdMedicoTiempo,
   });
   function sListarPacienteRecom(datos) {
     var request = $http({
@@ -269,6 +318,14 @@ app.service("GraficoServices",function($http, $q, handleBehavior) {
     var request = $http({
       method : "post",
       url: angular.patchURLCI +"Grafico/listar_prod_medico_mes",
+      data : datos
+    });
+    return (request.then(handleBehavior.success,handleBehavior.error));
+  }
+  function sListarProdMedicoTiempo(datos) {
+    var request = $http({
+      method : "post",
+      url: angular.patchURLCI +"Grafico/listar_prod_medico_tiempo",
       data : datos
     });
     return (request.then(handleBehavior.success,handleBehavior.error));
