@@ -255,9 +255,9 @@ app.controller('DashboardCtrl', [
         categories: []
       },
       legend: {
-          layout: 'vertical',
-          align: 'right',
-          verticalAlign: 'middle'
+          // layout: 'horizontal',
+          align: 'center'
+          // verticalAlign: 'middle'
       },
       plotOptions: {
         series: {
