@@ -65,6 +65,68 @@ class Model_cita extends CI_Model {
 		}
 		return $this->db->get()->result_array();
 	}
+
+	public function m_cargar_citas_excel($paramPaginate,$paramDatos){
+		$desde = $this->db->escape(darFormatoYMD($paramDatos['fechaDesde']));
+ 		$hasta = $this->db->escape(darFormatoYMD($paramDatos['fechaHasta']));
+		$this->db->select("
+			ci.id,
+			ci.pacienteId,
+			ci.usuarioId,
+			ci.sedeId,
+			ci.fechaAtencion,
+			ci.fechaCita,
+			ci.horaDesde,
+			ci.horaHasta,
+			ci.apuntesCita,
+			ci.total,
+			ci.peso,
+			ci.talla,
+			ci.imc,
+			ci.presionArterial,
+			ci.frecuenciaCardiaca,
+			ci.temperaturaCorporal,
+			ci.perimetroAbdominal,
+			ci.observaciones,
+			ci.estado,
+			ci.medioContacto,
+			ci.gestando,
+			ci.metodoPago,
+			ci.numOperacion,
+			ci.fechaUltimaRegla,
+			ci.fechaProbableParto,
+			ci.semanaGestacion,
+			concat_ws(' ', pa.nombres, pa.apellidoPaterno, pa.apellidoMaterno) AS paciente,
+			pa.tipoDocumento,
+			pa.numeroDocumento,
+			ci.medicoId,
+			concat_ws(' ', us.nombres, us.apellidos) AS medico,
+			ci.anotacionesPago
+		", FALSE);
+		$this->db->from('cita ci');
+		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
+		$this->db->join('usuario us', 'ci.medicoId = us.id','left');
+		$this->db->where('ci.estado <> ', 0);
+		$this->db->where('pa.estado', 1);
+		$this->db->where('ci.fechaCita BETWEEN ' . $desde .' AND ' . $hasta);
+
+		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
+			foreach ($paramPaginate['searchColumn'] as $key => $value) {
+				if(! empty($value)){
+					$this->db->like($key ,strtoupper_total($value) ,FALSE);
+				}
+			}
+		}
+
+		if( $paramPaginate['sortName'] ){
+			$this->db->order_by($paramPaginate['sortName'], $paramPaginate['sort']);
+		}
+		if( $paramPaginate['firstRow'] || $paramPaginate['pageSize'] ){
+			$this->db->limit($paramPaginate['pageSize'],$paramPaginate['firstRow'] );
+		}
+		return $this->db->get()->result_array();
+	}
+
 	public function m_count_citas_en_grilla($paramPaginate,$paramDatos){
 		$desde = $this->db->escape(darFormatoYMD($paramDatos['fechaDesde']));
  		$hasta = $this->db->escape(darFormatoYMD($paramDatos['fechaHasta']));

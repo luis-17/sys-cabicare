@@ -32,7 +32,7 @@ class Reportes extends CI_Controller {
 			$paramPaginate['pageSize'] = FALSE;
 			$paramDatos = $allInputs['filtro'];
 			$nombre_reporte = 'citas';
-			$lista = $this->model_cita->m_cargar_citas_en_grilla($paramPaginate,$paramDatos);
+			$lista = $this->model_cita->m_cargar_citas_excel($paramPaginate,$paramDatos);
 
 			$total = 0;
 			$arrListadoProd = array();
