@@ -73,6 +73,20 @@ class Model_paciente extends CI_Model {
 		return $this->db->get()->row_array();
 	}
 
+	public function m_cargar_pacientes_excel()
+	{
+		$this->db->select("pa.id AS pacienteId, pa.nombres, pa.apellidoPaterno, pa.apellidoMaterno, 
+		pa.tipoDocumento, pa.numeroDocumento, pa.medioContacto, pa.distritoId, di.nombre AS distrito,
+		pa.sexo, pa.fechaNacimiento, pa.celular, pa.email, pa.alergias, pa.operador, pa.antecedentes, pa.createdAt", FALSE);
+		$this->db->select("concat_ws(' ', pa.nombres, pa.apellidoPaterno, pa.apellidoMaterno) AS paciente", FALSE);
+		$this->db->select("FLOOR(DATEDIFF(NOW(), pa.fechaNacimiento)/365) AS edad", FALSE);
+		$this->db->from('paciente pa');
+		$this->db->join('distrito di', 'pa.distritoId = di.id','left');
+		$this->db->where('pa.estado', 1);
+		$this->db->order_by('pa.id', 'DESC');
+		return $this->db->get()->result_array();
+	}
+
 	public function m_cargar_paciente_por_id($datos)
 	{
 		$this->db->select("

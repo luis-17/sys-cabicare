@@ -53,6 +53,11 @@ app.controller('CentralReportesCtrl', ['$scope', '$filter', '$uibModal', '$bootb
             id: 'AM-PRODMED',
             tipoCuadro: 'report',
             name: 'PRODUCCIÓN POR MÉDICO'
+          },
+          {
+            id: 'PAC-ALL',
+            tipoCuadro: 'report',
+            name: 'REPORTE DE PACIENTES'
           }
         ]
       }
@@ -120,15 +125,21 @@ app.controller('CentralReportesCtrl', ['$scope', '$filter', '$uibModal', '$bootb
             };
             ModalReporteFactory.getPopupReporte(arrParams);
             break;
-          case 'VT-RCTD':
-            $scope.fBusqueda.titulo = $scope.selectedReport.name;
+          case 'PAC-ALL':
             var arrParams = {
-              titulo: $scope.fBusqueda.titulo,
-              datos: $scope.fBusqueda,
-              metodo: 'js'
-            }
-            var strController = arrParams.metodo == 'js' ? strControllerJS : strControllerPHP; 
-            arrParams.url = angular.patchURLCI+strController+'/report_detalle_por_tipo_documento_caja'; 
+              url: angular.patchURLCI+'Reportes/reporte_pacientes',
+              metodo: 'php',
+              salida: 'excel',
+              datos: {
+                // desde: $scope.fBusqueda.desde,
+                // hasta: $scope.fBusqueda.hasta,
+                // tipoReporte: $scope.fBusqueda.tipoReporte,
+                // orden: $scope.fBusqueda.orden,
+                // origen: $scope.fBusqueda.origen,
+                titulo: 'REPORTE DE PACIENTES',
+                tituloAbv: 'PAC-ALL'
+              }
+            };
             ModalReporteFactory.getPopupReporte(arrParams); 
             break;
           // NINGUN REPORTE SELECCIONADO
