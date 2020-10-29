@@ -77,7 +77,12 @@ class Grafico extends CI_Controller {
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
 		// PACIENTES POR MES
 		$arrResult = array();
-		$lista = $this->model_grafico->m_pacientes_por_mes($allInputs['datos']); 
+		if($allInputs['datos']['tg']['id'] == 'CPM'){
+			$lista = $this->model_grafico->m_pacientes_por_mes($allInputs['datos']);
+		}
+		if($allInputs['datos']['tg']['id'] == 'PNPM'){
+			$lista = $this->model_grafico->m_pacientes_nuevos_por_mes($allInputs['datos']);
+		}
 		foreach ($lista as $key => $row) { 
 			$rowSliced = FALSE;
 			$rowSelected = FALSE;
@@ -89,9 +94,11 @@ class Grafico extends CI_Controller {
 				'name'=> $row['mes'],
 				'y'=> (float)$row['contador'],
 				'sliced'=> $rowSliced,
-        'selected'=> $rowSelected
+				'selected'=> $rowSelected
 			);
 		}
+		
+		
 		$arrData['datos'] = $arrResult;
 		$arrData['message'] = '';
 		$arrData['flag'] = 1;

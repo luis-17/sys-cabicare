@@ -32,6 +32,10 @@ app.controller('DashboardCtrl', [
       { id: 'PC', descripcion: 'POR CANTIDAD' },
       { id: 'PM', descripcion: 'POR MONTO' }
     ];
+    $scope.fArr.listaTG = [
+      { id: 'CPM', descripcion: 'CITAS POR MES' },
+      { id: 'PNPM', descripcion: 'PACIENTES NUEVOS POR MES' }
+    ];
     $scope.fArr.listaAnio = [
       { id: 2020, descripcion: '2020' },
       { id: 2021, descripcion: '2021' },
@@ -47,6 +51,7 @@ app.controller('DashboardCtrl', [
     $scope.fBusquedaPPM = {};
     $scope.fBusquedaPPM.inicio = moment().format('01-01-YYYY');
     $scope.fBusquedaPPM.fin = moment().format('DD-MM-YYYY');
+    $scope.fBusquedaPPM.tg = $scope.fArr.listaTG[0];
 
     $scope.fBusquedaPMM = {};
     $scope.fBusquedaPMM.anio = $scope.fArr.listaAnio[0];
@@ -112,7 +117,7 @@ app.controller('DashboardCtrl', [
         height: 350,
       },
       title: {
-        text: 'PACIENTES POR MES'
+        text: 'CONSOLIDADOS POR MES'
       },
       tooltip: {
         pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>' 

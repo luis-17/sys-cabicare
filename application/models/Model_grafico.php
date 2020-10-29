@@ -58,6 +58,22 @@ class Model_grafico extends CI_Model {
 		return $query->result_array();
 	}
 
+	public function m_pacientes_nuevos_por_mes($paramDatos){
+		$sql = 'SELECT COUNT(*) AS contador, MONTHNAME(pa.createdAt) AS mes, MONTH(pa.createdAt) AS numMes
+					FROM paciente pa 
+					WHERE pa.estado = 1 
+					AND DATE(pa.createdAt) BETWEEN ? AND ? 
+					GROUP BY MONTHNAME(pa.createdAt), MONTH (pa.createdAt)
+					ORDER BY MONTH(pa.createdAt)'; 
+		$query = $this->db->query($sql, 
+			array(
+				darFormatoYMD($paramDatos['inicio']), 
+				darFormatoYMD($paramDatos['fin'])
+			) 
+		); 
+		return $query->result_array();
+	}
+
 	public function m_medico_prod_mes($paramDatos){
 		$sql = 'SELECT 
 						COUNT(*) AS contador, 
