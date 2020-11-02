@@ -970,6 +970,20 @@ class Cita extends CI_Controller {
 		    ->set_output(json_encode($arrData));
 	}
 
+	public function listar_atencion_cita()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$fAte = $this->model_cita->m_obtener_atencion_consulta($allInputs['datos']['citaId']);
+		
+		$arrData = array(
+			'plan' => $fAte['plan'],
+			'observaciones' => $fAte['observaciones']
+		);
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+	}
+
 	public function calcular_semana_gestacion($fur = FALSE, $param = FALSE) 
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);

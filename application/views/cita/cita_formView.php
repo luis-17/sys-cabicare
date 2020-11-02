@@ -261,7 +261,30 @@
 					</div>
 				</div>
 			</div>
-
+			<hr>
+			<div class="row" ng-if="fData.tipoCita == '3'">
+				<div class="col-sm-12">
+					<h3> Datos de atención</h3>
+				</div>
+				<div class="form-group col-md-12">
+	        <label for="name" class="control-label minotaur-label">Plan: </label>
+				  <textarea
+					class="form-control input-sm"
+					ng-model="fData.plan"
+					disabled
+					rows="3"
+				  ></textarea>
+				</div>
+				<div class="form-group col-md-12">
+	        <label for="name" class="control-label minotaur-label">Observaciones: </label>
+				  <textarea
+					class="form-control input-sm"
+					ng-model="fData.observaciones"
+					disabled
+					rows="3"
+				  ></textarea>
+	      </div>
+			</div>
 
 		</form>
 	</section>
@@ -269,6 +292,6 @@
 
 <div class="modal-footer">
     <button class="btn btn-danger pull-left" ng-click="btnAnular(fData)" ng-if="fData.accion == 'edit' && bool">Anular</button>
-    <button class="btn btn-primary" ng-click="aceptar(); $event.preventDefault();" ng-disabled="formCita.$invalid">Aceptar</button>
-    <button class="btn btn-warning" ng-click="cancel()">Cerrar</button>
+    <button ng-if="(fSessionCI.keyPerfil == 'key_root') || (fData.tipoCita != '3')" class="btn btn-primary" ng-click="aceptar(); $event.preventDefault();" ng-disabled="formCita.$invalid">Aceptar</button>
+    <button class="btn btn-warning" ng-click="cancel()">Cerrar </button>
 </div>

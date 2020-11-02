@@ -162,7 +162,8 @@ app.controller('CitaCtrl',
 				'start': start || null,
 				'end': end || null,
 				'fArr': $scope.fArr,
-				'metodos': $scope.metodos
+				'metodos': $scope.metodos,
+				'fSessionCI': $scope.fSessionCI
 			};
 			ReservaCitasFactory.agregarCitaModal(arrParams);
 		}
@@ -173,7 +174,8 @@ app.controller('CitaCtrl',
 				'cita': cita,
 				'fArr': $scope.fArr,
 				'metodos': $scope.metodos,
-				'bool': bool
+				'bool': bool,
+				'fSessionCI': $scope.fSessionCI
 			};
 			ReservaCitasFactory.editarCitaModal(arrParams);
     }
@@ -439,6 +441,7 @@ app.service("CitaServices", function ($http, $q, handleBehavior) {
     sMoverCita: sMoverCita,
     sAgregarMetodoPago: sAgregarMetodoPago,
 		sAnular: sAnular,
+		sListarAtencionEnCita: sListarAtencionEnCita,
 	});
 
 	function sListarCitasGrilla(datos) {
@@ -505,6 +508,14 @@ app.service("CitaServices", function ($http, $q, handleBehavior) {
 		});
 		return (request.then(handleBehavior.success, handleBehavior.error));
 	}
+	function sListarAtencionEnCita(datos) {
+		var request = $http({
+			method: "post",
+			url: angular.patchURLCI + "Cita/listar_atencion_cita",
+			data: datos
+		});
+		return (request.then(handleBehavior.success, handleBehavior.error));
+	}
 });
 
 app.factory("ReservaCitasFactory",
@@ -534,6 +545,7 @@ app.factory("ReservaCitasFactory",
 					$scope.fArr = arrParams.fArr;
 					$scope.metodos = arrParams.metodos;
 					$scope.fData.accion = 'reg';
+					$scope.fSessionCI = arrParams.fSessionCI;
 
 					$scope.btnNuevo = function(){
 						var arrP = {
@@ -1053,6 +1065,7 @@ app.factory("ReservaCitasFactory",
 					$scope.fData.eliminados = [];
 					$scope.fData.accion = 'edit';
 					$scope.bool = arrParams.bool;
+					$scope.fSessionCI = arrParams.fSessionCI;
 					$scope.titleForm = 'Edición de Cita';
 
 					$scope.fData.sede = $scope.fArr.listaSedes[0];
@@ -1211,6 +1224,28 @@ app.factory("ReservaCitasFactory",
 							height: (cant_filas * rowHeight + headerHeight) + "px"
 						};
 					}
+
+					$scope.getAtencionDet = function () {
+						var arrParams = {
+							datos: {
+								citaId: $scope.fData.id
+							}
+						};
+						blockUI.start('Procesando información...');
+						CitaServices.sListarAtencionEnCita(arrParams).then(function (rpta) {
+							// if (rpta.datos.length > 0) {
+							$scope.fData.plan = rpta.plan;
+							$scope.fData.observaciones = rpta.observaciones;
+							// }
+							// $scope.gridOptions.totalItems = rpta.paginate.totalRows;
+							// $scope.gridOptions.data = rpta.datos;
+							// $scope.calcularTotales();
+							// if (loader) {
+								blockUI.stop();
+							// }
+						});
+					}
+					$scope.getAtencionDet();
 
 					$scope.getPaginationServerSideDet = function (loader) {
 						if (loader) {

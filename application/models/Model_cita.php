@@ -578,6 +578,19 @@ class Model_cita extends CI_Model {
 		return $this->db->delete('imagen');
 	}
 
+	public function m_obtener_atencion_consulta($citaId)
+	{
+		$this->db->select("
+			cp.plan,
+			cp.observaciones
+		", FALSE);
+		$this->db->from('citaproducto cp');
+		$this->db->where('cp.citaId', $citaId);
+		$this->db->order_by('cp.productoId', 'ASC');
+		$this->db->limit(1);
+		return $this->db->get()->row_array();
+	}
+
 	// REPORTES
 	public function m_obtener_produccion_medicos($params)
 	{
