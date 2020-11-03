@@ -337,7 +337,8 @@ class Reportes extends CI_Controller {
 					$row['email'],
 					$row['celular'],
 					$row['edad'],
-					$row['distrito']
+					$row['distrito'],
+					$row['createdAt']
 				)
 			);
 		}
@@ -352,7 +353,8 @@ class Reportes extends CI_Controller {
 			array( 'col' => 'EMAIL',			'ancho' => 60, 	'align' => 'L' ),
 			array( 'col' => 'CELULAR',			'ancho' => 15, 	'align' => 'L' ),
 			array( 'col' => 'EDAD',			'ancho' => 20, 	'align' => 'L' ),
-			array( 'col' => 'DISTRITO',			'ancho' => 20, 	'align' => 'C' )
+			array( 'col' => 'DISTRITO',			'ancho' => 20, 	'align' => 'C' ),
+			array( 'col' => 'FECHA CREACIÓN',			'ancho' => 20, 	'align' => 'C' )
 		);
 		$titulo = 'LISTADO DE PACIENTES';
 		$nombre_hoja = 'PACIENTES';
