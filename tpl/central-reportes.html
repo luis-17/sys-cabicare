@@ -107,7 +107,13 @@
                               ng-options="item as item.descripcion for item in fArr.listaOrigen" > </select> 
                         </li>
                         <li class="col-md-6 col-sm-6 form-group" 
-                            ng-show="selectedReport.id=='AM-PRODMED' || selectedReport.id=='AM-PRODGEN'"> 
+                            ng-show="selectedReport.id=='AM-PRODGEN'"> 
+                            <label> TIPO REPORTE </label> 
+                            <select tabindex="50" class="form-control input-sm mb" ng-model="fBusqueda.tipoReporte2" 
+                              ng-options="item as item.descripcion for item in fArr.listaTipoReporte2" > </select> 
+                        </li>
+                        <li class="col-md-6 col-sm-6 form-group" 
+                            ng-show="selectedReport.id=='AM-PRODMED'"> 
                             <label> TIPO REPORTE </label> 
                             <select tabindex="50" class="form-control input-sm mb" ng-model="fBusqueda.tipoReporte" 
                               ng-options="item as item.descripcion for item in fArr.listaTipoReporte" > </select> 

@@ -33,7 +33,14 @@ app.controller('CentralReportesCtrl', ['$scope', '$filter', '$uibModal', '$bootb
       { id : 'DET', descripcion:'DETALLADO'},
       { id : 'RPP', descripcion:'RESUMIDO POR PRODUCTO'}
     ];
+    $scope.fArr.listaTipoReporte2 = [
+      { id : '', descripcion:'--Seleccione tipo--'},
+      { id : 'DET', descripcion:'DETALLADO'},
+      { id : 'RPP', descripcion:'RESUMIDO POR PRODUCTO'},
+      { id : 'RPM', descripcion:'RESUMIDO POR MÉDICO'}
+    ];
     $scope.fBusqueda.tipoReporte = $scope.fArr.listaTipoReporte[0];
+    $scope.fBusqueda.tipoReporte2 = $scope.fArr.listaTipoReporte2[0];
     $scope.fArr.listaOrden = [
       { id : 'OC', descripcion:'ORDENADO POR CANTIDAD'},
       { id : 'OM', descripcion:'ORDENADO POR MONTO'}
@@ -116,7 +123,7 @@ app.controller('CentralReportesCtrl', ['$scope', '$filter', '$uibModal', '$bootb
               datos: {
                 desde: $scope.fBusqueda.desde,
                 hasta: $scope.fBusqueda.hasta,
-                tipoReporte: $scope.fBusqueda.tipoReporte,
+                tipoReporte: $scope.fBusqueda.tipoReporte2,
                 orden: $scope.fBusqueda.orden,
                 origen: $scope.fBusqueda.origen,
                 titulo: 'PRODUCCIÓN GENERAL',

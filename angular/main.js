@@ -139,7 +139,7 @@ angular.module('app')
               $scope.fConfigSys.valores = [true,true,true,true,true,true,true,true,true];
             }
             if($scope.fSessionCI.keyPerfil == 'key_rep'){
-              $scope.fConfigSys.valores = [true,false,true,false,true,false,false];
+              $scope.fConfigSys.valores = [false,false,true,false,true,false,false];
             }
             if($scope.fSessionCI.keyPerfil == 'key_med'){
               $scope.fConfigSys.valores = [false,false,false,false,false,true,false];
@@ -154,6 +154,9 @@ angular.module('app')
             }
             if($scope.fSessionCI.keyPerfil == 'key_med'){
               $location.path('/app/atencion-medica');
+            }
+            if($scope.fSessionCI.keyPerfil == 'key_rep'){
+              $location.path('/app/reserva-cita');
             }
           }else{
             $scope.fSessionCI = {};

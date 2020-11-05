@@ -719,6 +719,33 @@ class Model_cita extends CI_Model {
 		}
 		return $this->db->get()->result_array();
 	}
+	public function m_obtener_produccion_general_group_medico($params)
+	{
+		$this->db->select("COUNT(*) AS contador, SUM(cp.precioReal) AS total, concat_ws(' ', us.nombres, us.apellidos) AS medico", FALSE);
+		$this->db->from('cita ci');
+		$this->db->join('usuario us', 'ci.medicoId = us.id');
+		$this->db->join('citaproducto cp', 'ci.id = cp.citaId');
+		$this->db->join('producto pr', 'cp.productoId = pr.id');
+		// $this->db->join('paciente pa', 'ci.pacienteId = pa.id');
+		$this->db->where('ci.estado', 3);
+		// $this->db->where('pa.estado', 1);
+		$this->db->where('cp.estado', 1);
+		if($params['origen']['id'] === 'INT'){
+			$this->db->where('pr.procedencia', 'INT');
+		}
+		if($params['origen']['id'] === 'EXT'){
+			$this->db->where('pr.procedencia', 'EXT');
+		}
+		$this->db->where("DATE(ci.fechaAtencion) BETWEEN '" . darFormatoYMD($params['desde']) ."' AND '" . darFormatoYMD($params['hasta'])."'");
+		$this->db->group_by('ci.medicoId');
+		if($params['orden']['id'] == 'OC'){
+			$this->db->order_by('COUNT(*)', 'DESC');
+		}
+		if($params['orden']['id'] == 'OM'){
+			$this->db->order_by('SUM(cp.precioReal)', 'DESC');
+		}
+		return $this->db->get()->result_array();
+	}
 	public function m_actualizar_cita_sms($idcita)
 	{
 		$data = array(
