@@ -384,7 +384,7 @@ app.controller('CitaCtrl',
 						'pa.numeroDocumento': grid.columns[5].filters[0].term,
 						"concat_ws(' ', pa.nombres, pa.apellidoPaterno, pa.apellidoMaterno)": grid.columns[6].filters[0].term,
 						"concat_ws(' ', us.nombres, us.apellidos)": grid.columns[7].filters[0].term,
-						'ci.total': grid.columns[87].filters[0].term,
+						'ci.total': grid.columns[8].filters[0].term,
 
 					};
 					$scope.metodos.getPaginationServerSide();
