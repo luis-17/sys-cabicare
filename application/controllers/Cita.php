@@ -928,15 +928,6 @@ class Cita extends CI_Controller {
 		// $allInputs['tipoImagen'] = $allInputs['tipoImagen'];
 		$allInputs['descripcion'] = $this->input->post('descripcion');
 		$allInputs['fechaSubida'] = date('Y-m-d H:i:s');
-		// $data = array(
-		// 	'citaId' 				=> $allInputs['citaId'],
-		// 	'descripcion'		=> empty($allInputs['descripcion']) ? NULL : nl2br($allInputs['descripcion']),
-		// 	'tipoImagen'		=> nl2br($allInputs['tipoImagen']),
-		// 	'fechaReceta'		=> date('Y-m-d H:i:s'),
-		// 	'estado' 				=> 1,
-		// 	'createdAt'			=> date('Y-m-d H:i:s'),
-		// 	'updatedAt'			=> date('Y-m-d H:i:s')
-		// );
 		$this->db->trans_start();
 		if( !empty($_FILES['srcImagen_blob']) ){
 			$extension = pathinfo($_FILES['srcImagen_blob']['name'], PATHINFO_EXTENSION);

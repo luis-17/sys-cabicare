@@ -67,38 +67,18 @@
       <span class="font-bold"> Atención Médica </span>
     </a>
   </li>
-  <!-- <li ng-if="fConfigSys.valores[5]">
-    <a href class="auto">      
-      <span class="pull-right text-muted">
-        <i class="fa fa-fw fa-angle-right text"></i>
-        <i class="fa fa-fw fa-angle-down text-active"></i>
-      </span>
-      <i class="glyphicon glyphicon-user icon text-primary-dker"></i>
-      <span class="font-bold"> Historia Médica </span>
-    </a> -->
-    <!-- <ul class="nav nav-sub dk">
-      <li class="nav-sub-header">
-        <a href>
-          <span> Historia Médica</span>
-        </a>
-      </li>
-      <li ui-sref-active="active">
-        <a ui-sref="app.atencion-medica"> 
-          <span>Atención Médica</span>
-        </a>
-      </li>
-      <li ui-sref-active="active">
-        <a ui-sref="app.historial-atencion"> 
-          <span>Historial</span>
-        </a>
-      </li>
-    </ul> -->
-  <!-- </li> -->
   <!-- CENTRAL DE REPORTES --> 
   <li ng-if="fConfigSys.valores[6]" ui-sref-active="active">
     <a ui-sref="app.central-reportes">
       <i class="glyphicon glyphicon-stats icon text-primary-dker"></i>
       <span class="font-bold"> Reportes </span> 
+    </a>
+  </li>
+  <!-- DOCUMENTOS -->
+  <li ui-sref-active="active" ng-if="fConfigSys.valores[7]">
+    <a ui-sref="app.documento">
+      <i class="glyphicon glyphicon-stats icon text-primary-dker"></i>
+      <span class="font-bold"> Documentos </span>
     </a>
   </li>
   <li class="line dk hidden-folded"></li>

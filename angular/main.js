@@ -139,10 +139,13 @@ angular.module('app')
               $scope.fConfigSys.valores = [true,true,true,true,true,true,true,true,true];
             }
             if($scope.fSessionCI.keyPerfil == 'key_rep'){
-              $scope.fConfigSys.valores = [false,false,true,false,true,false,false];
+              $scope.fConfigSys.valores = [false,false,true,false,true,false,false,true];
             }
             if($scope.fSessionCI.keyPerfil == 'key_med'){
-              $scope.fConfigSys.valores = [false,false,false,false,false,true,false];
+              $scope.fConfigSys.valores = [false,false,false,false,false,true,false,false];
+            }
+            if($scope.fSessionCI.keyPerfil == 'key_cont'){
+              $scope.fConfigSys.valores = [false,false,false,false,false,false,false,true];
             }
             // $scope.getListaEmpresasSession();
             $scope.logIn();
@@ -157,6 +160,9 @@ angular.module('app')
             }
             if($scope.fSessionCI.keyPerfil == 'key_rep'){
               $location.path('/app/reserva-cita');
+            }
+            if($scope.fSessionCI.keyPerfil == 'key_cont'){
+              $location.path('/app/documento');
             }
           }else{
             $scope.fSessionCI = {};

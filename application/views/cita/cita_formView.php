@@ -292,6 +292,6 @@
 
 <div class="modal-footer">
     <button class="btn btn-danger pull-left" ng-click="btnAnular(fData)" ng-if="fData.accion == 'edit' && bool">Anular</button>
-    <button ng-if="(fSessionCI.keyPerfil == 'key_root') || (fData.tipoCita != '3')" class="btn btn-primary" ng-click="aceptar(); $event.preventDefault();" ng-disabled="formCita.$invalid">Aceptar</button>
+    <button class="btn btn-primary" ng-click="aceptar(); $event.preventDefault();" ng-disabled="formCita.$invalid">Aceptar</button>
     <button class="btn btn-warning" ng-click="cancel()">Cerrar </button>
 </div>

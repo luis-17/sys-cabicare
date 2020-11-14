@@ -116,6 +116,13 @@ angular.module('app')
               'angular/controllers/UsuarioCtrl.js'
             ])
           })
+          .state('app.documento', {
+            url: '/documento',
+            templateUrl: 'tpl/documento.html',
+            resolve: load([
+              'angular/controllers/DocumentoCtrl.js'
+            ])
+          })
           .state('app.central-reportes', {
             url: '/central-reportes',
             templateUrl: 'tpl/central-reportes.html',
