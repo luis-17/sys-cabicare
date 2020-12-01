@@ -454,7 +454,7 @@ class CentralReportes extends CI_Controller {
     $fill = TRUE;
     $headerDetalle = array('N°', 'FECHA AT.', 'PACIENTE', 'N° DOC.', 'TIPO PROD.', 'PRODUCTO', 'M. PAGO', 'PRECIO');
     $this->pdf->SetAligns(array('L', 'C', 'L', 'C', 'L', 'R', 'C', 'R'));
-    $this->pdf->SetWidths(array(5, 22, 70, 20, 28, 85, 30, 25));
+    $this->pdf->SetWidths(array(15, 22, 70, 20, 28, 85, 30, 25));
     if($allInputs['tipoReporte']['id'] === 'RPP'){
       $headerDetalle = array('N°', 'PRODUCTO', 'CANTIDAD', 'MONTO');
       $this->pdf->SetAligns(array('L', 'C', 'R', 'R'));

@@ -736,9 +736,9 @@ class Model_cita extends CI_Model {
 		$this->db->join('usuario us', 'ci.medicoId = us.id');
 		$this->db->join('citaproducto cp', 'ci.id = cp.citaId');
 		$this->db->join('producto pr', 'cp.productoId = pr.id');
-		// $this->db->join('paciente pa', 'ci.pacienteId = pa.id');
+		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
 		$this->db->where('ci.estado', 3);
-		// $this->db->where('pa.estado', 1);
+		$this->db->where('pa.estado', 1);
 		$this->db->where('cp.estado', 1);
 		if($params['origen']['id'] === 'INT'){
 			$this->db->where('pr.procedencia', 'INT');
