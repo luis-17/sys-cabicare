@@ -15,6 +15,23 @@
 			<label class="control-label mb-n"> Categoria <small class="text-danger">*</small>: </label>
 			<select class="form-control input-sm" ng-model="fDataDoc.categoria" required ng-options="item as item.descripcion for item in fArr.listaCategoria"></select>
 		</div>
+		<div class="form-group col-sm-6 mb-md">
+			<label class="control-label mb-n"> Moneda <small class="text-danger">*</small>: </label>
+			<select class="form-control input-sm" ng-model="fDataDoc.moneda" required ng-options="item as item.descripcion for item in fArr.listaMoneda"></select>
+		</div>
+		<div class="form-group col-md-6 mb-md">
+			<label class="control-label mb-n"> N° Serie / Factura </label>
+			<div class="group-bloque" style="display:flex;">
+				<input type="text" class="form-control input-sm" ng-model="fDataDoc.numSerie" placeholder="Ingrese N° Serie" 
+					style="width: 100px; margin-right: 4px;" />
+				<input type="text" class="form-control input-sm" ng-model="fDataDoc.numDoc" placeholder="Ingrese N° Doc." 
+					style="" />
+			</div>
+		</div>
+		<div class="form-group col-md-6 mb-md">
+			<label class="control-label mb-n"> RUC </label>
+			<input type="text" class="form-control input-sm" ng-model="fDataDoc.ruc" placeholder="Ingrese RUC" />
+		</div>
 		<div class="form-group col-md-6 mb-md">
 			<label class="control-label mb-n"> Código Interno </label>
 			<input type="text" class="form-control input-sm" ng-model="fDataDoc.codigoExterno" placeholder="Ingrese cod. externo" />

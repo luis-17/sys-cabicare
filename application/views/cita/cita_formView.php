@@ -262,6 +262,35 @@
 				</div>
 			</div>
 			<hr>
+			<div class="row">
+				<div class="col-sm-12">
+					<h3> Datos de Pago</h3>
+				</div>
+				<div class="form-group col-md-4 mb-md">
+					<label class="control-label mb-n"> N° Serie / Factura </label>
+					<div class="group-bloque" style="display:flex;">
+						<input type="text" class="form-control input-sm" ng-model="fData.numSerie" placeholder="Ingrese N° Serie" 
+							style="width: 100px; margin-right: 4px;" />
+						<input type="text" class="form-control input-sm" ng-model="fData.numDoc" placeholder="Ingrese N° Doc." 
+							style="" />
+					</div>
+				</div>
+				<div class="form-group col-md-4 mb-md">
+					<label class="control-label mb-n"> Método de Pago </label>
+					<select class="form-control input-sm" ng-model="fData.metodoPago" ng-options="item as item.descripcion for item in fArr.listaMetodoPago" tabindex="60" ></select> 
+				</div>
+				<div class="form-group col-md-4 mb-md">
+					<label class="control-label mb-n"> N° de Operación </label>
+					<input type="text" class="form-control input-sm" ng-model="fData.numOperacion" placeholder="Ingrese número de operación" tabindex="50" />
+				</div>
+				<div class="form-group col-md-12 mb-md">
+					<label class="control-label mb-n"> Anotaciones </label>
+					<textarea class="form-control input-sm" ng-model="fData.anotacionesPago" placeholder="Anotaciones" tabindex="200" rows="5"></textarea>
+				</div>
+			</div>
+			
+
+			<hr>
 			<div class="row" ng-if="fData.tipoCita == '3'">
 				<div class="col-sm-12">
 					<h3> Datos de atención</h3>

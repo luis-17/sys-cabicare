@@ -15,7 +15,7 @@ class Cita extends CI_Controller {
 		$this->sessionFactur = @$this->session->userdata('sess_cabi_'.substr(base_url(),-20,7));
 		date_default_timezone_set("America/Lima");
 
-    }
+  }
 
 	public function listar_citas_en_grilla()
 	{
@@ -83,9 +83,11 @@ class Cita extends CI_Controller {
           'medioContacto'=> array(
 						'id'=> $row['medioContacto'],
 						'descripcion'=> $row['medioContacto']
-         	),
-					'numOperacion'=> $row['numOperacion'],
-					'anotacionesPago'=> $row['anotacionesPago'],
+					 ),
+					 'numSerie' => $row['numSerie'],
+					 'numDoc' => $row['numDoc'], 
+					'numOperacion' => $row['numOperacion'],
+					'anotacionesPago' => $row['anotacionesPago'],
           'metodoPago'=> array(
 						'id'=> $row['metodoPago'],
 						'descripcion'=> $row['metodoPago']
@@ -323,6 +325,14 @@ class Cita extends CI_Controller {
 						'id'=> $row['medioContacto'],
 						'descripcion'=> $row['medioContacto']
 					),
+					'numSerie' => $row['numSerie'],
+					'numDoc' => $row['numDoc'],
+					'numOperacion' => $row['numOperacion'],
+					'anotacionesPago' => $row['anotacionesPago'],
+          'metodoPago'=> array(
+						'id'=> $row['metodoPago'],
+						'descripcion'=> $row['metodoPago']
+					),
 					'className' => $clases,
 					'start' => $row['fechaCita'] .' '. $row['horaDesde'],
 					'end' => $row['fechaCita'] .' '. $row['horaHasta'],
@@ -470,6 +480,11 @@ class Cita extends CI_Controller {
       'estado'				=> $allInputs['tipoCita'],
 			'medioContacto'			=> empty($allInputs['medioContacto']) ? NULL : $allInputs['medioContacto']['id'],
 			'smsEnviadoCita'	=> 'POR_ENVIAR',
+			'metodoPago' => $allInputs['metodoPago']['id'],
+			'numSerie' => empty($allInputs['numSerie']) ? NULL : $allInputs['numSerie'],
+			'numDoc' => empty($allInputs['numDoc']) ? NULL : $allInputs['numDoc'],
+			'numOperacion' => empty($allInputs['numOperacion']) ? NULL : $allInputs['numOperacion'],
+			'anotacionesPago' => empty($allInputs['anotacionesPago']) ? NULL : $allInputs['anotacionesPago'],
 			'createdAt'				=> date('Y-m-d H:i:s'),
 			'updatedAt'				=> date('Y-m-d H:i:s')
 		);
@@ -594,6 +609,11 @@ class Cita extends CI_Controller {
 			'observaciones'			=> empty($allInputs['observaciones']) ? NULL : $allInputs['observaciones'],
 			'estado'				=> $allInputs['tipoCita'],
 			'medioContacto'			=> empty($allInputs['medioContacto']) ? NULL : $allInputs['medioContacto']['id'],
+			'metodoPago' => $allInputs['metodoPago']['id'],
+			'numSerie' => empty($allInputs['numSerie']) ? NULL : $allInputs['numSerie'],
+			'numDoc' => empty($allInputs['numDoc']) ? NULL : $allInputs['numDoc'],
+			'numOperacion' => empty($allInputs['numOperacion']) ? NULL : $allInputs['numOperacion'],
+			'anotacionesPago' => empty($allInputs['anotacionesPago']) ? NULL : $allInputs['anotacionesPago'],
 			'updatedAt'				=> date('Y-m-d H:i:s')
 		);
 

@@ -51,6 +51,13 @@ class Documento extends CI_Controller {
 						'id' => $row['categoria'],
 						'descripcion' => $row['categoria'],
 					),
+					'moneda' => array(
+						'id' => $row['moneda'],
+						'descripcion' => $row['moneda'],
+					),
+					'ruc' => $row['ruc'],
+					'numDoc' => $row['numDoc'],
+					'numSerie' => $row['numSerie'],
 					'codigoExterno' => $row['codigoExterno'],
 					'fechaCreacion' => darFormatoDMY($row['fechaCreacion']),
 					'observaciones' => $row['observaciones'],
@@ -124,6 +131,12 @@ class Documento extends CI_Controller {
 		$allInputs['codigoExterno'] = $this->input->post('codigoExterno');
 		$allInputs['observaciones'] = $this->input->post('observaciones');
 		$allInputs['monto'] = $this->input->post('monto');
+
+		$allInputs['numDoc'] = $this->input->post('numDoc');
+		$allInputs['numSerie'] = $this->input->post('numSerie');
+		$allInputs['moneda'] = $this->input->post('moneda');
+		$allInputs['ruc'] = $this->input->post('ruc');
+
 		$allInputs['fechaSubida'] = date('Y-m-d H:i:s');
 		$this->db->trans_start();
 		if( !empty($_FILES['nombreArchivo_blob']) ){
@@ -166,7 +179,7 @@ class Documento extends CI_Controller {
         </body>
       </html>';
        
-		mail($to, $subject, $message, $headers);
+		// mail($to, $subject, $message, $headers);
 			
 		$this->db->trans_complete();
 		$this->output

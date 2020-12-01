@@ -4,26 +4,41 @@
 <div class="modal-body">
 	<form class="row" name="formDocumento">
 		<div class="form-group col-sm-6 mb-md">
-			<label class="control-label mb-n"> PERIODO</label>
+			<label class="control-label mb-n block"> PERIODO</label>
 			<label> {{fDataDoc.mes.descripcion}} - {{fDataDoc.anio.descripcion}} </label>
 		</div>
 		<div class="form-group col-sm-6 mb-md">
-            <label class="control-label mb-n"> Categoria</label>
+            <label class="control-label mb-n block"> Categoria</label>
             <label> {{fDataDoc.categoria.descripcion}} </label>
         </div>
         <div class="form-group col-sm-6 mb-md">
-            <label class="control-label mb-n"> Código Interno</label>
+            <label class="control-label mb-n block"> Código Interno</label>
             <label> {{fDataDoc.codigoExterno}} </label>
         </div>
         <div class="form-group col-sm-6 mb-md">
-            <label class="control-label mb-n"> Monto</label>
+            <label class="control-label mb-n block"> Monto</label>
             <label> {{fDataDoc.monto}} </label>
         </div>
         <div class="form-group col-sm-6 mb-md">
-            <label class="control-label mb-n"> Anotaciones</label>
+            <label class="control-label mb-n block"> RUC</label>
+            <label> {{fDataDoc.ruc}} </label>
+        </div>
+        <div class="form-group col-sm-6 mb-md">
+            <label class="control-label mb-n block"> N° Serie / N° Doc</label>
+            <label> {{fDataDoc.numSerie}} - {{fDataDoc.numDoc}}</label>
+		</div>
+		<!-- <div class="form-group col-sm-6 mb-md">
+            <label class="control-label mb-n block"> N° Doc. </label>
+            <label> {{fDataDoc.numDoc}} </label>
+        </div> -->
+        <div class="form-group col-sm-6 mb-md">
+            <label class="control-label mb-n block"> Moneda</label>
+            <label> {{fDataDoc.moneda.descripcion}} </label>
+        </div>
+        <div class="form-group col-sm-6 mb-md">
+            <label class="control-label mb-n block"> Anotaciones</label>
             <label> {{fDataDoc.observaciones}} </label>
 		</div>
-		
 		<div class="form-group mb-md col-sm-6">
             <label class="control-label minotaur-label mb-xs"> ARCHIVO </label>
             <div class="block">

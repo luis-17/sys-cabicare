@@ -52,6 +52,12 @@ app.controller('DocumentoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '
 			{id: 'BALANCES', descripcion: 'BALANCES' },
 			{id: 'EECC', descripcion: 'EECC' },
 			{id: 'OTROS', descripcion: 'OTROS' }
+    ];
+
+    $scope.fArr.listaMoneda = [
+      {id : '', descripcion:'--Seleccione moneda--'},
+      {id: 'SOLES', descripcion: 'SOLES'},
+			{id: 'DOLARES', descripcion: 'DOLARES' }
 		];
 
 		$scope.fArr.listaMesFiltro = [
@@ -81,6 +87,7 @@ app.controller('DocumentoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '
     $scope.fArr.listaCategoriaFiltro = [
       {id : 'ALL', descripcion:'TODOS'},
       {id: 'FACTURAS', descripcion: 'FACTURAS'},
+      {id: 'BOLETA', descripcion: 'BOLETA'},
 			{id: 'RECIBOS', descripcion: 'RECIBOS' },
 			{id: 'RXH', descripcion: 'RXH' },
 			{id: 'BALANCES', descripcion: 'BALANCES' },
@@ -338,7 +345,8 @@ app.factory("DocumentoFactory", function($uibModal, pinesNotifications, blockUI,
 						// formData.append($scope.fDataDoc.anio.descripcion, 'anio');
 						// formData.append($scope.fDataDoc.categoria.descripcion, 'categoria');
 
-						formData.append('mes', $scope.fDataDoc.mes.id);
+            formData.append('moneda', $scope.fDataDoc.moneda.id);
+            formData.append('mes', $scope.fDataDoc.mes.id);
 						formData.append('anio', $scope.fDataDoc.anio.id);
 						formData.append('categoria', $scope.fDataDoc.categoria.id);
 						
@@ -391,7 +399,7 @@ app.factory("DocumentoFactory", function($uibModal, pinesNotifications, blockUI,
 					$scope.titleForm = 'Ver documento';
 					/* BOTONES FINALES */
 					$scope.cancel = function () {
-							$uibModalInstance.dismiss('cancel');
+						$uibModalInstance.dismiss('cancel');
 					}
 				},
 				resolve: {

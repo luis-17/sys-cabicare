@@ -40,7 +40,9 @@ class Model_cita extends CI_Model {
 			pa.numeroDocumento,
 			ci.medicoId,
 			concat_ws(' ', us.nombres, us.apellidos) AS medico,
-			ci.anotacionesPago
+			ci.anotacionesPago,
+			ci.numDoc,
+			ci.numSerie
 		", FALSE);
 		$this->db->from('cita ci');
 		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
@@ -101,7 +103,9 @@ class Model_cita extends CI_Model {
 			pa.numeroDocumento,
 			ci.medicoId,
 			concat_ws(' ', us.nombres, us.apellidos) AS medico,
-			ci.anotacionesPago
+			ci.anotacionesPago,
+			ci.numSerie,
+			ci.numDoc
 		", FALSE);
 		$this->db->from('cita ci');
 		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
@@ -316,7 +320,12 @@ class Model_cita extends CI_Model {
 			concat_ws(' ', pa.nombres, pa.apellidoPaterno, pa.apellidoMaterno) AS paciente,
 			pa.numeroDocumento,
 			ci.medicoId,
-			concat_ws(' ', us.nombres, us.apellidos) AS medico
+			concat_ws(' ', us.nombres, us.apellidos) AS medico,
+			ci.numOperacion,
+			ci.anotacionesPago,
+			ci.metodoPago,
+			ci.numSerie,
+			ci.numDoc
 		", FALSE);
 		$this->db->from('cita ci');
 		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
@@ -325,6 +334,7 @@ class Model_cita extends CI_Model {
 		$this->db->where('pa.estado', 1);
 		return $this->db->get()->result_array();
 	}
+
 	public function m_cargar_detalle_cita($datos)
 	{
 		$this->db->select("

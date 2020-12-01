@@ -695,6 +695,7 @@ app.factory("ReservaCitasFactory",
 					$scope.titleForm = 'Registro de Cita';
 					// $scope.fArr.listaTipoCita.splice(0, 0, { id: "", descripcion: '--Seleccione tipo cita--' });
 					$scope.fData.medioContacto = $scope.fArr.listaMedioContacto[0];
+					$scope.fData.metodoPago = $scope.fArr.listaMetodoPago[0];
 
 					$scope.fData.sede = $scope.fArr.listaSedes[0];
 
@@ -1069,11 +1070,20 @@ app.factory("ReservaCitasFactory",
 					$scope.titleForm = 'Edición de Cita';
 
 					$scope.fData.sede = $scope.fArr.listaSedes[0];
-          //BINDEO MEDIO CONTACTO
+          // BINDEO MEDIO CONTACTO
           var objIndexCp = $scope.fArr.listaMedioContacto.filter(function(obj) {
             return obj.id == $scope.fData.medioContacto.id;
           }).shift();
           $scope.fData.medioContacto = objIndexCp;
+
+					// BINDEO METODO PAGO
+          var objIndexMp = $scope.fArr.listaMetodoPago.filter(function(obj) {
+            return obj.id == $scope.fData.metodoPago.id;
+          }).shift();
+          $scope.fData.metodoPago = objIndexMp;
+          if ( !$scope.fData.metodoPago ) {
+            $scope.fData.metodoPago = $scope.fArr.listaMetodoPago[0];
+					}
 
 					/* DATEPICKERS */
 					$scope.configDP = {};
