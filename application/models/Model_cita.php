@@ -632,9 +632,9 @@ class Model_cita extends CI_Model {
 			$this->db->where('pr.procedencia', 'EXT');
 		}
 		$this->db->where('ci.estado', 3);
-		$this->db->where("DATE(ci.fechaAtencion) BETWEEN '" . darFormatoYMD($params['desde']) ."' AND '" . darFormatoYMD($params['hasta'])."'");
+		$this->db->where("DATE(ci.fechaCita) BETWEEN '" . darFormatoYMD($params['desde']) ."' AND '" . darFormatoYMD($params['hasta'])."'");
 		$this->db->where('ci.medicoId', $params['medico']['id']);
-		$this->db->order_by('ci.fechaAtencion', 'ASC');
+		$this->db->order_by('ci.fechaCita', 'ASC');
 		return $this->db->get()->result_array();
 	}
 	public function m_obtener_produccion_medicos_group_producto($params)
@@ -653,7 +653,7 @@ class Model_cita extends CI_Model {
 		if($params['origen']['id'] === 'EXT'){
 			$this->db->where('pr.procedencia', 'EXT');
 		}
-		$this->db->where("DATE(ci.fechaAtencion) BETWEEN '" . darFormatoYMD($params['desde']) ."' AND '" . darFormatoYMD($params['hasta'])."'");
+		$this->db->where("DATE(ci.fechaCita) BETWEEN '" . darFormatoYMD($params['desde']) ."' AND '" . darFormatoYMD($params['hasta'])."'");
 		$this->db->where('ci.medicoId', $params['medico']['id']);
 		$this->db->group_by('pr.id');
 		if($params['orden']['id'] == 'OC'){
@@ -698,8 +698,8 @@ class Model_cita extends CI_Model {
 			$this->db->where('pr.procedencia', 'EXT');
 		}
 		$this->db->where('ci.estado', 3);
-		$this->db->where("DATE(ci.fechaAtencion) BETWEEN '" . darFormatoYMD($params['desde']) ."' AND '" . darFormatoYMD($params['hasta'])."'");
-		$this->db->order_by('ci.fechaAtencion', 'ASC');
+		$this->db->where("DATE(ci.fechaCita) BETWEEN '" . darFormatoYMD($params['desde']) ."' AND '" . darFormatoYMD($params['hasta'])."'");
+		$this->db->order_by('ci.fechaCita', 'ASC');
 		// $this->db->where('ci.medicoId', $params['medico']['id']);
 		return $this->db->get()->result_array();
 	}
@@ -719,7 +719,7 @@ class Model_cita extends CI_Model {
 		if($params['origen']['id'] === 'EXT'){
 			$this->db->where('pr.procedencia', 'EXT');
 		}
-		$this->db->where("DATE(ci.fechaAtencion) BETWEEN '" . darFormatoYMD($params['desde']) ."' AND '" . darFormatoYMD($params['hasta'])."'");
+		$this->db->where("DATE(ci.fechaCita) BETWEEN '" . darFormatoYMD($params['desde']) ."' AND '" . darFormatoYMD($params['hasta'])."'");
 		$this->db->group_by('pr.id');
 		if($params['orden']['id'] == 'OC'){
 			$this->db->order_by('COUNT(*)', 'DESC');
@@ -746,7 +746,7 @@ class Model_cita extends CI_Model {
 		if($params['origen']['id'] === 'EXT'){
 			$this->db->where('pr.procedencia', 'EXT');
 		}
-		$this->db->where("DATE(ci.fechaAtencion) BETWEEN '" . darFormatoYMD($params['desde']) ."' AND '" . darFormatoYMD($params['hasta'])."'");
+		$this->db->where("DATE(ci.fechaCita) BETWEEN '" . darFormatoYMD($params['desde']) ."' AND '" . darFormatoYMD($params['hasta'])."'");
 		$this->db->group_by('ci.medicoId');
 		if($params['orden']['id'] == 'OC'){
 			$this->db->order_by('COUNT(*)', 'DESC');
