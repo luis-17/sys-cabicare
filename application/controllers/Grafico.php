@@ -220,4 +220,34 @@ class Grafico extends CI_Controller {
 			->set_content_type('application/json')
 			->set_output(json_encode($arrData));
 	}
+
+	public function listar_pacientes_embarazo()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		// PACIENTES EMBARAZO
+		$arrResult = array();
+		$lista = $this->model_grafico->m_pacientes_embarazo($allInputs['datos']);
+		foreach ($lista as $key => $row) { 
+			$rowSliced = FALSE;
+			$rowSelected = FALSE;
+			if($key === 0){ 
+				$rowSliced = TRUE;
+				$rowSelected = TRUE;
+			}
+			$arrResult[] = array( 
+				'name'=> $row['gestando'] == '1' ? 'EMBARAZADAS' : 'NO EMBARAZADAS',
+				'y'=> (float)$row['contador'],
+				'sliced'=> $rowSliced,
+				'selected'=> $rowSelected
+			);
+		}
+		
+		
+		$arrData['datos'] = $arrResult;
+		$arrData['message'] = '';
+		$arrData['flag'] = 1;
+		$this->output
+			->set_content_type('application/json')
+			->set_output(json_encode($arrData));
+	}
 }

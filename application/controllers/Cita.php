@@ -763,8 +763,8 @@ class Cita extends CI_Controller {
 
 		$data = array(
 			'fechaAtencion' => date('Y-m-d H:i:s'),
-      'estado' => 3,
-			'gestando' => empty($allInputs['gestando']) ? NULL : $allInputs['gestando']['id'],
+      		'estado' => 3,
+			'gestando' => empty($allInputs['gestando']) ? 2 : $allInputs['gestando']['id'],
 			'fechaUltimaRegla' => date('Y-m-d',strtotime($allInputs['fechaUltimaRegla'])),
 			'fechaProbableParto' => $allInputs['fechaProbableParto'],
 			'semanaGestacion' => $allInputs['semanaGestacion'],

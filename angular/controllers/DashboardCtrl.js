@@ -62,6 +62,10 @@ app.controller('DashboardCtrl', [
     $scope.fBusquedaPPD.fin = moment().format('DD-MM-YYYY');
     $scope.fBusquedaPPD.ultimo = $scope.fArr.listaUltimosDist[0];
 
+    $scope.fBusquedaEMB = {};
+    $scope.fBusquedaEMB.inicio = moment().format('01-01-YYYY');
+    $scope.fBusquedaEMB.fin = moment().format('DD-MM-YYYY');
+
     $scope.fBusquedaMMC = {};
     $scope.fBusquedaMMC.anio = $scope.fArr.listaAnio[0];
     $scope.fBusquedaMMC.mc = $scope.fArr.listaMC[0];
@@ -199,6 +203,50 @@ app.controller('DashboardCtrl', [
 		};
     $scope.consultarPacientePorDistrito();
 
+    $scope.fData.chartPacPorEmb = { 
+      chart: { 
+        type: 'pie',
+        height: 350,
+      },
+      title: {
+        text: 'PACIENTES VS EMBARAZADAS'
+      },
+      tooltip: {
+        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>' 
+      },
+      plotOptions: {
+        pie: {
+          allowPointSelect: true,
+          cursor: 'pointer',
+          dataLabels: {
+            enabled: false
+          },
+          showInLegend: true
+        }
+      },
+      legend: {
+        labelFormat: '{name} ( {y} )' 
+      },
+      series: [{ 
+        name: '',
+        colorByPoint: true,
+        data: [],
+      }]
+    };
+    $scope.consultarPacientePorEmb = function () {
+			blockUI.start('Procesando información...');
+			var arrParams = {
+				datos: $scope.fBusquedaEMB
+			};
+			GraficoServices.sListarPacPorEmb(arrParams).then(function (rpta) {
+				if (rpta.datos.length > 0) {
+					$scope.fData.chartPacPorEmb.series[0].data = angular.copy(rpta.datos);
+				}
+				blockUI.stop();
+			});
+		};
+    $scope.consultarPacientePorEmb();
+
     $scope.fData.chartProdMedicoMes = {
       chart: {
         type: 'column',
@@ -294,6 +342,7 @@ app.service("GraficoServices",function($http, $q, handleBehavior) {
     sListarPacPorDist: sListarPacPorDist,
     sListarProdMedico: sListarProdMedico,
     sListarProdMedicoTiempo: sListarProdMedicoTiempo,
+    sListarPacPorEmb: sListarPacPorEmb,
   });
   function sListarPacienteRecom(datos) {
     var request = $http({
@@ -331,6 +380,14 @@ app.service("GraficoServices",function($http, $q, handleBehavior) {
     var request = $http({
       method : "post",
       url: angular.patchURLCI +"Grafico/listar_prod_medico_tiempo",
+      data : datos
+    });
+    return (request.then(handleBehavior.success,handleBehavior.error));
+  }
+  function sListarPacPorEmb(datos) {
+    var request = $http({
+      method : "post",
+      url: angular.patchURLCI +"Grafico/listar_pacientes_embarazo",
       data : datos
     });
     return (request.then(handleBehavior.success,handleBehavior.error));

@@ -21,8 +21,8 @@ class Model_documento extends CI_Model {
         if( $paramDatos['anio']['id'] != 'ALL' ){
             $this->db->where('do.anio', $paramDatos['anio']['id']);
         }
-
-        if( $this->sessionFactur['keyPerfil'] != 'key_root' || $this->sessionFactur['keyPerfil'] != 'key_cont' ){
+		
+        if( !($this->sessionFactur['keyPerfil'] == 'key_root' || $this->sessionFactur['keyPerfil'] == 'key_cont') ){
             $this->db->where('do.usuarioEnvioId', $this->sessionFactur['usuarioId']);
         }
 		

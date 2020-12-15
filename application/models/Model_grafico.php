@@ -95,4 +95,22 @@ class Model_grafico extends CI_Model {
 		); 
 		return $query->result_array();
 	}
+
+	public function m_pacientes_embarazo($paramDatos)
+	{
+		$sql = 'SELECT COUNT(*) AS contador, ci.gestando
+					FROM paciente pa 
+					INNER JOIN cita ci ON pa.id = ci.pacienteId
+					WHERE pa.estado = 1 
+					AND ci.estado IN (2, 3)
+					AND DATE(ci.fechaCita) BETWEEN ? AND ? 
+					GROUP BY ci.gestando'; 
+		$query = $this->db->query($sql, 
+			array(
+				darFormatoYMD($paramDatos['inicio']), 
+				darFormatoYMD($paramDatos['fin'])
+			) 
+		); 
+		return $query->result_array();
+	}
 }
