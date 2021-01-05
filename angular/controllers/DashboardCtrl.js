@@ -36,6 +36,10 @@ app.controller('DashboardCtrl', [
       { id: 'CPM', descripcion: 'CITAS POR MES' },
       { id: 'PNPM', descripcion: 'PACIENTES NUEVOS POR MES' }
     ];
+    $scope.fArr.listaTLE = [
+      { id: 'ALL', descripcion: 'GENERAL' },
+      { id: 'PM', descripcion: 'POR MÉDICO' }
+    ];
     $scope.fArr.listaAnio = [
       { id: 2020, descripcion: '2020' },
       { id: 2021, descripcion: '2021' },
@@ -69,6 +73,10 @@ app.controller('DashboardCtrl', [
     $scope.fBusquedaMMC = {};
     $scope.fBusquedaMMC.anio = $scope.fArr.listaAnio[0];
     $scope.fBusquedaMMC.mc = $scope.fArr.listaMC[0];
+
+    $scope.fBusquedaTLE = {};
+    $scope.fBusquedaTLE.anio = $scope.fArr.listaAnio[0];
+    $scope.fBusquedaTLE.tipoTLE = $scope.fArr.listaTLE[0];
 
     $scope.fData = {};
     $scope.fData.chartMedioContacto = { 
@@ -333,6 +341,50 @@ app.controller('DashboardCtrl', [
       });
     };
     $scope.consultarProdMedicoTiempo();
+
+    $scope.fData.chartPacienteEmbTL = {
+      chart: { 
+        type: 'line',
+        height: 350,
+      },
+      title: {
+        text: 'Pacientes Embarazadas - General / Por médico'
+      },
+      subtitle: {
+        text: 'Fuente: Cabicare'
+      },
+      yAxis: {
+        title: {
+          text: 'Cant.'
+        }
+      },
+      xAxis: {
+        categories: []
+      },
+      legend: {
+          align: 'center'
+      },
+      plotOptions: {
+        series: {
+          label: {
+            connectorAllowed: false
+          }
+        }
+      },
+      series: []
+    };
+    $scope.consultarPacientePorEmbTL = function () {
+			blockUI.start('Procesando información...');
+			var arrParams = {
+				datos: $scope.fBusquedaTLE
+			};
+			GraficoServices.sListarPacPorEmbTL(arrParams).then(function (rpta) {
+        $scope.fData.chartPacienteEmbTL.xAxis.categories = angular.copy(rpta.datos.categories);
+        $scope.fData.chartPacienteEmbTL.series = angular.copy(rpta.datos.series);
+				blockUI.stop();
+      });
+    };
+    $scope.consultarPacientePorEmbTL();
 }]);
 
 app.service("GraficoServices",function($http, $q, handleBehavior) {
@@ -343,6 +395,7 @@ app.service("GraficoServices",function($http, $q, handleBehavior) {
     sListarProdMedico: sListarProdMedico,
     sListarProdMedicoTiempo: sListarProdMedicoTiempo,
     sListarPacPorEmb: sListarPacPorEmb,
+    sListarPacPorEmbTL: sListarPacPorEmbTL,
   });
   function sListarPacienteRecom(datos) {
     var request = $http({
@@ -388,6 +441,14 @@ app.service("GraficoServices",function($http, $q, handleBehavior) {
     var request = $http({
       method : "post",
       url: angular.patchURLCI +"Grafico/listar_pacientes_embarazo",
+      data : datos
+    });
+    return (request.then(handleBehavior.success,handleBehavior.error));
+  }
+  function sListarPacPorEmbTL(datos) {
+    var request = $http({
+      method : "post",
+      url: angular.patchURLCI +"Grafico/listar_pacientes_embarazo_timeline",
       data : datos
     });
     return (request.then(handleBehavior.success,handleBehavior.error));

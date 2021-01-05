@@ -163,6 +163,28 @@
             <highchart id="chartProdMedicoTiempo" config="fData.chartProdMedicoTiempo" class="col-xs-12"></highchart>
           </div>
         </div>
+        <div class="col-xs-12 col-sm-12 col-lg-12">
+          <div class="panel p col-lg-12 row">
+            <div class="boxform">
+              <div class="form-group inline">
+                <label> Tipo </label>
+                <select ng-model="fBusquedaTLE.tipoTLE" class="form-control input-xs" 
+                ng-options="item as item.descripcion for item in fArr.listaTLE"> </select>
+              </div>
+              <div class="form-group inline">
+                <label> Año </label>
+                <select ng-model="fBusquedaTLE.anio" class="form-control input-xs" 
+                ng-options="item as item.descripcion for item in fArr.listaAnio"> </select>
+              </div>
+              <div class="form-group inline">
+                <button type="button" class="btn btn-info btn-xs" ng-click="consultarPacientePorEmbTL();">
+                  <i class="fa fa-refresh"></i> PROCESAR
+                </button>
+              </div>
+            </div>
+            <highchart id="chartPacienteEmbTL" config="fData.chartPacienteEmbTL" class="col-xs-12"></highchart>
+          </div>
+        </div>
       </div>
     </div>
   </div>

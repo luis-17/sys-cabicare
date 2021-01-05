@@ -113,4 +113,50 @@ class Model_grafico extends CI_Model {
 		); 
 		return $query->result_array();
 	}
+
+	public function m_pacientes_embarazo_tl_general($paramDatos)
+	{
+		$sql = 'SELECT COUNT(*) AS contador, 
+							MONTHNAME(ci.fechaCita) AS mes, 
+							MONTH(ci.fechaCita) AS numMes,
+							ci.gestando
+					FROM paciente pa 
+					INNER JOIN cita ci ON pa.id = ci.pacienteId
+					WHERE pa.estado = 1 
+					AND ci.estado IN (2, 3)
+					AND YEAR(ci.fechaCita) = ?
+					AND ci.gestando = 1
+					GROUP BY MONTHNAME(ci.fechaCita), MONTH(ci.fechaCita), ci.gestando
+					ORDER BY MONTH(ci.fechaCita), ci.gestando';
+		$query = $this->db->query($sql, 
+			array(
+				$paramDatos['anio']['id']
+			)
+		);
+		return $query->result_array();
+	}
+	public function m_pacientes_embarazo_tl_medico($paramDatos)
+	{
+		$sql = 'SELECT COUNT(*) AS contador, 
+							MONTHNAME(ci.fechaCita) AS mes, 
+							MONTH(ci.fechaCita) AS numMes,
+							us.nombres AS medico,
+							ci.gestando
+					FROM paciente pa
+					INNER JOIN cita ci ON pa.id = ci.pacienteId
+					INNER JOIN usuario us ON ci.medicoId = us.id
+					WHERE pa.estado = 1 
+					AND us.estado = 1 
+					AND ci.estado IN (2, 3)
+					AND YEAR(ci.fechaCita) = ?
+					AND ci.gestando = 1
+					GROUP BY MONTHNAME(ci.fechaCita), MONTH(ci.fechaCita), us.nombres, ci.gestando
+					ORDER BY MONTH(ci.fechaCita), us.nombres, ci.gestando';
+		$query = $this->db->query($sql, 
+			array(
+				$paramDatos['anio']['id']
+			)
+		);
+		return $query->result_array();
+	}
 }
