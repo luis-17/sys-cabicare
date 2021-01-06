@@ -98,7 +98,7 @@ class Model_grafico extends CI_Model {
 
 	public function m_pacientes_embarazo($paramDatos)
 	{
-		$sql = 'SELECT COUNT(*) AS contador, COALESCE(ci.gestando, 2) 
+		$sql = 'SELECT COUNT(*) AS contador, COALESCE(ci.gestando, 2) AS gestando 
 					FROM paciente pa 
 					INNER JOIN cita ci ON pa.id = ci.pacienteId
 					WHERE pa.estado = 1 
