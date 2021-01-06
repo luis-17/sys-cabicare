@@ -98,13 +98,13 @@ class Model_grafico extends CI_Model {
 
 	public function m_pacientes_embarazo($paramDatos)
 	{
-		$sql = 'SELECT COUNT(*) AS contador, ci.gestando
+		$sql = 'SELECT COUNT(*) AS contador, COALESCE(ci.gestando, 2) 
 					FROM paciente pa 
 					INNER JOIN cita ci ON pa.id = ci.pacienteId
 					WHERE pa.estado = 1 
 					AND ci.estado IN (2, 3)
 					AND DATE(ci.fechaCita) BETWEEN ? AND ? 
-					GROUP BY ci.gestando'; 
+					GROUP BY COALESCE(ci.gestando, 2)'; 
 		$query = $this->db->query($sql, 
 			array(
 				darFormatoYMD($paramDatos['inicio']), 
