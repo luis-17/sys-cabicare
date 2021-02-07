@@ -68,7 +68,7 @@ app.controller('CitaCtrl',
     ];
     $scope.fArr.listaMedioContacto = [
 			{ id: '', descripcion: '--Seleccione medio de contacto--' },
-			{ id: 'POR RECOMENDACION', descripcion: 'POR RECOMENDACION' },
+			{ id: 'POR UN AMIGO', descripcion: 'POR UN AMIGO' },
 			{ id: 'POR GOOGLE', descripcion: 'POR GOOGLE' },
 			{ id: 'POR FACEBOOK', descripcion: 'POR FACEBOOK' },
 			{ id: 'POR INSTAGRAM', descripcion: 'POR INSTAGRAM' },
