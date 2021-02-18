@@ -142,7 +142,7 @@ angular.module('app')
               $scope.fConfigSys.valores = [false,false,true,false,true,false,false,true];
             }
             if($scope.fSessionCI.keyPerfil == 'key_med'){
-              $scope.fConfigSys.valores = [false,false,false,false,false,true,false,false];
+              $scope.fConfigSys.valores = [false,false,false,false,false,true,false,false,false];
             }
             if($scope.fSessionCI.keyPerfil == 'key_cont'){
               $scope.fConfigSys.valores = [false,false,false,false,false,false,false,true];

@@ -123,6 +123,13 @@ angular.module('app')
               'angular/controllers/DocumentoCtrl.js'
             ])
           })
+          .state('app.nota', {
+            url: '/nota',
+            templateUrl: 'tpl/notas.html',
+            resolve: load([
+              'angular/controllers/NotaCtrl.js'
+            ])
+          })
           .state('app.central-reportes', {
             url: '/central-reportes',
             templateUrl: 'tpl/central-reportes.html',
