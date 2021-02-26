@@ -92,6 +92,10 @@ class Cita extends CI_Controller {
 						'id'=> $row['metodoPago'],
 						'descripcion'=> $row['metodoPago']
 					),
+					'tipoDocumentoCont'=> array(
+						'id'=> $row['tipoDocumentoCont'],
+						'descripcion'=> $row['tipoDocumentoCont']
+					),
 					'tipoCita' => $row['estado'],
 					'estado' => array(
 						'string' => $estado,
@@ -321,6 +325,10 @@ class Cita extends CI_Controller {
 						'id' => $row['medicoId'],
 						'medico' => $row['medico']
 					),
+					'tipoDocumentoCont'=> array(
+						'id'=> $row['tipoDocumentoCont'],
+						'descripcion'=> $row['tipoDocumentoCont']
+					),
           'medioContacto'=> array(
 						'id'=> $row['medioContacto'],
 						'descripcion'=> $row['medioContacto']
@@ -392,6 +400,24 @@ class Cita extends CI_Controller {
 		    ->set_output(json_encode($arrData));
 	}
 
+	public function listar_detalle_pagos()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+
+		$arrListado = $this->model_cita->m_cargar_detalle_pagos($allInputs['citaId']);
+		foreach($arrListado as $key => $row) {
+			$arrListado[$key]['metodoPago'] = array(
+				'id' => $row['metodoPago'],
+				'descripcion' => $row['metodoPago']
+			);
+		};
+
+		$arrData['datos'] = $arrListado;
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+	}
+
 	public function ver_popup_form_cita(){
 		$this->load->view('cita/cita_formView');
 	}
@@ -448,7 +474,6 @@ class Cita extends CI_Controller {
 		$horadesde = strtotime($allInputs['hora_desde']);
 		$horahasta = strtotime($allInputs['hora_hasta']);
 
-
 		if(!($horadesde  >= $hora_inicio_calendar &&  $horahasta <= $hora_fin_calendar)){
 			$arrData['flag'] = 0;
 			$arrData['message'] = 'Debe seleccionar un rango de horas permitido.';
@@ -458,6 +483,8 @@ class Cita extends CI_Controller {
 		    return;
 		}
 
+		$igv = round($allInputs['total_a_pagar'] * 0.18, 2);
+		$subtotal =  round($allInputs['total_a_pagar'] - $igv, 2);
 
 		$data = array(
 			'pacienteId'			=> $allInputs['pacienteId'],
@@ -469,6 +496,8 @@ class Cita extends CI_Controller {
 			'apuntesCita'			=> empty($allInputs['apuntesCita'])? NULL : $allInputs['apuntesCita'],
 			'medicoId'				=> empty($allInputs['medico']) ? NULL : $allInputs['medico']['id'],
 			'total'					=> $allInputs['total_a_pagar'],
+			'igv'					=> $igv,
+			'subtotal'					=> $subtotal,
 			'peso'					=> empty($allInputs['peso']) ? NULL : $allInputs['peso'],
 			'talla'					=> empty($allInputs['talla']) ? NULL : $allInputs['talla'],
 			'imc'					=> empty($allInputs['imc']) ? NULL : $allInputs['imc'],
@@ -590,7 +619,8 @@ class Cita extends CI_Controller {
 		    ->set_output(json_encode($arrData));
 		    return;
 		}
-
+		$igv = round($allInputs['total_a_pagar'] * 0.18, 2);
+		$subtotal =  round($allInputs['total_a_pagar'] - $igv, 2);
 		$data = array(
 			'sedeId'				=> $allInputs['sede']['id'],
 			'fechaCita'				=> Date('Y-m-d',strtotime($allInputs['fecha'])),
@@ -599,6 +629,8 @@ class Cita extends CI_Controller {
 			'apuntesCita'			=> empty($allInputs['apuntesCita'])? NULL : $allInputs['apuntesCita'],
 			'medicoId'				=> empty($allInputs['medico']) ? NULL : $allInputs['medico']['id'],
 			'total'					=> $allInputs['total_a_pagar'],
+			'igv'					=> $igv,
+			'subtotal'					=> $subtotal,
 			'peso'					=> empty($allInputs['peso']) ? NULL : $allInputs['peso'],
 			'talla'					=> empty($allInputs['talla']) ? NULL : $allInputs['talla'],
 			'imc'					=> empty($allInputs['imc']) ? NULL : $allInputs['imc'],
@@ -609,7 +641,8 @@ class Cita extends CI_Controller {
 			'observaciones'			=> empty($allInputs['observaciones']) ? NULL : $allInputs['observaciones'],
 			'estado'				=> $allInputs['tipoCita'],
 			'medioContacto'			=> empty($allInputs['medioContacto']) ? NULL : $allInputs['medioContacto']['id'],
-			'metodoPago' => $allInputs['metodoPago']['id'],
+			// 'metodoPago' => $allInputs['metodoPago']['id'],
+			'tipoDocumentoCont' => empty($allInputs['tipoDocumentoCont']) ? NULL : $allInputs['tipoDocumentoCont']['id'],
 			'numSerie' => empty($allInputs['numSerie']) ? NULL : $allInputs['numSerie'],
 			'numDoc' => empty($allInputs['numDoc']) ? NULL : $allInputs['numDoc'],
 			'numOperacion' => empty($allInputs['numOperacion']) ? NULL : $allInputs['numOperacion'],
@@ -644,6 +677,33 @@ class Cita extends CI_Controller {
 
 			foreach ($allInputs['eliminados'] as $row_el) {
 				$this->model_cita->m_eliminar_detalle($row_el);
+			}
+
+			if(!empty($allInputs['detalleCont'])){
+				foreach ($allInputs['detalleCont'] as $key => $row) {
+					if( empty($row['id']) ){ //si es nuevo se registra
+						$data_det = array(
+							'citaId' 		=> $allInputs['id'],
+							'numOperacion' 	=> empty($row['numOperacion']) ? null : $row['numOperacion'],
+							'monto' 	=> $row['monto'],
+							'metodoPago' 	=> $row['metodoPago']['id'],
+							'estado' 		=> 1,
+							'fechaRegistro'		=> date('Y-m-d H:i:s'),
+							'updatedAt'		=> date('Y-m-d H:i:s')
+						);
+						$this->model_cita->m_registrar_detalle_cont($data_det);
+					}else{
+						$data_det = array(
+							'numOperacion' 	=> $row['numOperacion'],
+							'monto' 	=> $row['monto'],
+							'updatedAt'		=> date('Y-m-d H:i:s')
+						);
+						$this->model_cita->m_editar_detalle_cont($data_det, $row['id']);
+					}
+				}
+			}
+			foreach ($allInputs['eliminadosCont'] as $row_cont) {
+				$this->model_cita->m_eliminar_detalle_cont($row_cont);
 			}
 			// ENVIO DE SMS CONFIRMACION DE CITA
 			if(

@@ -41,15 +41,17 @@
 	            	</div>
 	            </div>
 
-				<div class="form-group col-md-3" ng-class="{'has-error': Form.formCita.tipoCita.$invalid}">
+				<div ng-if="!(fData.tipoCita == 3)" class="form-group col-md-3" ng-class="{'has-error': Form.formCita.tipoCita.$invalid}">
 					<label for="tipoCita" class="control-label minotaur-label">Tipo de Cita <span class="text-danger">*</span>: </label>
 					<select class="form-control input-sm" name="tipoCita" ng-model="fData.tipoCita" required>
 						<option value="">--Seleccione tipo cita--</option>
 						<option ng-repeat="item in fArr.listaTipoCita" value="{{item.id}}">{{item.descripcion}}</option>
 					</select>
-
 	      </div>
-
+				<div ng-if="fData.tipoCita == 3" class="form-group col-md-3">
+					<label for="tipoCita" class="control-label minotaur-label">Tipo de Cita: </label>
+					<p style="color: green;">ATENDIDA</p>
+	      </div>
 				<div class="form-group col-md-3">
 					<label for="name" class="control-label minotaur-label">Sede : </label>
 					<select
@@ -58,7 +60,7 @@
 						ng-options="item as item.descripcion for item in fArr.listaSedes"
 						required
 					></select>
-	            </div>
+	      </div>
 
 				<div class="form-group col-md-6">
 	            	<label for="name" class="control-label minotaur-label">Médico : </label>
@@ -255,6 +257,14 @@
 				<div class="col-md-6 col-xs-12 pl-n pull-right">
 					<div class="row">
 						<div class="form-inline mt-xs col-xs-12 text-right">
+							<label class="control-label minotaur-label mr-xs mt-sm text-success f-14"> SUBTOTAL (S/): </label>
+							<input type="text" class="form-control pull-right text-center" disabled ng-model="fData.subtotal" placeholder="0.00" style="width: 160px; font-size: 17px; font-weight: bolder;"/>
+						</div>
+						<div class="form-inline mt-xs col-xs-12 text-right">
+							<label class="control-label minotaur-label mr-xs mt-sm text-success f-14"> IGV (S/): </label>
+							<input type="text" class="form-control pull-right text-center" disabled ng-model="fData.igv" placeholder="0.00" style="width: 160px; font-size: 17px; font-weight: bolder;"/>
+						</div>
+						<div class="form-inline mt-xs col-xs-12 text-right">
 							<label class="control-label minotaur-label mr-xs mt-sm text-success f-14"> TOTAL A PAGAR (S/): </label>
 							<input type="text" class="form-control pull-right text-center" disabled ng-model="fData.total_a_pagar" placeholder="0.00" style="width: 160px; font-size: 17px; font-weight: bolder;"/>
 						</div>
@@ -262,9 +272,13 @@
 				</div>
 			</div>
 			<hr>
-			<div class="row">
+			<div class="row" ng-if="fData.tipoCita == '3'">
 				<div class="col-sm-12">
 					<h3> Datos de Pago</h3>
+				</div>
+				<div class="form-group col-md-4 mb-md">
+					<label class="control-label mb-n"> Tipo de Documento </label>
+					<select class="form-control input-sm" ng-model="fData.tipoDocumentoCont" ng-options="item as item.descripcion for item in fArr.listaTipoDocumentoCont" tabindex="60" ></select> 
 				</div>
 				<div class="form-group col-md-4 mb-md">
 					<label class="control-label mb-n"> N° Serie / Factura </label>
@@ -275,21 +289,75 @@
 							style="" />
 					</div>
 				</div>
-				<div class="form-group col-md-4 mb-md">
+				<!-- <hr class="col-lg-12"> -->
+				<div class="col-lg-12">
+					<div class="row">
+						<div class="form-group mb-md col-md-3 col-sm-3">
+							<label class="control-label minotaur-label mb-xs"> Método de pago </label>
+							<select class="form-control input-sm" ng-model="fData.temporalCont.metodoPago" 
+								ng-options="item as item.descripcion for item in fArr.listaMetodoPago" tabindex="60" ></select> 
+						</div>
+
+						<div class="form-group col-md-3 col-sm-6 mb-md">
+							<label class="control-label mb-xs"> N° Operación </label>
+							<input
+								type="text"
+								ng-model="fData.temporalCont.numOperacion"
+								class="form-control input-sm"
+								autocomplete="off"
+							/>
+						</div>
+
+						<div class="form-group col-md-3 col-sm-6 mb-md">
+							<label class="control-label mb-xs"> Monto </label>
+							<input
+								type="text"
+								ng-model="fData.temporalCont.monto"
+								class="form-control input-sm"
+								autocomplete="off"
+							/>
+						</div>
+
+						<div class="form-group col-md-3 mb-md  mt-xs">
+							<button
+								class="btn btn-success btn-sm mt-md"
+								style="width: 100%;"
+								ng-click="agregarItemPago()"
+								ng-disabled="fData.temporalCont.idproducto == null && (fData.temporalCont.monto == null || fData.temporalCont.monto == '')"
+							>AGREGAR</button>
+						</div>
+						<div class="col-xs-12">
+							<div ui-grid="gridOptionsCont" ui-grid-auto-resize ui-grid-resize-columns ui-grid-edit class="grid table-responsive fs-mini-grid" ng-style="getTableHeightCont();"></div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-6 col-xs-12 pl-n pull-right">
+							<div class="row">
+								<div class="form-inline mt-xs col-xs-12 text-right">
+									<label class="control-label minotaur-label mr-xs mt-sm text-success f-14"> TOTAL PAGADO (S/): </label>
+									<input type="text" class="form-control pull-right text-center" disabled ng-model="fData.total_pagado" placeholder="0.00" style="width: 160px; font-size: 17px; font-weight: bolder;"/>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				
+				<!-- <div class="form-group col-md-4 mb-md">
 					<label class="control-label mb-n"> Método de Pago </label>
 					<select class="form-control input-sm" ng-model="fData.metodoPago" ng-options="item as item.descripcion for item in fArr.listaMetodoPago" tabindex="60" ></select> 
 				</div>
 				<div class="form-group col-md-4 mb-md">
 					<label class="control-label mb-n"> N° de Operación </label>
 					<input type="text" class="form-control input-sm" ng-model="fData.numOperacion" placeholder="Ingrese número de operación" tabindex="50" />
-				</div>
+				</div> -->
 				<div class="form-group col-md-12 mb-md">
 					<label class="control-label mb-n"> Anotaciones </label>
 					<textarea class="form-control input-sm" ng-model="fData.anotacionesPago" placeholder="Anotaciones" tabindex="200" rows="5"></textarea>
 				</div>
+				<div class="col-sm-12 ">
+					<button class="btn btn-info pull-right" type="button">GENERAR FACTURA ELECTRÓNICA</button>
+				</div>
 			</div>
-			
-
 			<hr>
 			<div class="row" ng-if="fData.tipoCita == '3'">
 				<div class="col-sm-12">

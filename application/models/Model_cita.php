@@ -41,6 +41,7 @@ class Model_cita extends CI_Model {
 			ci.medicoId,
 			concat_ws(' ', us.nombres, us.apellidos) AS medico,
 			ci.anotacionesPago,
+			ci.tipoDocumentoCont,
 			ci.numDoc,
 			ci.numSerie
 		", FALSE);
@@ -104,6 +105,7 @@ class Model_cita extends CI_Model {
 			ci.medicoId,
 			concat_ws(' ', us.nombres, us.apellidos) AS medico,
 			ci.anotacionesPago,
+			ci.tipoDocumentoCont,
 			ci.numSerie,
 			ci.numDoc
 		", FALSE);
@@ -324,6 +326,7 @@ class Model_cita extends CI_Model {
 			ci.numOperacion,
 			ci.anotacionesPago,
 			ci.metodoPago,
+			ci.tipoDocumentoCont,
 			ci.numSerie,
 			ci.numDoc
 		", FALSE);
@@ -362,6 +365,23 @@ class Model_cita extends CI_Model {
 		// $this->db->where('pr.tipoProductoId <>', 4);
 		$this->db->order_by('pr.tipoProductoId', 'ASC');
 		$this->db->order_by('cp.id', 'ASC');
+		return $this->db->get()->result_array();
+	}
+	public function m_cargar_detalle_pagos($citaId) // ME QUEDE AQUI, MODIFICAR ESTE METODO
+	{
+		$this->db->select("
+			pg.id,
+			pg.citaId,
+			pg.numOperacion,
+			pg.metodoPago,
+			pg.monto,
+			pg.fechaRegistro
+		", FALSE);
+		$this->db->from('pago pg');
+		$this->db->where('pg.citaId', $citaId);
+		$this->db->where('estado', 1);
+		$this->db->order_by('fechaRegistro', 'ASC');
+		// $this->db->order_by('cp.id', 'ASC');
 		return $this->db->get()->result_array();
 	}
 	public function m_cargar_detalle_cita_atendida_por_paciente($datos)
@@ -464,6 +484,11 @@ class Model_cita extends CI_Model {
 		return $this->db->insert('citaproducto', $data);
 	}
 
+	public function m_registrar_detalle_cont($data)
+	{
+		return $this->db->insert('pago', $data);
+	}
+
 	public function m_editar($data,$id)
 	{
 		$this->db->where('id',$id);
@@ -478,10 +503,24 @@ class Model_cita extends CI_Model {
 		$this->db->where('id',$datos['id']);
 		return $this->db->update('citaproducto', $data);
 	}
+	public function m_eliminar_detalle_cont($datos)
+	{
+		$data = array(
+			'estado' 		=> 0,
+			'updatedAt'		=> date('Y-m-d H:i:s')
+		);
+		$this->db->where('id',$datos['id']);
+		return $this->db->update('pago', $data);
+	}
 	public function m_editar_detalle($data, $id)
 	{
 		$this->db->where('id',$id);
 		return $this->db->update('citaproducto', $data);
+	}
+	public function m_editar_detalle_cont($data, $id)
+	{
+		$this->db->where('id',$id);
+		return $this->db->update('pago', $data);
 	}
 	public function m_anular($datos)
 	{

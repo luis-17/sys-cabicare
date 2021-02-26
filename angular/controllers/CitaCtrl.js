@@ -30,7 +30,7 @@ app.controller('CitaCtrl',
 		DistritoServices
 	) {
 		$scope.metodos = {}; // contiene todas las funciones
-		$scope.fArr = {}; // contiene todos los arrays generados por las funciones
+		$scope.fArr = {}; // contiene todos los arrays generados por las funciones tipoCita
 		$scope.fBusqueda = {};
 
 		moment.tz.add('America/Lima|LMT -05 -04|58.A 50 40|0121212121212121|-2tyGP.o 1bDzP.o zX0 1aN0 1cL0 1cN0 1cL0 1PrB0 zX0 1O10 zX0 6Gp0 zX0 98p0 zX0|11e6');
@@ -42,7 +42,7 @@ app.controller('CitaCtrl',
         myCallback();
       });
 		};
-		
+
 		$scope.fArr.listaTipoCita = [
 			{ id: '1', descripcion: 'POR CONFIRMAR' },
 			{ id: '2', descripcion: 'CONFIRMADA' }
@@ -52,6 +52,12 @@ app.controller('CitaCtrl',
 			{ id: '1', descripcion: 'HIGUERETA' }
 		];
 
+		$scope.fArr.listaTipoDocumentoCont = [
+			{ id: '0', descripcion: '--Seleccione tipo--' },
+			{ id: 'BOLETA', descripcion: 'BOLETA' },
+			{ id: 'FACTURA', descripcion: 'FACTURA' },
+		];
+
 		$scope.fArr.listaTipoDocumento = [
 			{ id: '0', descripcion: '--Seleccione tipo--' },
 			{ id: 'DNI', descripcion: 'DOCUMENTO NACIONAL DE IDENTIDAD' },
@@ -59,7 +65,7 @@ app.controller('CitaCtrl',
 			{ id: 'PAS', descripcion: 'PASAPORTE' },
 			{ id: 'PTP', descripcion: 'PERMISO TEMPORAL DE PERMANENCIA' },
 			{id: 'CED', descripcion: 'CEDULA' },
-      		{id: 'CR', descripcion: 'CARNET DE REFUGIO' }
+      {id: 'CR', descripcion: 'CARNET DE REFUGIO' }
 		];
 		$scope.fArr.listaSexo = [
 			{ id: '0', descripcion: '--Seleccione sexo--' },
@@ -80,7 +86,8 @@ app.controller('CitaCtrl',
 			{ id: 'TARJETA DE DÉBITO', descripcion: 'TARJETA DE DÉBITO' },
 			{ id: 'TARJETA DE CRÉDITO', descripcion: 'TARJETA DE CRÉDITO' },
 			{ id: 'TRANSFERENCIA', descripcion: 'TRANSFERENCIA' },
-			{ id: 'SEGURO', descripcion: 'SEGURO' }
+			{ id: 'SEGURO', descripcion: 'SEGURO' },
+			{ id: 'YAPE', descripcion: 'YAPE' }
 		];
 		$scope.fArr.listaOperadores = [
 			{ id: '0', descripcion: '--Seleccione operador--' },
@@ -339,7 +346,6 @@ app.controller('CitaCtrl',
 				{ field: 'tipoDocumento', name: 'tipoDocumento', displayName: 'Tipo Doc.', minWidth: 80, width: 80, visible: false },
 				{ field: 'numeroDocumento', name: 'numeroDocumento', displayName: 'Nº Documento', minWidth: 90, width: 115 },
 				{ field: 'paciente', name: 'paciente', displayName: 'Paciente', minWidth: 100 },
-        // { field: 'medico', name: 'medico', displayName: 'Médico', minWidth: 120 },
         { field: 'medico', name: 'medico', width: 130,
           cellTemplate:'<div class="ui-grid-cell-contents text-left ">'+ '{{ COL_FIELD.medico }}</div>',  displayName: 'Médico' },
         { field: 'total', name: 'total', displayName: 'Total', minWidth: 100, width: 100 },
@@ -436,12 +442,14 @@ app.service("CitaServices", function ($http, $q, handleBehavior) {
 		sListarCitasGrilla: sListarCitasGrilla,
 		sListarCitaCalendario: sListarCitaCalendario,
 		sListarDetalleCita: sListarDetalleCita,
+		sListarDetallePagos: sListarDetallePagos,
 		sRegistrar: sRegistrar,
 		sEditar: sEditar,
     sMoverCita: sMoverCita,
     sAgregarMetodoPago: sAgregarMetodoPago,
 		sAnular: sAnular,
 		sListarAtencionEnCita: sListarAtencionEnCita,
+		
 	});
 
 	function sListarCitasGrilla(datos) {
@@ -464,6 +472,14 @@ app.service("CitaServices", function ($http, $q, handleBehavior) {
 		var request = $http({
 			method: "post",
 			url: angular.patchURLCI + "Cita/listar_detalle_cita",
+			data: datos
+		});
+		return (request.then(handleBehavior.success, handleBehavior.error));
+	}
+	function sListarDetallePagos(datos) {
+		var request = $http({
+			method: "post",
+			url: angular.patchURLCI + "Cita/listar_detalle_pagos",
 			data: datos
 		});
 		return (request.then(handleBehavior.success, handleBehavior.error));
@@ -953,6 +969,8 @@ app.factory("ReservaCitasFactory",
 						angular.forEach($scope.gridOptions.data, function (value, key) {
 							totales += parseFloat($scope.gridOptions.data[key].precio);
 						});
+						$scope.fData.igv = (totales * 0.18).toFixed(2);
+						$scope.fData.subtotal = (totales - $scope.fData.igv).toFixed(2);
 						$scope.fData.total_a_pagar = totales.toFixed(2);
 					}
 
@@ -1061,14 +1079,18 @@ app.factory("ReservaCitasFactory",
 					$scope.fData = arrParams.cita;
 					$scope.Form = {}
 					$scope.fData.temporal = {};
+					$scope.fData.temporalCont = {};
+					
 					$scope.fArr = arrParams.fArr;
 					$scope.metodos = arrParams.metodos;
 					$scope.fData.eliminados = [];
+					$scope.fData.eliminadosCont = [];
 					$scope.fData.accion = 'edit';
 					$scope.bool = arrParams.bool;
 					$scope.fSessionCI = arrParams.fSessionCI;
 					$scope.titleForm = 'Edición de Cita';
 
+					$scope.fData.temporalCont.metodoPago = $scope.fArr.listaMetodoPago[0];
 					$scope.fData.sede = $scope.fArr.listaSedes[0];
           // BINDEO MEDIO CONTACTO
           var objIndexCp = $scope.fArr.listaMedioContacto.filter(function(obj) {
@@ -1076,13 +1098,13 @@ app.factory("ReservaCitasFactory",
           }).shift();
           $scope.fData.medioContacto = objIndexCp;
 
-					// BINDEO METODO PAGO
-          var objIndexMp = $scope.fArr.listaMetodoPago.filter(function(obj) {
-            return obj.id == $scope.fData.metodoPago.id;
+					// BINDEO TIPO DOCUMENTO
+          var objIndexTp = $scope.fArr.listaTipoDocumentoCont.filter(function(obj) {
+            return obj.id == $scope.fData.tipoDocumentoCont.id;
           }).shift();
-          $scope.fData.metodoPago = objIndexMp;
-          if ( !$scope.fData.metodoPago ) {
-            $scope.fData.metodoPago = $scope.fArr.listaMetodoPago[0];
+          $scope.fData.tipoDocumentoCont = objIndexTp;
+          if ( !$scope.fData.tipoDocumentoCont ) {
+            $scope.fData.tipoDocumentoCont = $scope.fArr.listaTipoDocumentoCont[0];
 					}
 
 					/* DATEPICKERS */
@@ -1336,6 +1358,9 @@ app.factory("ReservaCitasFactory",
 						angular.forEach($scope.gridOptions.data, function (value, key) {
 							totales += parseFloat($scope.gridOptions.data[key].precio);
 						});
+						$scope.fData.igv = (totales * 0.18).toFixed(2);
+						$scope.fData.subtotal = (totales - $scope.fData.igv).toFixed(2);
+						
 						$scope.fData.total_a_pagar = totales.toFixed(2);
 					}
 
@@ -1372,6 +1397,157 @@ app.factory("ReservaCitasFactory",
 						$scope.fData.imc = (parseFloat($scope.fData.peso) / (parseFloat(talla * talla))).toFixed(2);
 					}
 
+					/* SECCION DE PAGOS */
+					$scope.gridOptionsCont = {
+						rowHeight: 30,
+						enableGridMenu: false,
+						enableColumnMenus: false,
+						enableRowSelection: false,
+						enableSelectAll: false,
+						enableFiltering: false,
+						enableSorting: false,
+						enableFullRowSelection: false,
+						enableCellEdit: false,
+						multiSelect: false,
+						data: [],
+						columnDefs: [
+							// { field: 'id', name: 'id', displayName: 'ID', minWidth: 80, width: 80 },
+							{ field: 'metodoPago', name: 'metodoPago', displayName: 'MEDIO DE PAGO', minWidth: 150,
+								cellTemplate:'<div class="ui-grid-cell-contents text-left ">'+ '{{ COL_FIELD.descripcion }}</div>' },
+							{ field: 'numOperacion', name: 'numOperacion', displayName: 'N° OPERACIÓN', width: 140, enableCellEdit: true, cellClass: 'ui-editCell' },
+							{ field: 'monto', name: 'monto', displayName: 'MONTO', width: 170, enableCellEdit: true, cellClass: 'ui-editCell' },
+							{
+								field: 'eliminar', name: 'eliminar', displayName: '', width: 100,
+								cellTemplate: '<button class="btn btn-default btn-sm text-danger btn-action" ng-click="grid.appScope.btnQuitarDeLaCestaCont(row);$event.stopPropagation();"> <i class="fa fa-trash" tooltip-placement="left" uib-tooltip="ELIMINAR!"></i> </button>'
+							}
+						],
+						onRegisterApi: function (gridApi) {
+							$scope.gridApi = gridApi;
+							gridApi.edit.on.afterCellEdit($scope, function (rowEntity, colDef, newValue, oldValue) {
+								if (newValue != oldValue) {
+									$scope.calcularTotalesCont();
+								}
+							});
+						}
+					};
+
+					$scope.getTableHeightCont = function () {
+						var rowHeight = 30; // your row height
+						var headerHeight = 30; // your header height
+						var cant_filas = 4; // min 4
+						if ($scope.gridOptionsCont.data.length > cant_filas) {
+							var cant_filas = $scope.gridOptionsCont.data.length;
+						}
+						return {
+							height: (cant_filas * rowHeight + headerHeight) + "px"
+						};
+					}
+
+					$scope.getPaginationServerSideCont = function (loader) {
+						if (loader) {
+							blockUI.start('Procesando información...');
+						}
+						var arrParams = {
+							citaId: $scope.fData.id
+						};
+						CitaServices.sListarDetallePagos(arrParams).then(function (rpta) {
+							if (rpta.datos.length == 0) {
+								rpta.paginate = { totalRows: 0 };
+							}
+							$scope.gridOptionsCont.data = rpta.datos;
+							$scope.calcularTotalesCont();
+							if (loader) {
+								blockUI.stop();
+							}
+						});
+					};
+					$scope.getPaginationServerSideCont(true);
+
+					$scope.agregarItemPago = function () {
+						if ($scope.fData.temporalCont.metodoPago == null) {
+							pinesNotifications.notify({
+								title: 'Advertencia.',
+								text: 'Debe seleccionar un medio de pago.',
+								type: 'warning',
+								delay: 5000
+							});
+							return;
+						}
+
+						if ($scope.fData.temporalCont.monto == null ||
+							$scope.fData.temporalCont.monto == "" ||
+							$scope.fData.temporalCont.monto < 0) {
+							pinesNotifications.notify({
+								title: 'Advertencia.',
+								text: 'El monto no es válido.',
+								type: 'warning',
+								delay: 5000
+							});
+							return;
+						}
+
+						var producto_repetido = false;
+						var excede_monto = false;
+						angular.forEach($scope.gridOptionsCont.data, function (value, key) {
+							if (value.metodoPago == $scope.fData.temporalCont.metodoPago) {
+								producto_repetido = true;
+								pinesNotifications.notify({
+									title: 'Advertencia.',
+									text: 'Ya está cargado este metodo de pago.',
+									type: 'warning',
+									delay: 5000
+								});
+								return;
+							}
+						});
+
+						var montoSumatoria = parseFloat($scope.fData.total_pagado, 10) + parseFloat($scope.fData.temporalCont.monto, 10);
+						if (montoSumatoria > parseFloat($scope.fData.total_a_pagar, 10)) {
+							excede_monto = true;
+							pinesNotifications.notify({
+								title: 'Advertencia.',
+								text: 'Se excedió el monto de pago.',
+								type: 'warning',
+								delay: 5000
+							});
+							return;
+						}
+
+						if (producto_repetido === false && excede_monto === false) {
+							$scope.gridOptionsCont.data.push({
+								// id:null,
+								citaId: $scope.fData.id,
+								metodoPago: $scope.fData.temporalCont.metodoPago,
+								numOperacion: $scope.fData.temporalCont.numOperacion,
+								monto: $scope.fData.temporalCont.monto
+							});
+
+							$scope.fData.temporalCont = {};
+							$scope.fData.temporalCont.metodoPago = $scope.fArr.listaMetodoPago[0];
+							$scope.calcularTotalesCont();
+						}
+					}
+
+					$scope.calcularTotalesCont = function () {
+						var totales = 0;
+						angular.forEach($scope.gridOptionsCont.data, function (value, key) {
+							totales += parseFloat($scope.gridOptionsCont.data[key].monto);
+						});
+						$scope.fData.total_pagado = totales.toFixed(2);
+					}
+
+					$scope.btnQuitarDeLaCestaCont = function (row) {
+						if( row.entity.id > 0 ){
+							row.entity.estado = 0;
+							$scope.fData.eliminadosCont.push(row.entity)
+						}
+						console.log('eliminadosCont', $scope.fData.eliminadosCont);
+						var index = $scope.gridOptionsCont.data.indexOf(row.entity);
+						console.log('elimina', index);
+						$scope.gridOptionsCont.data.splice(index, 1);
+						$scope.calcularTotalesCont();
+					}
+
 					/* BOTONES FINALES */
 					$scope.cancel = function () {
 						$uibModalInstance.dismiss('cancel');
@@ -1406,6 +1582,7 @@ app.factory("ReservaCitasFactory",
 							$scope.fData.hora_hasta_str = $scope.fData.hora_hasta.toLocaleTimeString();
 						}
 						$scope.fData.detalle = $scope.gridOptions.data;
+						$scope.fData.detalleCont = $scope.gridOptionsCont.data;
 
 						blockUI.start("Actualizando cita");
 						CitaServices.sEditar($scope.fData).then(function (rpta) {
@@ -1417,7 +1594,6 @@ app.factory("ReservaCitasFactory",
 							} else {
 								var pTitle = 'Advertencia!';
 								var pType = 'warning';
-
 							}
 							blockUI.stop();
 							pinesNotifications.notify({

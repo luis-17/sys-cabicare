@@ -145,7 +145,7 @@ angular.module('app')
               $scope.fConfigSys.valores = [false,false,false,false,false,true,false,false,false];
             }
             if($scope.fSessionCI.keyPerfil == 'key_cont'){
-              $scope.fConfigSys.valores = [false,false,false,false,false,false,false,true];
+              $scope.fConfigSys.valores = [false,false,false,false,false,false,false,true, true];
             }
             // $scope.getListaEmpresasSession();
             $scope.logIn();
