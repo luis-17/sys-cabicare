@@ -45,7 +45,7 @@ class Model_grafico extends CI_Model {
 					FROM paciente pa 
 					INNER JOIN cita ci ON pa.id = ci.pacienteId
 					WHERE pa.estado = 1 
-					AND ci.estado IN (2, 3)
+					AND ci.estado IN (3)
 					AND DATE(ci.fechaCita) BETWEEN ? AND ? 
 					GROUP BY MONTHNAME(ci.fechaCita), MONTH (ci.fechaCita)
 					ORDER BY MONTH(ci.fechaCita)'; 
@@ -84,7 +84,7 @@ class Model_grafico extends CI_Model {
 					FROM cita ci 
 					INNER JOIN usuario us ON ci.medicoId = us.id
 					WHERE us.estado = 1 
-					AND ci.estado IN (2, 3)
+					AND ci.estado IN (3)
 					AND YEAR(ci.fechaCita) = ? 
 					GROUP BY MONTHNAME(ci.fechaCita), MONTH (ci.fechaCita), us.nombres
 					ORDER BY MONTH(ci.fechaCita), us.nombres'; 
@@ -102,7 +102,7 @@ class Model_grafico extends CI_Model {
 					FROM paciente pa 
 					INNER JOIN cita ci ON pa.id = ci.pacienteId
 					WHERE pa.estado = 1 
-					AND ci.estado IN (2, 3)
+					AND ci.estado IN (3)
 					AND DATE(ci.fechaCita) BETWEEN ? AND ? 
 					GROUP BY COALESCE(ci.gestando, 2)'; 
 		$query = $this->db->query($sql, 
@@ -123,7 +123,7 @@ class Model_grafico extends CI_Model {
 					FROM paciente pa 
 					INNER JOIN cita ci ON pa.id = ci.pacienteId
 					WHERE pa.estado = 1 
-					AND ci.estado IN (2, 3)
+					AND ci.estado IN (3)
 					AND YEAR(ci.fechaCita) = ?
 					AND ci.gestando = 1
 					GROUP BY MONTHNAME(ci.fechaCita), MONTH(ci.fechaCita), ci.gestando
@@ -147,7 +147,7 @@ class Model_grafico extends CI_Model {
 					INNER JOIN usuario us ON ci.medicoId = us.id
 					WHERE pa.estado = 1 
 					AND us.estado = 1 
-					AND ci.estado IN (2, 3)
+					AND ci.estado IN (3)
 					AND YEAR(ci.fechaCita) = ?
 					AND ci.gestando = 1
 					GROUP BY MONTHNAME(ci.fechaCita), MONTH(ci.fechaCita), us.nombres, ci.gestando
