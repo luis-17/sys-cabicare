@@ -1232,7 +1232,7 @@ app.factory("ReservaCitasFactory",
 							{ field: 'precio', name: 'precio', displayName: 'PRECIO (S/)', width: 120, enableCellEdit: true, cellClass: 'ui-editCell' },
 							{
 								field: 'eliminar', name: 'eliminar', displayName: '', width: 50,
-								cellTemplate: '<button class="btn btn-default btn-sm text-danger btn-action" ng-click="grid.appScope.btnQuitarDeLaCesta(row);$event.stopPropagation();"> <i class="fa fa-trash" tooltip-placement="left" uib-tooltip="ELIMINAR!"></i> </button>'
+								cellTemplate: '<button ng-if="!(row.entity.idproducto == 70)" class="btn btn-default btn-sm text-danger btn-action" ng-click="grid.appScope.btnQuitarDeLaCesta(row);$event.stopPropagation();"> <i class="fa fa-trash" tooltip-placement="left" uib-tooltip="ELIMINAR!"></i> </button>'
 							}
 						],
 						onRegisterApi: function (gridApi) {
@@ -1367,10 +1367,13 @@ app.factory("ReservaCitasFactory",
 					$scope.btnQuitarDeLaCesta = function (row) {
 						if( row.entity.id > 0 ){
 							row.entity.estado = 0;
-							$scope.fData.eliminados.push(row.entity)
+							$scope.fData.eliminados.push(row.entity);
 						}
 						console.log('eliminados', $scope.fData.eliminados);
-						var index = $scope.gridOptions.data.indexOf(row.entity);
+						// var index = $scope.gridOptions.data.indexOf(row.entity);
+						var index = $scope.gridOptions.data.findIndex(function(elm){
+							return elm.id == row.entity.id;
+						});
 						console.log('elimina', index);
 						$scope.gridOptions.data.splice(index, 1);
 						$scope.calcularTotales();
@@ -1501,17 +1504,17 @@ app.factory("ReservaCitasFactory",
 							}
 						});
 
-						var montoSumatoria = parseFloat($scope.fData.total_pagado, 10) + parseFloat($scope.fData.temporalCont.monto, 10);
-						if (montoSumatoria > parseFloat($scope.fData.total_a_pagar, 10)) {
-							excede_monto = true;
-							pinesNotifications.notify({
-								title: 'Advertencia.',
-								text: 'Se excedió el monto de pago.',
-								type: 'warning',
-								delay: 5000
-							});
-							return;
-						}
+						// var montoSumatoria = parseFloat($scope.fData.total_pagado, 10) + parseFloat($scope.fData.temporalCont.monto, 10);
+						// if (montoSumatoria > parseFloat($scope.fData.total_a_pagar, 10) && ) {
+						// 	excede_monto = true;
+						// 	pinesNotifications.notify({
+						// 		title: 'Advertencia.',
+						// 		text: 'Se excedió el monto de pago.',
+						// 		type: 'warning',
+						// 		delay: 5000
+						// 	});
+						// 	return;
+						// }
 
 						if (producto_repetido === false && excede_monto === false) {
 							$scope.gridOptionsCont.data.push({
@@ -1521,7 +1524,24 @@ app.factory("ReservaCitasFactory",
 								numOperacion: $scope.fData.temporalCont.numOperacion,
 								monto: $scope.fData.temporalCont.monto
 							});
+							// logica tarjeta
+							if ($scope.fData.temporalCont.metodoPago.id == 'TARJETA DE DÉBITO' || 
+								$scope.fData.temporalCont.metodoPago.id == 'TARJETA DE CRÉDITO') {
 
+									var montoPago = $scope.fData.temporalCont.monto;
+									var comision = ( montoPago - (montoPago / 1.045)).toFixed(2);
+									$scope.gridOptions.data.push({
+										id:null,
+										citaId: $scope.fData.id,
+										idproducto: 70,
+										producto: 'COMISION POR USO DE TARJETA (4.5%)',
+										tipoProducto: 'TARJETAS',
+										tipoProductoId: 5,
+										precio: comision,
+										estado: 1
+									});
+									$scope.calcularTotales();
+							}
 							$scope.fData.temporalCont = {};
 							$scope.fData.temporalCont.metodoPago = $scope.fArr.listaMetodoPago[0];
 							$scope.calcularTotalesCont();
@@ -1541,10 +1561,32 @@ app.factory("ReservaCitasFactory",
 							row.entity.estado = 0;
 							$scope.fData.eliminadosCont.push(row.entity)
 						}
+						if (row.entity.metodoPago.id == 'TARJETA DE DÉBITO'
+							|| row.entity.metodoPago.id == 'TARJETA DE CRÉDITO') {
+								console.log('entraste');
+								// $scope.gridOptions.data.splice(index, 1);
+								var rowEntity = {};
+								angular.forEach($scope.gridOptions.data, function(item) {
+									console.log('item ==>', item);
+									if (item.idproducto == '70') {
+										rowEntity = {
+											entity: {
+												id: item.id
+											}
+										}
+									}
+								});
+								if (rowEntity.entity) {
+									console.log('rowEntity.entity =>', rowEntity.entity);
+									$scope.btnQuitarDeLaCesta(rowEntity);
+								}
+								
+						}
 						console.log('eliminadosCont', $scope.fData.eliminadosCont);
 						var index = $scope.gridOptionsCont.data.indexOf(row.entity);
 						console.log('elimina', index);
 						$scope.gridOptionsCont.data.splice(index, 1);
+
 						$scope.calcularTotalesCont();
 					}
 

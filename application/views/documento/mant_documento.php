@@ -56,7 +56,7 @@
 			</div>
 		</div>
 		<div class="form-group mb-md col-sm-12">
-			<label class="control-label minotaur-label mb-xs"> Anotaciones </label>
+			<label class="control-label minotaur-label mb-xs"> Descripción </label>
 			<textarea class="form-control" rows="3" ng-model="fDataDoc.observaciones"></textarea>	
 		</div>
 	</form>
@@ -64,4 +64,4 @@
 <div class="modal-footer">
     <button class="btn btn-primary" ng-click="aceptar(); $event.preventDefault();" ng-disabled="formDocumento.$invalid">Aceptar</button>
     <button class="btn btn-warning" ng-click="cancel()">Cerrar</button>
-</div> 
+</div>

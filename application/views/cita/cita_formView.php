@@ -254,17 +254,17 @@
 
 			</div>
 			<div class="row">
-				<div class="col-md-6 col-xs-12 pl-n pull-right">
+				<div class="col-md-7 col-xs-12 pl-n pull-right">
 					<div class="row">
-						<div class="form-inline mt-xs col-xs-12 text-right">
+						<div class="form-inline mt-xs col-xs-4 text-right">
 							<label class="control-label minotaur-label mr-xs mt-sm text-success f-14"> SUBTOTAL (S/): </label>
 							<input type="text" class="form-control pull-right text-center" disabled ng-model="fData.subtotal" placeholder="0.00" style="width: 160px; font-size: 17px; font-weight: bolder;"/>
 						</div>
-						<div class="form-inline mt-xs col-xs-12 text-right">
+						<div class="form-inline mt-xs col-xs-4 text-right">
 							<label class="control-label minotaur-label mr-xs mt-sm text-success f-14"> IGV (S/): </label>
 							<input type="text" class="form-control pull-right text-center" disabled ng-model="fData.igv" placeholder="0.00" style="width: 160px; font-size: 17px; font-weight: bolder;"/>
 						</div>
-						<div class="form-inline mt-xs col-xs-12 text-right">
+						<div class="form-inline mt-xs col-xs-4 text-right">
 							<label class="control-label minotaur-label mr-xs mt-sm text-success f-14"> TOTAL A PAGAR (S/): </label>
 							<input type="text" class="form-control pull-right text-center" disabled ng-model="fData.total_a_pagar" placeholder="0.00" style="width: 160px; font-size: 17px; font-weight: bolder;"/>
 						</div>

@@ -36,7 +36,7 @@
             <label> {{fDataDoc.moneda.descripcion}} </label>
         </div>
         <div class="form-group col-sm-6 mb-md">
-            <label class="control-label mb-n block"> Anotaciones</label>
+            <label class="control-label mb-n block"> Descripción </label>
             <label> {{fDataDoc.observaciones}} </label>
 		</div>
 		<div class="form-group mb-md col-sm-6">

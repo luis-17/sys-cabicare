@@ -65,6 +65,11 @@ app.controller('CentralReportesCtrl', ['$scope', '$filter', '$uibModal', '$bootb
             id: 'PAC-ALL',
             tipoCuadro: 'report',
             name: 'REPORTE DE PACIENTES'
+          },
+          {
+            id: 'CIT-ALL',
+            tipoCuadro: 'report',
+            name: 'REPORTE DE CITAS'
           }
         ]
       }
@@ -145,6 +150,23 @@ app.controller('CentralReportesCtrl', ['$scope', '$filter', '$uibModal', '$bootb
                 // origen: $scope.fBusqueda.origen,
                 titulo: 'REPORTE DE PACIENTES',
                 tituloAbv: 'PAC-ALL'
+              }
+            };
+            ModalReporteFactory.getPopupReporte(arrParams);
+            break;
+          case 'CIT-ALL':
+            var arrParams = {
+              url: angular.patchURLCI+'Reportes/listado_citas_excel',
+              metodo: 'php',
+              salida: 'excel',
+              datos: {
+                paginate: {},
+                filtro: {
+                  fechaDesde: $scope.fBusqueda.desde,
+                  fechaHasta: $scope.fBusqueda.hasta
+                },
+                titulo: 'REPORTE DE CITAS',
+                tituloAbv: 'CIT-ALL'
               }
             };
             ModalReporteFactory.getPopupReporte(arrParams); 

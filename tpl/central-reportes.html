@@ -39,26 +39,26 @@
                     </div>
                     <ul class="demo-btns list-unstyled" ng-show="selectedReport.id" style="min-height: 200px;">
                         <li class="col-md-3 col-xs-12 form-group" 
-                            ng-show="selectedReport.id=='AM-PRODMED' || selectedReport.id=='AM-PRODGEN'"> 
+                            ng-show="selectedReport.id=='AM-PRODMED' || selectedReport.id=='AM-PRODGEN' || selectedReport.id=='CIT-ALL'"> 
                             <label> DESDE </label>
                             <div class="input-group">
                               <input
                                 type="text"
                                 ng-model="fBusqueda.desde"
                                 class="form-control input-sm mask"
-                                data-inputmask="'alias': 'dd-mm-yyyy'"
+                                input-mask mask-options="{alias: 'dd-mm-yyyy'}"
                                 style="width: 80px;" /> 
                                 <!-- <input type="text" class="form-control input-sm" ng-model="fBusqueda.desde" data-inputmask="'alias': 'dd-mm-yyyy'" tabindex="3" style="width: 80px;" /> -->
                             </div>
                         </li>
                         <li class="col-md-3 col-xs-12 form-group" 
-                            ng-show="selectedReport.id=='AM-PRODMED' || selectedReport.id=='AM-PRODGEN'"> 
+                            ng-show="selectedReport.id=='AM-PRODMED' || selectedReport.id=='AM-PRODGEN' || selectedReport.id=='CIT-ALL'"> 
                             <label> HASTA </label> 
                             <div class="input-group" > 
                                 <input type="text" 
                                 class="form-control input-sm mask" 
                                 ng-model="fBusqueda.hasta" 
-                                data-inputmask="'alias': 'dd-mm-yyyy'"
+                                input-mask mask-options="{alias: 'dd-mm-yyyy'}"
                                 style="width: 80px;" /> 
                             </div>
                         </li>

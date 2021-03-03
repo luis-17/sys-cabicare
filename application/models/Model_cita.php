@@ -116,19 +116,19 @@ class Model_cita extends CI_Model {
 		$this->db->where('pa.estado', 1);
 		$this->db->where('ci.fechaCita BETWEEN ' . $desde .' AND ' . $hasta);
 
-		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
-			foreach ($paramPaginate['searchColumn'] as $key => $value) {
+		if( isset($paramPaginate['search'] ) && @$paramPaginate['search'] ){
+			foreach (@$paramPaginate['searchColumn'] as $key => $value) {
 				if(! empty($value)){
 					$this->db->like($key ,strtoupper_total($value) ,FALSE);
 				}
 			}
 		}
 
-		if( $paramPaginate['sortName'] ){
-			$this->db->order_by($paramPaginate['sortName'], $paramPaginate['sort']);
+		if( @$paramPaginate['sortName'] ){
+			$this->db->order_by(@$paramPaginate['sortName'], @$paramPaginate['sort']);
 		}
-		if( $paramPaginate['firstRow'] || $paramPaginate['pageSize'] ){
-			$this->db->limit($paramPaginate['pageSize'],$paramPaginate['firstRow'] );
+		if( @$paramPaginate['firstRow'] || @$paramPaginate['pageSize'] ){
+			$this->db->limit(@$paramPaginate['pageSize'],@$paramPaginate['firstRow'] );
 		}
 		return $this->db->get()->result_array();
 	}
@@ -415,7 +415,7 @@ class Model_cita extends CI_Model {
 		return $this->db->get()->result_array();
 	}
 	public function m_obtener_cita($citaId) {
-		$this->db->select("ci.estado, pa.celular");
+		$this->db->select("ci.id, ci.estado, pa.celular");
 		$this->db->from('cita ci');
 		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
 		$this->db->where('ci.id', $citaId);

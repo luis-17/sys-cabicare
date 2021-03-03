@@ -705,6 +705,19 @@ class Cita extends CI_Controller {
 			foreach ($allInputs['eliminadosCont'] as $row_cont) {
 				$this->model_cita->m_eliminar_detalle_cont($row_cont);
 			}
+			// LOGICA DE TARJETAS
+			// $arrDetalleCita = $this->model_citas->m_cargar_detalle_cita($allInputs['id']);
+			// $boolTarjeta = false;
+			// // $fPagoTa
+			// foreach($arrDetalleCita as $key => $row) {
+			// 	if ($row['tipoProductoId'] == '5') {
+			// 		$boolTarjeta = true;
+			// 	}
+			// }
+			// if ($boolTarjeta) {
+
+			// }
+
 			// ENVIO DE SMS CONFIRMACION DE CITA
 			if(
 				$allInputs['tipoCita'] == '2' && 
