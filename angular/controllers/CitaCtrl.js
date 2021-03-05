@@ -1491,18 +1491,18 @@ app.factory("ReservaCitasFactory",
 
 						var producto_repetido = false;
 						var excede_monto = false;
-						angular.forEach($scope.gridOptionsCont.data, function (value, key) {
-							if (value.metodoPago == $scope.fData.temporalCont.metodoPago) {
-								producto_repetido = true;
-								pinesNotifications.notify({
-									title: 'Advertencia.',
-									text: 'Ya está cargado este metodo de pago.',
-									type: 'warning',
-									delay: 5000
-								});
-								return;
-							}
-						});
+						// angular.forEach($scope.gridOptionsCont.data, function (value, key) {
+						// 	if (value.metodoPago == $scope.fData.temporalCont.metodoPago) {
+						// 		producto_repetido = true;
+						// 		pinesNotifications.notify({
+						// 			title: 'Advertencia.',
+						// 			text: 'Ya está cargado este metodo de pago.',
+						// 			type: 'warning',
+						// 			delay: 5000
+						// 		});
+						// 		return;
+						// 	}
+						// });
 
 						// var montoSumatoria = parseFloat($scope.fData.total_pagado, 10) + parseFloat($scope.fData.temporalCont.monto, 10);
 						// if (montoSumatoria > parseFloat($scope.fData.total_a_pagar, 10) && ) {
