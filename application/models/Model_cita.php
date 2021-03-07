@@ -94,8 +94,6 @@ class Model_cita extends CI_Model {
 			ci.estado,
 			ci.medioContacto,
 			ci.gestando,
-			ci.metodoPago,
-			ci.numOperacion,
 			ci.fechaUltimaRegla,
 			ci.fechaProbableParto,
 			ci.semanaGestacion,
@@ -107,13 +105,19 @@ class Model_cita extends CI_Model {
 			ci.anotacionesPago,
 			ci.tipoDocumentoCont,
 			ci.numSerie,
-			ci.numDoc
+			ci.numDoc,
+			pg.numOperacion,
+			pg.metodoPago,
+			pg.monto,
+			pg.fechaRegistro
 		", FALSE);
 		$this->db->from('cita ci');
+		$this->db->join('pago pg', 'ci.id = pg.citaId');
 		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
 		$this->db->join('usuario us', 'ci.medicoId = us.id','left');
 		$this->db->where('ci.estado <> ', 0);
 		$this->db->where('pa.estado', 1);
+		$this->db->where('pg.estado', 1);
 		$this->db->where('ci.fechaCita BETWEEN ' . $desde .' AND ' . $hasta);
 
 		if( isset($paramPaginate['search'] ) && @$paramPaginate['search'] ){

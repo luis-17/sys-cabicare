@@ -62,6 +62,7 @@ class Reportes extends CI_Controller {
 						$row['numDoc'],
 						$row['metodoPago'],
 						$row['numOperacion'],
+						$row['monto'],
 						$row['anotacionesPago'],
 						$estado
 					)
@@ -83,6 +84,7 @@ class Reportes extends CI_Controller {
 				array( 'col' => 'N° DOC.',			'ancho' => 15, 	'align' => 'R' ),
 				array( 'col' => 'METODO PAGO',			'ancho' => 15, 	'align' => 'L' ),
 				array( 'col' => 'N° OPERACION',			'ancho' => 15, 	'align' => 'R' ),
+				array( 'col' => 'MONTO DE PAGO',			'ancho' => 15, 	'align' => 'R' ),
 				array( 'col' => 'ANOTACIONES',			'ancho' => 15, 	'align' => 'L' ),
 				array( 'col' => 'ESTADO',			'ancho' => 20, 	'align' => 'C' ),
 
