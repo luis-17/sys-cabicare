@@ -70,6 +70,11 @@ app.controller('CentralReportesCtrl', ['$scope', '$filter', '$uibModal', '$bootb
             id: 'CIT-ALL',
             tipoCuadro: 'report',
             name: 'REPORTE DE CITAS'
+          },
+          {
+            id: 'DOC-ALL',
+            tipoCuadro: 'report',
+            name: 'REPORTE DE DOCUMENTOS'
           }
         ]
       }
@@ -96,7 +101,7 @@ app.controller('CentralReportesCtrl', ['$scope', '$filter', '$uibModal', '$bootb
         
       //   $scope.fBusqueda.desde = $filter('date')(desde30.toDate(),'dd-MM-yyyy');
       // }
-    } 
+    }
 
     // BOTON PROCESAR
     $scope.btnConsultarReporte = function () { 

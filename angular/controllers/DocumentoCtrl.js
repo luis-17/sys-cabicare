@@ -35,6 +35,40 @@ app.controller('DocumentoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '
 			{ id: 'NOVIEMBRE', descripcion: 'NOVIEMBRE' },
 			{ id: 'DICIEMBRE', descripcion: 'DICIEMBRE' }
     ];
+    $scope.fArr.listaDia = [
+			{ id: '', descripcion: '--Seleccione dia--' },
+			{ id: '01', descripcion: '01' },
+			{ id: '02', descripcion: '02' },
+			{ id: '03', descripcion: '03' },
+			{ id: '04', descripcion: '04' },
+			{ id: '05', descripcion: '05' },
+			{ id: '06', descripcion: '06' },
+			{ id: '07', descripcion: '07' },
+			{ id: '08', descripcion: '08' },
+			{ id: '09', descripcion: '09' },
+			{ id: '10', descripcion: '10' },
+			{ id: '11', descripcion: '11' },
+			{ id: '12', descripcion: '12' },
+			{ id: '13', descripcion: '13' },
+			{ id: '14', descripcion: '14' },
+			{ id: '15', descripcion: '15' },
+			{ id: '16', descripcion: '16' },
+			{ id: '17', descripcion: '17' },
+			{ id: '18', descripcion: '18' },
+			{ id: '19', descripcion: '19' },
+			{ id: '20', descripcion: '20' },
+			{ id: '21', descripcion: '21' },
+			{ id: '22', descripcion: '22' },
+			{ id: '23', descripcion: '23' },
+			{ id: '24', descripcion: '24' },
+			{ id: '25', descripcion: '25' },
+			{ id: '26', descripcion: '26' },
+			{ id: '27', descripcion: '27' },
+			{ id: '28', descripcion: '28' },
+			{ id: '29', descripcion: '29' },
+			{ id: '30', descripcion: '30' },
+			{ id: '31', descripcion: '31' }
+    ];
     $scope.fArr.listaAnio = [
       {id : '', descripcion:'--Seleccione año--'},
       {id: '2020', descripcion: '2020'},
@@ -121,15 +155,17 @@ app.controller('DocumentoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '
       multiSelect: false,
       columnDefs: [
         { field: 'documentoId', name: 'do.id', displayName: 'ID', width: '75',  sort: { direction: uiGridConstants.DESC} },
-        { field: 'anio', name: 'do.anio', width: 120,
+        { field: 'fechaDocumento', name: 'fechaDocumento', displayName: 'Fecha documento', width: 140, enableFiltering: false, visible: true },
+        { field: 'anio', name: 'do.anio', width: 120, visible: false,
 					cellTemplate:'<div class="ui-grid-cell-contents text-left ">'+ '{{ COL_FIELD.descripcion }}</div>',  displayName: 'Año' },
-				{ field: 'mes', name: 'do.mes', width: 120,
+				{ field: 'mes', name: 'do.mes', width: 120, visible: false,
 					cellTemplate:'<div class="ui-grid-cell-contents text-left ">'+ '{{ COL_FIELD.descripcion }}</div>',  displayName: 'Mes' },
 				{ field: 'categoria', name: 'do.categoria', width: 120,
           cellTemplate:'<div class="ui-grid-cell-contents text-left ">'+ '{{ COL_FIELD.descripcion }}</div>',  displayName: 'Categoria' },
         { field: 'codigoExterno', name: 'do.codigoExterno', displayName: 'Cod. Interno', width: 100 },
 				{ field: 'monto', name: 'do.monto', displayName: 'Monto', width: 120 },
 				{ field: 'usuarioRegistro', name: 'us.nombres', displayName: 'Usuario Creación', width: 140 },
+        { field: 'fechaCreacion', name: 'do.fechaCreacion', displayName: 'Fecha Creación', width: 140 },
 				{ field: 'nombreArchivo', name: 'nombreArchivo', minWidth: 120,
           cellTemplate:'<div class="ui-grid-cell-contents text-left "><a class="btn btn-link" target="_blank" href="{{COL_FIELD.link}}">'+ '{{ COL_FIELD.texto }}</a></div>',  displayName: 'LINK' },
               
@@ -164,11 +200,12 @@ app.controller('DocumentoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '
           paginationOptions.search = true;
           paginationOptions.searchColumn = {
             'do.id' : grid.columns[1].filters[0].term,
-            'do.anio' : grid.columns[2].filters[0].term,
-            'do.mes' : grid.columns[3].filters[0].term,
-            'do.categoria' : grid.columns[4].filters[0].term,
-            'do.codigoExterno' : grid.columns[5].filters[0].term,
-            'do.monto' : grid.columns[6].filters[0].term
+            'do.anio' : grid.columns[3].filters[0].term,
+            'do.mes' : grid.columns[4].filters[0].term,
+            'do.categoria' : grid.columns[5].filters[0].term,
+            'do.codigoExterno' : grid.columns[6].filters[0].term,
+            'do.monto' : grid.columns[7].filters[0].term,
+            'us.nombres' : grid.columns[7].filters[0].term
           };
           $scope.metodos.getPaginationServerSide();
         });
@@ -327,6 +364,7 @@ app.factory("DocumentoFactory", function($uibModal, pinesNotifications, blockUI,
 					$scope.fDataDoc = {};
 					$scope.fDataDoc.mes = $scope.fArr.listaMes[0];
 					$scope.fDataDoc.anio = $scope.fArr.listaAnio[0];
+          $scope.fDataDoc.dia = $scope.fArr.listaDia[0];
 					$scope.fDataDoc.categoria = $scope.fArr.listaCategoria[0];
 					
 					$scope.titleForm = 'Registra documento';
@@ -348,6 +386,7 @@ app.factory("DocumentoFactory", function($uibModal, pinesNotifications, blockUI,
             formData.append('moneda', $scope.fDataDoc.moneda.id);
             formData.append('mes', $scope.fDataDoc.mes.id);
 						formData.append('anio', $scope.fDataDoc.anio.id);
+            formData.append('dia', $scope.fDataDoc.dia.id);
 						formData.append('categoria', $scope.fDataDoc.categoria.id);
 						
 						// console.log('formData ==>', formData);

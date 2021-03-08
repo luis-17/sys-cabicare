@@ -39,6 +39,7 @@ class Documento extends CI_Controller {
 				$arrListado,
 				array(
 					'documentoId' => $row['documentoId'],
+					'fechaDocumento' => $row['dia'].'-'.$row['mes'].'-'.$row['anio'],
 					'anio' => array(
 						'id' => $row['anio'],
 						'descripcion' => $row['anio'],
@@ -59,7 +60,7 @@ class Documento extends CI_Controller {
 					'numDoc' => $row['numDoc'],
 					'numSerie' => $row['numSerie'],
 					'codigoExterno' => $row['codigoExterno'],
-					'fechaCreacion' => darFormatoDMY($row['fechaCreacion']),
+					'fechaCreacion' => formatoFechaReporte4($row['fechaCreacion']),
 					'observaciones' => $row['observaciones'],
 					'monto' => $row['monto'],
 					// 'nombreArchivo' => $row['nombreArchivo'],
@@ -127,6 +128,7 @@ class Documento extends CI_Controller {
 		// $allInputs['citaId'] = $this->input->post('citaId');
 		$allInputs['mes'] = $this->input->post('mes');
 		$allInputs['anio'] = $this->input->post('anio');
+		$allInputs['dia'] = $this->input->post('dia');
 		$allInputs['categoria'] = $this->input->post('categoria');
 		$allInputs['codigoExterno'] = $this->input->post('codigoExterno');
 		$allInputs['observaciones'] = $this->input->post('observaciones');
@@ -137,11 +139,11 @@ class Documento extends CI_Controller {
 		$allInputs['moneda'] = $this->input->post('moneda');
 		$allInputs['ruc'] = $this->input->post('ruc');
 
-		$allInputs['fechaSubida'] = date('Y-m-d H:i:s');
+		// $allInputs['fechaSubida'] = date('Y-m-d H:i:s');
 		$this->db->trans_start();
 		if( !empty($_FILES['nombreArchivo_blob']) ){
 			$extension = pathinfo($_FILES['nombreArchivo_blob']['name'], PATHINFO_EXTENSION);
-			$nuevoNombreArchivo = strtotime("now").'-'.$allInputs['mes'].$allInputs['anio'].'.'.$extension;
+			$nuevoNombreArchivo = strtotime("now").'-'.$allInputs['mes'].$allInputs['anio'].$allInputs['dia'].'.'.$extension;
 			if( subir_fichero('assets/dinamic/documentos','nombreArchivo_blob',$nuevoNombreArchivo) ){
 				$allInputs['nombreArchivo'] = $nuevoNombreArchivo;
 			}

@@ -4,8 +4,8 @@
 <div class="modal-body">
 	<form class="row" name="formDocumento">
 		<div class="form-group col-sm-6 mb-md">
-			<label class="control-label mb-n block"> PERIODO</label>
-			<label> {{fDataDoc.mes.descripcion}} - {{fDataDoc.anio.descripcion}} </label>
+			<label class="control-label mb-n block"> FECHA DE DOCUMENTO</label>
+			<label> {{fDataDoc.fechaDocumento}}</label>
 		</div>
 		<div class="form-group col-sm-6 mb-md">
             <label class="control-label mb-n block"> Categoria</label>

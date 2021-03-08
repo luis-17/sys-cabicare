@@ -12,6 +12,10 @@
 			<select class="form-control input-sm" ng-model="fDataDoc.mes" required ng-options="item as item.descripcion for item in fArr.listaMes"></select>
 		</div>
 		<div class="form-group col-sm-6 mb-md">
+			<label class="control-label mb-n"> Dia <small class="text-danger">*</small>: </label>
+			<select class="form-control input-sm" ng-model="fDataDoc.dia" required ng-options="item as item.descripcion for item in fArr.listaDia"></select>
+		</div>
+		<div class="form-group col-sm-6 mb-md">
 			<label class="control-label mb-n"> Categoria <small class="text-danger">*</small>: </label>
 			<select class="form-control input-sm" ng-model="fDataDoc.categoria" required ng-options="item as item.descripcion for item in fArr.listaCategoria"></select>
 		</div>

@@ -82,6 +82,8 @@ class Model_cita extends CI_Model {
 			ci.horaDesde,
 			ci.horaHasta,
 			ci.apuntesCita,
+			ci.subtotal,
+			ci.igv,
 			ci.total,
 			ci.peso,
 			ci.talla,
