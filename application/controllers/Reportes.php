@@ -211,6 +211,181 @@ class Reportes extends CI_Controller {
 			->set_output(json_encode($arrData));
 	}
 
+	public function listado_documentos_excel()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+
+		// TRATAMIENTO DE DATOS //
+		$lista = array();
+
+		$paramPaginate = $allInputs['paginate'];
+		$paramPaginate['firstRow'] = FALSE;
+		$paramPaginate['pageSize'] = FALSE;
+		$paramDatos = $allInputs['filtro'];
+		$nombre_reporte = 'documentos';
+		$lista = $this->model_cita->m_cargar_documentos_excel($paramDatos);
+
+		$total = 0;
+		$arrListadoProd = array();
+		$i = 1;
+		foreach ($lista as $row) {
+			// if ( $row['estado'] == 1 ){
+			// 	$estado = 'POR CONFIRMAR';
+			// }elseif ( $row['estado'] == 2 ){
+			// 	$estado = 'CONFIRMADO';
+			// }elseif ( $row['estado'] == 3 ) {
+			// 	$estado = 'ATENDIDO';
+			// }else {
+			// 	$estado = '';
+			// }
+			array_push($arrListadoProd,
+				array(
+					$i++,
+					$row['documentoId'],
+					$row['categoria'],
+					$row['anio'].'/'.$row['mes'].'/'.$row['dia'],
+					$row['numSerie'],
+					$row['numDoc'],
+					$row['ruc'],
+					$row['observaciones'],
+					$row['monto'],
+					$row['moneda'],
+					formatoFechaReporte4($row['fechaCreacion'])
+				)
+			);
+		}
+
+		// SETEO DE VARIABLES
+		$dataColumnsTP = array(
+			array( 'col' => '#',                'ancho' =>  7, 	'align' => 'L' ),
+			array( 'col' => 'COD DOCUMENTO',			'ancho' => 10, 	'align' => 'C' ),
+			array( 'col' => "CATEGORIA",	'ancho' => 12, 	'align' => 'C' ),
+			array( 'col' => 'FECHA DOCUMENTO', 		'ancho' => 12, 	'align' => 'C' ),
+			array( 'col' => 'Nº SERIE',		'ancho' => 15, 	'align' => 'C' ),
+			array( 'col' => 'Nº DOCUMENTO',		'ancho' => 15, 	'align' => 'C' ),
+			array( 'col' => 'RUC',			'ancho' => 60, 	'align' => 'L' ),
+			array( 'col' => 'ANOTACIONES',			'ancho' => 60, 	'align' => 'L' ),
+			array( 'col' => 'MONTO',			'ancho' => 15, 	'align' => 'R' ),
+			array( 'col' => 'MONEDA',			'ancho' => 15, 	'align' => 'R' ),
+			array( 'col' => 'FECHA DE CREACION',			'ancho' => 15, 	'align' => 'R' )
+		);
+		$titulo = 'LISTADO DE DOCUMENTOS';
+		$nombre_hoja = 'Documentos';
+
+
+		$cantColumns = count($dataColumnsTP);
+		$arrColumns = array();
+		$this->excel->getActiveSheet()->getColumnDimension('A')->setWidth(2); // por defecto lo ponemos en 2 luego si se usa la columna se cambia
+		$a = 'B'; // INICIO DE COLUMNA
+		for ($x=0; $x < $cantColumns; $x++) {
+			$arrColumns[] = $a++;
+		}
+		$endColum = end($arrColumns);
+		$this->excel->setActiveSheetIndex(0);
+		$this->excel->getActiveSheet()->setTitle($nombre_hoja);
+		$this->excel->getActiveSheet()->setShowGridlines(false);
+
+		// ESTILOS
+		$styleArrayTitle = array(
+			'font'=>  array(
+				'bold'  => false,
+				'size'  => 18,
+				'name'  => 'calibri',
+				'color' => array('rgb' => 'FFFFFF')
+			),
+			'alignment' => array(
+				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+				'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+			),
+			'fill' => array(
+				'type' => PHPExcel_Style_Fill::FILL_SOLID,
+				'startcolor' => array( 'rgb' => '3A3838' )
+			),
+		);
+		$styleArraySubTitle = array(
+			'font'=>  array(
+				'bold'  => false,
+				'size'  => 12,
+				'name'  => 'Microsoft Sans Serif',
+				'color' => array('rgb' => 'FFFFFF')
+			),
+			'alignment' => array(
+				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+				'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+			),
+			'fill' => array(
+				'type' => PHPExcel_Style_Fill::FILL_SOLID,
+				'startcolor' => array( 'rgb' => '3A3838' )
+			),
+		);
+		$styleArrayHeader = array(
+			'borders' => array(
+				'allborders' => array(
+					'style' => PHPExcel_Style_Border::BORDER_THIN,
+					'color' => array('rgb' => '000000')
+				)
+			),
+			'alignment' => array(
+				'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+				'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+			),
+			'font'=>  array(
+				'bold'  => false,
+				'size'  => 10,
+				'name'  => 'calibri',
+				'color' => array('rgb' => 'FFFFFF')
+			),
+			'fill' => array(
+				'type' => PHPExcel_Style_Fill::FILL_SOLID,
+				'startcolor' => array( 'rgb' => '5B9BD5' )
+			),
+		);
+		// TITULO
+		$this->excel->getActiveSheet()->getCell($arrColumns[0].'1')->setValue($titulo);
+		$this->excel->getActiveSheet()->getStyle($arrColumns[0].'1')->applyFromArray($styleArrayTitle);
+		$this->excel->getActiveSheet()->mergeCells($arrColumns[0].'1:'. $endColum .'1');
+
+
+		$currentCellEncabezado = 4; // donde inicia el encabezado del listado
+		$fila_mes = $currentCellEncabezado - 1;
+		$fila = $currentCellEncabezado + 1;
+		$pieListado = $fila + count($arrListadoProd);
+
+		// ENCABEZADO DE LA LISTA
+		$i=0;
+		foreach ($dataColumnsTP as $key => $value) {
+			$this->excel->getActiveSheet()->getColumnDimension($arrColumns[$i])->setWidth($value['ancho']);
+			$this->excel->getActiveSheet()->getCell($arrColumns[$i].$currentCellEncabezado)->setValue($value['col']);
+			if( $value['align'] == 'C' ){
+				$this->excel->getActiveSheet()->getStyle($arrColumns[$i].$fila .':'.$arrColumns[$i].$pieListado)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+			}
+
+			$i++;
+		}
+		$c1 = $i;
+		$this->excel->getActiveSheet()->getStyle($arrColumns[0].$currentCellEncabezado.':'.$endColum.$currentCellEncabezado)->getAlignment()->setWrapText(true);
+		$this->excel->getActiveSheet()->getStyle($arrColumns[0].($currentCellEncabezado).':'.$endColum.($currentCellEncabezado))->applyFromArray($styleArrayHeader);
+		$this->excel->getActiveSheet()->getRowDimension($currentCellEncabezado)->setRowHeight(45);
+		$this->excel->getActiveSheet()->setAutoFilter($arrColumns[0].$currentCellEncabezado.':'.$endColum.$currentCellEncabezado);
+
+		// LISTA
+		$this->excel->getActiveSheet()->fromArray($arrListadoProd, null, $arrColumns[0].$fila);
+		$this->excel->getActiveSheet()->freezePane($arrColumns[0].$fila);
+
+		$objWriter = new PHPExcel_Writer_Excel2007($this->excel);
+		$time = date('YmdHis_His');
+		$objWriter->save('assets/dinamic/excelTemporales/'. $nombre_reporte . '_' . $time.'.xlsx');
+
+		$arrData = array(
+		  'urlTempEXCEL'=> 'assets/dinamic/excelTemporales/'. $nombre_reporte . '_' . $time.'.xlsx',
+		  'flag'=> 1
+		);
+
+		$this->output
+			->set_content_type('application/json')
+			->set_output(json_encode($arrData));
+	}
+
 	public function generar_pdf_receta()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);

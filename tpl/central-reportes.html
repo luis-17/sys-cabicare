@@ -131,6 +131,27 @@
                                 <input type="radio" ng-model="fBusqueda.salida" value="excel"  /> EXCEL 
                             </div>
                         </li>
+                        <li class="col-md-6 col-sm-6 form-group" ng-show="selectedReport.id=='DOC-ALL'">
+							<label> Categoria </label>
+							<div class="input-group">
+								<select class="form-control input-sm" ng-model="fBusqueda.categoriaDoc" 
+									ng-options="item as item.descripcion for item in fArr.listaCategoriaFiltro"></select>
+							</div>
+						</li>
+                        <li class="col-md-6 col-sm-6 form-group" ng-show="selectedReport.id=='DOC-ALL'">
+							<label> Año </label>
+							<div class="input-group">
+								<select class="form-control input-sm" ng-model="fBusqueda.anioDoc" 
+									ng-options="item as item.descripcion for item in fArr.listaAnioFiltro"></select>
+							</div>
+						</li>
+                        <li class="col-md-6 col-sm-6 form-group" ng-show="selectedReport.id=='DOC-ALL'">
+							<label> Mes </label>
+							<div class="input-group">
+								<select class="form-control input-sm" ng-model="fBusqueda.mesDoc" 
+									ng-options="item as item.descripcion for item in fArr.listaMesFiltro"></select>
+							</div>
+						</li>
                     </ul>
                     <div class="row" style="width: 100%; " ng-show="selectedReport.id"> 
                         <div class="col-md-12 col-sm-12 col-xs-12" style="border: 1px solid #f1f3f4;margin-left: 16px;"> 

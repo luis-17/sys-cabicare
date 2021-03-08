@@ -46,6 +46,43 @@ app.controller('CentralReportesCtrl', ['$scope', '$filter', '$uibModal', '$bootb
       { id : 'OM', descripcion:'ORDENADO POR MONTO'}
     ];
     $scope.fBusqueda.orden = $scope.fArr.listaOrden[0];
+    $scope.fArr.listaMesFiltro = [
+			{ id: 'ALL', descripcion: 'TODOS' },
+			{ id: 'ENERO', descripcion: 'ENERO' },
+			{ id: 'FEBRERO', descripcion: 'FEBRERO' },
+			{ id: 'MARZO', descripcion: 'MARZO' },
+			{ id: 'ABRIL', descripcion: 'ABRIL' },
+			{ id: 'MAYO', descripcion: 'MAYO' },
+			{ id: 'JUNIO', descripcion: 'JUNIO' },
+			{ id: 'JULIO', descripcion: 'JULIO' },
+			{ id: 'AGOSTO', descripcion: 'AGOSTO' },
+			{ id: 'SEPTIEMBRE', descripcion: 'SEPTIEMBRE' },
+			{ id: 'OCTUBRE', descripcion: 'OCTUBRE' },
+			{ id: 'NOVIEMBRE', descripcion: 'NOVIEMBRE' },
+			{ id: 'DICIEMBRE', descripcion: 'DICIEMBRE' }
+    ];
+    $scope.fBusqueda.mesDoc = $scope.fArr.listaMesFiltro[0];
+    $scope.fArr.listaAnioFiltro = [
+      {id : 'ALL', descripcion:'TODOS'},
+      {id: '2020', descripcion: '2020'},
+      {id: '2021', descripcion: '2021' },
+      {id: '2022', descripcion: '2022' },
+      {id: '2023', descripcion: '2023' },
+      {id: '2024', descripcion: '2024' },
+      {id: '2025', descripcion: '2025' }
+    ];
+    $scope.fBusqueda.anioDoc = $scope.fArr.listaAnioFiltro[0];
+    $scope.fArr.listaCategoriaFiltro = [
+      {id : 'ALL', descripcion:'TODOS'},
+      {id: 'FACTURAS', descripcion: 'FACTURAS'},
+      {id: 'BOLETA', descripcion: 'BOLETA'},
+			{id: 'RECIBOS', descripcion: 'RECIBOS' },
+			{id: 'RXH', descripcion: 'RXH' },
+			{id: 'BALANCES', descripcion: 'BALANCES' },
+			{id: 'EECC', descripcion: 'EECC' },
+			{id: 'OTROS', descripcion: 'OTROS' }
+		];
+    $scope.fBusqueda.categoriaDoc = $scope.fArr.listaCategoriaFiltro[0];
     $scope.fArr.listaEstadisticas = [
       {
         textReporte: 'REPORTES 1',
@@ -172,6 +209,24 @@ app.controller('CentralReportesCtrl', ['$scope', '$filter', '$uibModal', '$bootb
                 },
                 titulo: 'REPORTE DE CITAS',
                 tituloAbv: 'CIT-ALL'
+              }
+            };
+            ModalReporteFactory.getPopupReporte(arrParams); 
+            break;
+          case 'DOC-ALL':
+            var arrParams = {
+              url: angular.patchURLCI+'Reportes/listado_documentos_excel',
+              metodo: 'php',
+              salida: 'excel',
+              datos: {
+                paginate: {},
+                filtro: {
+                  categoriaDoc: $scope.fBusqueda.categoriaDoc,
+                  mesDoc: $scope.fBusqueda.mesDoc,
+                  anioDoc: $scope.fBusqueda.anioDoc
+                },
+                titulo: 'REPORTE DE DOCUMENTOS',
+                tituloAbv: 'DOC-ALL'
               }
             };
             ModalReporteFactory.getPopupReporte(arrParams); 
