@@ -5,11 +5,14 @@ class Model_producto extends CI_Model {
 		parent::__construct();
 	}
 
-	public function m_cargar_producto($paramPaginate){
-		$this->db->select("pr.id AS productoId, pr.nombre, pr.precio, pr.procedencia, pr.tipoProductoId, tp.nombre AS tipoProducto", FALSE);
+	public function m_cargar_producto($paramDatos, $paramPaginate){
+		$this->db->select("pr.id AS productoId, pr.nombre, pr.precio, pr.procedencia, pr.tipoProductoId, 
+			tp.nombre AS tipoProducto, se.nombre AS sede, se.id AS sedeId", FALSE);
 		$this->db->from('producto pr');
 		$this->db->join('tipoproducto tp', 'pr.tipoProductoId = tp.id');
+		$this->db->join('sede se', 'pr.sedeId = se.id');
 		$this->db->where('pr.estado', 1);
+		$this->db->where('se.id', $paramDatos['sede']['id']);
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
 			foreach ($paramPaginate['searchColumn'] as $key => $value) {
 				if(! empty($value)){
@@ -26,11 +29,13 @@ class Model_producto extends CI_Model {
 		return $this->db->get()->result_array();
 	}
 
-	public function m_count_producto($paramPaginate){
+	public function m_count_producto($paramDatos, $paramPaginate){
 		$this->db->select('COUNT(*) AS contador');
 		$this->db->from('producto pr');
 		$this->db->join('tipoproducto tp', 'pr.tipoProductoId = tp.id');
+		$this->db->join('sede se', 'pr.sedeId = se.id');
 		$this->db->where('pr.estado', 1);
+		$this->db->where('se.id', $paramDatos['sede']['id']);
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
 			foreach ($paramPaginate['searchColumn'] as $key => $value) {
 				if(! empty($value)){
@@ -56,11 +61,15 @@ class Model_producto extends CI_Model {
 			pr.precio,
 			pr.procedencia,
 			pr.tipoProductoId,
-			tp.nombre AS tipoProducto
+			tp.nombre AS tipoProducto,
+			se.nombre AS sede,
+			se.id AS sedeId
 		", FALSE);
 		$this->db->from('producto pr');
 		$this->db->join('tipoproducto tp', 'pr.tipoProductoId = tp.id');
+		$this->db->join('sede se', 'pr.sedeId = se.id');
 		$this->db->where('pr.estado', 1);
+		$this->db->where('pr.sedeId', $datos['sedeId']);
 		$this->db->like('pr.nombre', $datos['searchText']);
 		$this->db->limit(10);
 
@@ -71,6 +80,7 @@ class Model_producto extends CI_Model {
 	{
 		$data = array(
 			'tipoProductoId' => $datos['tipo_producto']['id'],
+			'sedeId' => $datos['sede']['id'],
 			'nombre' => strtoupper($datos['nombre']),
 			'precio' => $datos['precio'],
 			'procedencia' => $datos['procedencia']['id'],
@@ -85,10 +95,11 @@ class Model_producto extends CI_Model {
 	{
 		$data = array(
 			'tipoProductoId' => $datos['tipo_producto']['id'],
+			'sedeId' => $datos['sede']['id'],
 			'nombre' => strtoupper($datos['nombre']),
 			'updatedAt' => date("Y-m-d H:i:s"),
-      'precio' => $datos['precio'],
-      'procedencia' => $datos['procedencia']['id'],
+			'precio' => $datos['precio'],
+			'procedencia' => $datos['procedencia']['id'],
 		);
 		$this->db->where('id',$datos['idproducto']);
 		return $this->db->update('producto', $data);

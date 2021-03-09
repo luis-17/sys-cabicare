@@ -41,9 +41,9 @@ class Model_sede extends CI_Model {
 		return $fData;
 	}
 	public function m_cargar_sede_cbo(){
-		$this->db->select("se.idsede, se.descripcion_se, se.direccion_se, se.abreviatura_se");
+		$this->db->select("se.id AS sedeId, se.nombre");
 		$this->db->from('sede se');
-		$this->db->where('estado_se', 1);
+		$this->db->where('se.estado', 1);
 		return $this->db->get()->result_array();
 	}
 	public function m_registrar($datos)

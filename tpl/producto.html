@@ -6,6 +6,10 @@
 		<div class="col-xs-12 text-right">
 			<button class="btn m-b-xs btn-info pull-left btn-xs" ng-click="btnBuscar();"> 
 				<i class="fa fa-search"> </i> Buscar </button>
+			<div class="pull-left">
+				<select class="form-control input-sm" ng-change="metodos.getPaginationServerSide(true)" ng-model="fBusqueda.sede" ng-options="item as item.descripcion for item in fArr.listaSedeFiltro" 
+            	required tabindex="10" style="width: 140px;margin-left: 6px;margin-top: -3px;margin-bottom: 3px;" ></select>
+			</div>
 	        <button class="btn m-b-xs btn-success btn-xs" ng-click="btnNuevo();">
 	        	<i class="fa fa-file-text"></i> Nuevo </button>
 	        <button ng-if="mySelectionGrid.length == 1" ng-click="btnEditar();" class="btn m-b-xs btn-warning btn-xs"> 

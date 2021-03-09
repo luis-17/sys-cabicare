@@ -79,7 +79,8 @@ angular.module('app')
             templateUrl: 'tpl/producto.html',
             resolve: load([
               'angular/controllers/ProductoCtrl.js',
-              'angular/controllers/TipoProductoCtrl.js'
+              'angular/controllers/TipoProductoCtrl.js',
+              'angular/controllers/SedeCtrl.js'
             ])
           })
           .state('app.reserva-cita', {

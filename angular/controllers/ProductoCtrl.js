@@ -2,13 +2,16 @@ app.controller('ProductoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$
   'ProductoFactory',
   'ProductoServices',
   'TipoProductoServices',
+  'SedeServices',
   function($scope, $filter, $uibModal, $bootbox, $log, $timeout, pinesNotifications, uiGridConstants, blockUI,
   ProductoFactory,
   ProductoServices,
-  TipoProductoServices
+  TipoProductoServices,
+  SedeServices
   ) {
     $scope.metodos = {}; // contiene todas las funciones
     $scope.fArr = {}; // contiene todos los arrays generados por las funciones
+    $scope.fBusqueda = {};
     $scope.mySelectionGrid = [];
     $scope.btnBuscar = function(){
       $scope.gridOptions.enableFiltering = !$scope.gridOptions.enableFiltering;
@@ -19,6 +22,25 @@ app.controller('ProductoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$
       var myCallback = myCallback || function() { };
       TipoProductoServices.sListarCbo().then(function(rpta) {
         $scope.fArr.listaTipoProducto = rpta.datos;
+        myCallback();
+      });
+    };
+    $scope.metodos.listaSedeFiltro = function() {
+      SedeServices.sListarCbo().then(function(rpta) {
+        $scope.fArr.listaSedeFiltro = rpta.datos;
+        $scope.fBusqueda.sede = $scope.fArr.listaSedeFiltro[0];
+        // myCallback();
+
+        $scope.metodos.getPaginationServerSide(true);
+        
+      });
+    };
+    $scope.metodos.listaSedeFiltro();
+    
+    $scope.metodos.listaSede = function(myCallback) {
+      var myCallback = myCallback || function() { };
+      SedeServices.sListarCbo().then(function(rpta) {
+        $scope.fArr.listaSede = rpta.datos;
         myCallback();
       });
     };
@@ -45,6 +67,8 @@ app.controller('ProductoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$
       multiSelect: false,
       columnDefs: [
         { field: 'idproducto', name: 'pr.id', displayName: 'ID', width: '75',  sort: { direction: uiGridConstants.DESC} },
+        { field: 'sede', name: 'se.nombre', width: 120, enableFiltering: false,
+          cellTemplate:'<div class="ui-grid-cell-contents text-left ">'+ '{{ COL_FIELD.descripcion }}</div>',  displayName: 'Sede' },
         { field: 'tipo_producto', name: 'tp.nombre', width: 160,
           cellTemplate:'<div class="ui-grid-cell-contents text-left ">'+ '{{ COL_FIELD.descripcion }}</div>',  displayName: 'Tipo Producto' },
         // { field: 'tipo_producto', name: 'tp.nombre', displayName: 'Tipo Producto', minWidth: 100 },
@@ -81,10 +105,10 @@ app.controller('ProductoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$
           paginationOptions.search = true;
           paginationOptions.searchColumn = {
             'pr.id' : grid.columns[1].filters[0].term,
-            'tp.nombre' : grid.columns[2].filters[0].term,
-            'pr.nombre' : grid.columns[3].filters[0].term,
-            'pr.precio' : grid.columns[4].filters[0].term,
-            'pr.procedencia' : grid.columns[5].filters[0].term
+            'tp.nombre' : grid.columns[3].filters[0].term,
+            'pr.nombre' : grid.columns[4].filters[0].term,
+            'pr.precio' : grid.columns[5].filters[0].term,
+            'pr.procedencia' : grid.columns[6].filters[0].term
           }
           $scope.metodos.getPaginationServerSide();
         });
@@ -96,7 +120,8 @@ app.controller('ProductoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$
         blockUI.start('Procesando información...');
       }
       var arrParams = {
-        paginate : paginationOptions
+        paginate : paginationOptions,
+        datos: $scope.fBusqueda
       };
       ProductoServices.sListar(arrParams).then(function (rpta) {
         if( rpta.datos.length == 0 ){
@@ -110,7 +135,7 @@ app.controller('ProductoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$
       });
       $scope.mySelectionGrid = [];
     };
-    $scope.metodos.getPaginationServerSide(true);
+    
     // MAS ACCIONES
     $scope.btnNuevo = function() {
       var arrParams = {
@@ -233,6 +258,13 @@ app.factory("ProductoFactory", function($uibModal, pinesNotifications, blockUI, 
             $scope.fData.tipo_producto = $scope.fArr.listaTipoProducto[0];
           }
           $scope.metodos.listaTipoProducto(myCallBackCC);
+
+          var myCallBackSede = function() {
+            $scope.fArr.listaSede.splice(0,0,{ id : '0', descripcion:'--Seleccione sede--'});
+            $scope.fData.sede = $scope.fArr.listaSede[0];
+          }
+          $scope.metodos.listaSede(myCallBackSede);
+
           $scope.modoEdit = true;
           $scope.aceptar = function () {
             blockUI.start('Procesando información...');
@@ -294,6 +326,7 @@ app.factory("ProductoFactory", function($uibModal, pinesNotifications, blockUI, 
           }).shift();
           console.log(objIndexProc, 'objIndexProc');
           $scope.fData.procedencia = objIndexProc;
+
           //BINDEO TIPO PRODUCTO
           var myCallBackCC = function() {
             var objIndex = $scope.fArr.listaTipoProducto.filter(function(obj) {
@@ -302,6 +335,16 @@ app.factory("ProductoFactory", function($uibModal, pinesNotifications, blockUI, 
             $scope.fData.tipo_producto = objIndex;
           }
           $scope.metodos.listaTipoProducto(myCallBackCC);
+
+          //BINDEO SEDE
+          var myCallBackSede = function() {
+            var objIndex = $scope.fArr.listaSede.filter(function(obj) {
+              return obj.id == $scope.fData.sede.id;
+            }).shift();
+            $scope.fData.sede = objIndex;
+          }
+          $scope.metodos.listaSede(myCallBackSede);
+
           $scope.modoEdit = false;
           $scope.aceptar = function () {
             blockUI.start('Procesando información...');

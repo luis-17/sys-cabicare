@@ -8,7 +8,11 @@
             <select class="form-control input-sm" ng-model="fData.tipo_producto" ng-options="item as item.descripcion for item in fArr.listaTipoProducto" 
             	required tabindex="10" ></select>
 		</div>
-		
+		<div class="form-group col-md-4 mb-md ">
+			<label class="control-label mb-n"> Sede <small class="text-danger">(*)</small> </label>
+            <select class="form-control input-sm" ng-model="fData.sede" ng-options="item as item.descripcion for item in fArr.listaSede" 
+            	required tabindex="15" ></select>
+		</div>
 		<div class="form-group col-md-8 mb-md">
 			<label class="control-label mb-n"> Nombre <small class="text-danger">(*)</small> </label>
 			<input type="text" class="form-control input-sm" ng-model="fData.nombre" placeholder="Nombre del producto" required tabindex="20" />

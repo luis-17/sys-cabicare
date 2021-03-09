@@ -847,8 +847,9 @@ app.factory("ReservaCitasFactory",
 					/* PRODUCTO */
 					$scope.getProductoAutocomplete = function (value) {
 						var params = {
-							searchText: value,
-						}
+							sedeId: $scope.fData.sede.id,
+							searchText: value
+						};
 						return ProductoServices.sListarProductoAutocomplete(params).then(function (rpta) {
 							$scope.noResultsPr = false;
 							if (rpta.flag === 0) {
@@ -1194,6 +1195,7 @@ app.factory("ReservaCitasFactory",
 					$scope.getProductoAutocomplete = function (value) {
 						var params = {
 							searchText: value,
+							sedeId: $scope.fData.sede.id
 						}
 						return ProductoServices.sListarProductoAutocomplete(params).then(function (rpta) {
 							$scope.noResultsPr = false;

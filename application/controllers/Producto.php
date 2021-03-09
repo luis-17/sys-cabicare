@@ -14,8 +14,9 @@ class Producto extends CI_Controller {
 	public function listar_producto(){
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
 		$paramPaginate = $allInputs['paginate'];
-		$lista = $this->model_producto->m_cargar_producto($paramPaginate);
-		$fCount = $this->model_producto->m_count_producto($paramPaginate);
+		$paramDatos = $allInputs['datos'];
+		$lista = $this->model_producto->m_cargar_producto($paramDatos, $paramPaginate);
+		$fCount = $this->model_producto->m_count_producto($paramDatos, $paramPaginate);
 		$arrListado = array();
 		foreach ($lista as $row) {
 			array_push($arrListado,
@@ -25,6 +26,10 @@ class Producto extends CI_Controller {
 					'tipo_producto' => array(
 						'id'=> $row['tipoProductoId'],
 						'descripcion'=> strtoupper($row['tipoProducto'])
+					),
+					'sede' => array(
+						'id'=> $row['sedeId'],
+						'descripcion'=> strtoupper($row['sede'])
 					),
 					'precio' => $row['precio'],
 					'procedenciaStr' => $row['procedencia'] === 'EXT' ? 'EXTERNO':'INTERNO',
@@ -78,6 +83,10 @@ class Producto extends CI_Controller {
 					'tipo_producto' => array(
 						'id'			=> $row['tipoProductoId'],
 						'descripcion'	=> strtoupper($row['tipoProducto'])
+					),
+					'sede' => array(
+						'id'			=> $row['sedeId'],
+						'descripcion'	=> strtoupper($row['sede'])
 					)
 				)
 			);
@@ -97,10 +106,10 @@ class Producto extends CI_Controller {
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
 		$arrData['message'] = 'Error al registrar los datos, inténtelo nuevamente';
-    	$arrData['flag'] = 0;
-    	// VALIDACIONES
+    $arrData['flag'] = 0;
+    // VALIDACIONES
 
-    	$this->db->trans_start();
+    $this->db->trans_start();
 		if($this->model_producto->m_registrar($allInputs)) { // registro de elemento
 			$arrData['message'] = 'Se registraron los datos correctamente';
 			$arrData['flag'] = 1;
