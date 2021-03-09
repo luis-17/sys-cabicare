@@ -139,30 +139,6 @@ class Model_cita extends CI_Model {
 		return $this->db->get()->result_array();
 	}
 
-	public function m_cargar_documentos_excel($paramDatos) {
-		$this->db->select("do.id AS documentoId, do.mes, do.anio, do.categoria, do.codigoExterno, do.observaciones, 
-		do.monto, do.estado, do.numSerie, do.numDoc, do.ruc, do.moneda, do.dia,
-        do.nombreArchivo, do.fechaCreacion, us.id AS usuarioId, concat_ws(' ', us.nombres, us.apellidos) AS usuarioRegistro,", FALSE);
-		$this->db->from('documento do');
-		$this->db->join('usuario us', 'do.usuarioEnvioId = us.id');
-        $this->db->where('do.estado', 1);
-
-        if( $paramDatos['categoriaDoc']['id'] != 'ALL' ){
-            $this->db->where('do.categoria', $paramDatos['categoriaDoc']['id']);
-        }
-        if( $paramDatos['mesDoc']['id'] != 'ALL' ){
-            $this->db->where('do.mes', $paramDatos['mesDoc']['id']);
-        }
-        if( $paramDatos['anioDoc']['id'] != 'ALL' ){
-            $this->db->where('do.anio', $paramDatos['anioDoc']['id']);
-        }
-		
-        if( !($this->sessionFactur['keyPerfil'] == 'key_root' || $this->sessionFactur['keyPerfil'] == 'key_cont') ){
-            $this->db->where('do.usuarioEnvioId', $this->sessionFactur['usuarioId']);
-        }
-		return $this->db->get()->result_array();
-	}
-
 	public function m_count_citas_en_grilla($paramPaginate,$paramDatos){
 		$desde = $this->db->escape(darFormatoYMD($paramDatos['fechaDesde']));
  		$hasta = $this->db->escape(darFormatoYMD($paramDatos['fechaHasta']));

@@ -6,7 +6,7 @@ class Model_documento extends CI_Model {
 	}
 	public function m_cargar_documento($paramPaginate, $paramDatos){
 		$this->db->select("do.id AS documentoId, do.mes, do.anio, do.categoria, do.codigoExterno, do.observaciones, 
-		do.monto, do.estado, do.numSerie, do.numDoc, do.ruc, do.moneda, do.dia,
+		do.monto, do.estado, do.numSerie, do.numDoc, do.ruc, do.moneda, do.dia, do.razonSocial,
         do.nombreArchivo, do.fechaCreacion, us.id AS usuarioId, concat_ws(' ', us.nombres, us.apellidos) AS usuarioRegistro,", FALSE);
 		$this->db->from('documento do');
 		$this->db->join('usuario us', 'do.usuarioEnvioId = us.id');
@@ -70,6 +70,32 @@ class Model_documento extends CI_Model {
 		$fData = $this->db->get()->row_array();
 		return $fData;
 	}
+
+	public function m_cargar_documentos_excel($paramDatos) {
+		$this->db->select("do.id AS documentoId, do.mes, do.anio, do.categoria, do.codigoExterno, do.observaciones, 
+		do.monto, do.estado, do.numSerie, do.numDoc, do.ruc, do.moneda, do.dia, do.razonSocial,
+        do.nombreArchivo, do.fechaCreacion, us.id AS usuarioId, concat_ws(' ', us.nombres, us.apellidos) AS usuarioRegistro,", FALSE);
+		$this->db->from('documento do');
+		$this->db->join('usuario us', 'do.usuarioEnvioId = us.id');
+        $this->db->where('do.estado', 1);
+
+        if( $paramDatos['categoriaDoc']['id'] != 'ALL' ){
+            $this->db->where('do.categoria', $paramDatos['categoriaDoc']['id']);
+        }
+        if( $paramDatos['mesDoc']['id'] != 'ALL' ){
+            $this->db->where('do.mes', $paramDatos['mesDoc']['id']);
+        }
+        if( $paramDatos['anioDoc']['id'] != 'ALL' ){
+            $this->db->where('do.anio', $paramDatos['anioDoc']['id']);
+        }
+		
+        if( !($this->sessionFactur['keyPerfil'] == 'key_root' || $this->sessionFactur['keyPerfil'] == 'key_cont') ){
+            $this->db->where('do.usuarioEnvioId', $this->sessionFactur['usuarioId']);
+        }
+		return $this->db->get()->result_array();
+	}
+
+
 	public function m_registrar($datos)
 	{
 		$data = array(
@@ -84,6 +110,7 @@ class Model_documento extends CI_Model {
 			'numSerie'=> empty($datos['numSerie']) ? NULL : $datos['numSerie'],
 			'moneda'=> empty($datos['moneda']) ? NULL : $datos['moneda'],
 			'ruc'=> empty($datos['ruc']) ? NULL : $datos['ruc'],
+			'razonSocial'=> empty($datos['razonSocial']) ? NULL : $datos['razonSocial'],
 			'nombreArchivo'=> $datos['nombreArchivo'],
 			'usuarioEnvioId'=> $this->sessionFactur['usuarioId'],
 			'fechaCreacion' => date('Y-m-d H:i:s')

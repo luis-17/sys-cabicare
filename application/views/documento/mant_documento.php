@@ -3,15 +3,15 @@
 </div>
 <div class="modal-body">
 	<form class="row" name="formDocumento">
-		<div class="form-group col-sm-6 mb-md">
+		<div class="form-group col-sm-4 mb-md">
 			<label class="control-label mb-n"> Año <small class="text-danger">*</small>: </label>
 			<select class="form-control input-sm" ng-model="fDataDoc.anio" required ng-options="item as item.descripcion for item in fArr.listaAnio"></select>
 		</div>
-		<div class="form-group col-sm-6 mb-md">
+		<div class="form-group col-sm-4 mb-md">
 			<label class="control-label mb-n"> Mes <small class="text-danger">*</small>: </label>
 			<select class="form-control input-sm" ng-model="fDataDoc.mes" required ng-options="item as item.descripcion for item in fArr.listaMes"></select>
 		</div>
-		<div class="form-group col-sm-6 mb-md">
+		<div class="form-group col-sm-4 mb-md">
 			<label class="control-label mb-n"> Dia <small class="text-danger">*</small>: </label>
 			<select class="form-control input-sm" ng-model="fDataDoc.dia" required ng-options="item as item.descripcion for item in fArr.listaDia"></select>
 		</div>
@@ -35,6 +35,10 @@
 		<div class="form-group col-md-6 mb-md">
 			<label class="control-label mb-n"> RUC </label>
 			<input type="text" class="form-control input-sm" ng-model="fDataDoc.ruc" placeholder="Ingrese RUC" />
+		</div>
+		<div class="form-group col-md-6 mb-md">
+			<label class="control-label mb-n"> RAZON SOCIAL </label>
+			<input type="text" class="form-control input-sm" ng-model="fDataDoc.razonSocial" placeholder="Ingrese razon social" />
 		</div>
 		<div class="form-group col-md-6 mb-md">
 			<label class="control-label mb-n"> Código Interno </label>

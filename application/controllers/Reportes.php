@@ -5,7 +5,7 @@ class Reportes extends CI_Controller {
 	public function __construct(){
 		parent::__construct();
 		$this->load->helper(array('fechas_helper', 'pdf_helper', 'otros_helper'));
-		$this->load->model(array('model_cita', 'model_paciente'));
+		$this->load->model(array('model_cita', 'model_paciente', 'model_documento'));
 		$this->load->library(array('excel','Fpdfext'));
 
 		$this->output->set_header("Cache-Control: no-store, no-cache, must-revalidate, no-transform, max-age=0, post-check=0, pre-check=0");
@@ -223,7 +223,7 @@ class Reportes extends CI_Controller {
 		$paramPaginate['pageSize'] = FALSE;
 		$paramDatos = $allInputs['filtro'];
 		$nombre_reporte = 'documentos';
-		$lista = $this->model_cita->m_cargar_documentos_excel($paramDatos);
+		$lista = $this->model_documento->m_cargar_documentos_excel($paramDatos);
 
 		$total = 0;
 		$arrListadoProd = array();
@@ -247,6 +247,7 @@ class Reportes extends CI_Controller {
 					$row['numSerie'],
 					$row['numDoc'],
 					$row['ruc'],
+					$row['razonSocial'],
 					$row['observaciones'],
 					$row['monto'],
 					$row['moneda'],
@@ -264,6 +265,7 @@ class Reportes extends CI_Controller {
 			array( 'col' => 'Nº SERIE',		'ancho' => 15, 	'align' => 'C' ),
 			array( 'col' => 'Nº DOCUMENTO',		'ancho' => 15, 	'align' => 'C' ),
 			array( 'col' => 'RUC',			'ancho' => 45, 	'align' => 'L' ),
+			array( 'col' => 'RAZON SOCIAL',			'ancho' => 45, 	'align' => 'L' ),
 			array( 'col' => 'ANOTACIONES',			'ancho' => 60, 	'align' => 'L' ),
 			array( 'col' => 'MONTO',			'ancho' => 15, 	'align' => 'R' ),
 			array( 'col' => 'MONEDA',			'ancho' => 15, 	'align' => 'R' ),

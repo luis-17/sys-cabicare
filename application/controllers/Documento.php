@@ -57,6 +57,7 @@ class Documento extends CI_Controller {
 						'descripcion' => $row['moneda'],
 					),
 					'ruc' => $row['ruc'],
+					'razonSocial' => $row['razonSocial'],
 					'numDoc' => $row['numDoc'],
 					'numSerie' => $row['numSerie'],
 					'codigoExterno' => $row['codigoExterno'],
@@ -138,6 +139,7 @@ class Documento extends CI_Controller {
 		$allInputs['numSerie'] = $this->input->post('numSerie');
 		$allInputs['moneda'] = $this->input->post('moneda');
 		$allInputs['ruc'] = $this->input->post('ruc');
+		$allInputs['razonSocial'] = $this->input->post('razonSocial');
 
 		// $allInputs['fechaSubida'] = date('Y-m-d H:i:s');
 		$this->db->trans_start();

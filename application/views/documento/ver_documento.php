@@ -24,6 +24,10 @@
             <label> {{fDataDoc.ruc}} </label>
         </div>
         <div class="form-group col-sm-6 mb-md">
+            <label class="control-label mb-n block"> RAZON SOCIAL</label>
+            <label> {{fDataDoc.razonSocial}} </label>
+        </div>
+        <div class="form-group col-sm-6 mb-md">
             <label class="control-label mb-n block"> N° Serie / N° Doc</label>
             <label> {{fDataDoc.numSerie}} - {{fDataDoc.numDoc}}</label>
 		</div>
