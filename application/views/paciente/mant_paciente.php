@@ -43,6 +43,10 @@
 			<label class="control-label mb-n"> Celular: </label>
 			<input type="text" class="form-control input-sm" ng-model="fData.celular" placeholder="Ingrese celular" tabindex="80" />
 		</div>
+		<div class="form-group col-md-6 mb-md">
+			<label class="control-label mb-n"> Dirección: </label>
+			<input type="text" class="form-control input-sm" ng-model="fData.direccionPersona" placeholder="Ingrese dirección" tabindex="80" />
+		</div>
 		<div class="form-group col-md-6 mb-md ">
 			<label class="control-label mb-n"> Distrito <small class="text-danger">(*)</small> </label>
             <select class="form-control input-sm" ng-model="fData.distrito" ng-options="item as item.descripcion for item in fArr.listaDistrito" 
@@ -64,9 +68,23 @@
 			<label class="control-label mb-n"> Antecedentes </label>
 			<textarea class="form-control input-sm" ng-model="fData.antecedentes" placeholder="Antecedentes" tabindex="300" rows="5"></textarea>
 		</div>
+		<hr>
+		<div class="form-group col-md-6 mb-md">
+			<label class="control-label mb-n"> RUC: </label>
+			<input type="text" class="form-control input-sm" ng-model="fData.ruc" placeholder="Ingrese ruc" tabindex="80" />
+		</div>
+		<div class="form-group col-md-6 mb-md">
+			<label class="control-label mb-n"> Razón Social: </label>
+			<input type="text" class="form-control input-sm" ng-model="fData.razonSocial" placeholder="Ingrese razón social" tabindex="80" />
+		</div>
+		<div class="form-group col-md-6 mb-md">
+			<label class="control-label mb-n"> Dirección Fiscal: </label>
+			<input type="text" class="form-control input-sm" ng-model="fData.direccionFiscal" placeholder="Ingrese dirección fiscal" tabindex="80" />
+		</div>
+		
 	</form>
 </div>
 <div class="modal-footer">
     <button class="btn btn-primary" ng-click="aceptar(); $event.preventDefault();" ng-disabled="formPaciente.$invalid">Aceptar</button>
     <button class="btn btn-warning" ng-click="cancel()">Cerrar</button>
-</div> 
+</div>

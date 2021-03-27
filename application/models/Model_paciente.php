@@ -6,6 +6,7 @@ class Model_paciente extends CI_Model {
 	}
 	public function m_cargar_paciente($paramPaginate){
 		$this->db->select("pa.id AS pacienteId, pa.nombres, pa.apellidoPaterno, pa.apellidoMaterno, 
+		pa.direccionPersona, pa.direccionFiscal, pa.ruc, pa.razonSocial,
 		pa.tipoDocumento, pa.numeroDocumento, pa.medioContacto, pa.distritoId, di.nombre AS distrito,
 		pa.sexo, pa.fechaNacimiento, pa.celular, pa.email, pa.alergias, pa.operador, pa.antecedentes, pa.createdAt", FALSE);
 		$this->db->from('paciente pa');
@@ -61,7 +62,11 @@ class Model_paciente extends CI_Model {
 			pa.alergias,
 			pa.operador,
 			pa.antecedentes,
-			pa.distritoId, 
+			pa.distritoId,
+			pa.direccionFiscal,
+			pa.direccionPersona,
+			pa.razonSocial,
+			pa.ruc,
 			di.nombre AS distrito,
 			concat_ws(' ', pa.nombres, pa.apellidoPaterno, pa.apellidoMaterno) AS paciente
 		", FALSE);
@@ -142,6 +147,10 @@ class Model_paciente extends CI_Model {
 			'operador' => $datos['operador']['id'],
 			'alergias' => empty($datos['alergias']) ? NULL : $datos['alergias'],
 			'antecedentes' => empty($datos['antecedentes']) ? NULL : $datos['antecedentes'],
+			'ruc' => empty($datos['ruc']) ? NULL : $datos['ruc'],
+			'razonSocial' => empty($datos['razonSocial']) ? NULL : $datos['razonSocial'],
+			'direccionFiscal' => empty($datos['direccionFiscal']) ? NULL : $datos['direccionFiscal'],
+			'direccionPersona' => empty($datos['direccionPersona']) ? NULL : $datos['direccionPersona'],
 			'estado'=> 1,
 			'createdat' => date('Y-m-d H:i:s'),
 			'updatedat' => date('Y-m-d H:i:s')
@@ -166,6 +175,10 @@ class Model_paciente extends CI_Model {
 			'operador' => $datos['operador']['id'],
 			'alergias' => empty($datos['alergias']) ? NULL : $datos['alergias'],
 			'antecedentes' => empty($datos['antecedentes']) ? NULL : $datos['antecedentes'],
+			'ruc' => empty($datos['ruc']) ? NULL : $datos['ruc'],
+			'razonSocial' => empty($datos['razonSocial']) ? NULL : $datos['razonSocial'],
+			'direccionFiscal' => empty($datos['direccionFiscal']) ? NULL : $datos['direccionFiscal'],
+			'direccionPersona' => empty($datos['direccionPersona']) ? NULL : $datos['direccionPersona'],
 			'updatedat' => date('Y-m-d H:i:s')
 		);
 		$this->db->where('id',$datos['idpaciente']);

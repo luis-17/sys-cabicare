@@ -443,6 +443,8 @@ app.service("CitaServices", function ($http, $q, handleBehavior) {
 		sListarCitaCalendario: sListarCitaCalendario,
 		sListarDetalleCita: sListarDetalleCita,
 		sListarDetallePagos: sListarDetallePagos,
+		sListarDetalleFacturas: sListarDetalleFacturas,
+		sGenerarDocumento: sGenerarDocumento,
 		sRegistrar: sRegistrar,
 		sEditar: sEditar,
     sMoverCita: sMoverCita,
@@ -480,6 +482,22 @@ app.service("CitaServices", function ($http, $q, handleBehavior) {
 		var request = $http({
 			method: "post",
 			url: angular.patchURLCI + "Cita/listar_detalle_pagos",
+			data: datos
+		});
+		return (request.then(handleBehavior.success, handleBehavior.error));
+	}
+	function sListarDetalleFacturas(datos) {
+		var request = $http({
+			method: "post",
+			url: angular.patchURLCI + "Cita/listar_detalle_facturas",
+			data: datos
+		});
+		return (request.then(handleBehavior.success, handleBehavior.error));
+	}
+	function sGenerarDocumento(datos) {
+		var request = $http({
+			method: "post",
+			url: angular.patchURLCI + "Cita/generar_documento_electronico",
 			data: datos
 		});
 		return (request.then(handleBehavior.success, handleBehavior.error));
@@ -1531,12 +1549,12 @@ app.factory("ReservaCitasFactory",
 								$scope.fData.temporalCont.metodoPago.id == 'TARJETA DE CRÉDITO') {
 
 									var montoPago = $scope.fData.temporalCont.monto;
-									var comision = ( montoPago - (montoPago / 1.045)).toFixed(2);
+									var comision = ( montoPago - (montoPago / 1.04)).toFixed(2);
 									$scope.gridOptions.data.push({
 										id:null,
 										citaId: $scope.fData.id,
 										idproducto: 70,
-										producto: 'COMISION POR USO DE TARJETA (4.5%)',
+										producto: 'COMISION POR USO DE TARJETA (4%)',
 										tipoProducto: 'TARJETAS',
 										tipoProductoId: 5,
 										precio: comision,
@@ -1591,6 +1609,95 @@ app.factory("ReservaCitasFactory",
 
 						$scope.calcularTotalesCont();
 					}
+
+					// SECCION DE FACT. ELECRONICA
+					$scope.gridOptionsFE = {
+						rowHeight: 30,
+						enableGridMenu: false,
+						enableColumnMenus: false,
+						enableRowSelection: false,
+						enableSelectAll: false,
+						enableFiltering: false,
+						enableSorting: false,
+						enableFullRowSelection: false,
+						enableCellEdit: false,
+						multiSelect: false,
+						data: [],
+						columnDefs: [
+							// { field: 'id', name: 'id', displayName: 'ID', minWidth: 80, width: 80 },
+							{ field: 'tipoDocumento', name: 'tipoDocumento', displayName: 'TIPO DE DOC.', width: 160,
+								cellTemplate:'<div class="ui-grid-cell-contents text-left ">'+ '{{ COL_FIELD.descripcion }}</div>' },
+							{ field: 'numSerie', name: 'numSerie', displayName: 'N° SERIE', width: 140 },
+							{ field: 'numDocumento', name: 'numDocumento', displayName: 'N° DOCUMENTO', width: 170 },
+							{ field: 'estado', name: 'estado', displayName: 'ESTADO', width: 170, 
+								cellTemplate:'<div class="ui-grid-cell-contents text-left ">'+ '{{ COL_FIELD.descripcion }}</div>' },
+							{
+								field: 'eliminar', name: 'eliminar', displayName: '', width: 100,
+								cellTemplate: '<button class="btn btn-default btn-sm text-danger btn-action" ng-click="grid.appScope.btnVerDocumento(row);$event.stopPropagation();"> <i class="fa fa-eye" tooltip-placement="left" uib-tooltip="VER DOC."></i> </button>'
+							}
+						],
+						onRegisterApi: function (gridApi) {
+							$scope.gridApi = gridApi;
+						}
+					};
+					$scope.getTableHeightFE = function () {
+						var rowHeight = 30; // your row height
+						var headerHeight = 30; // your header height
+						var cant_filas = 4; // min 4
+						if ($scope.gridOptionsFE.data.length > cant_filas) {
+							var cant_filas = $scope.gridOptionsFE.data.length;
+						}
+						return {
+							height: (cant_filas * rowHeight + headerHeight) + "px"
+						};
+					}
+
+					$scope.getPaginationServerSideFE = function (loader) {
+						if (loader) {
+							blockUI.start('Procesando información...');
+						}
+						var arrParams = {
+							citaId: $scope.fData.id
+						};
+						CitaServices.sListarDetalleFacturas(arrParams).then(function (rpta) {
+							if (rpta.datos.length == 0) {
+								rpta.paginate = { totalRows: 0 };
+							}
+							$scope.gridOptionsFE.data = rpta.datos;
+							if (loader) {
+								blockUI.stop();
+							}
+						});
+					};
+					$scope.getPaginationServerSideFE(true);
+
+					$scope.btnGenerarFact = function() {
+						var pMensaje = '¿Realmente desea generar el documento electrónico?';
+						$bootbox.confirm(pMensaje, function(result) {
+							if (result) {
+								var arrParams = {
+									idcita: $scope.fData.id
+								};
+								blockUI.start('Procesando información...');
+								CitaServices.sGenerarDocumento(arrParams).then(function (rpta) {
+									if(rpta.flag == 1){
+										var pTitle = 'OK!';
+										var pType = 'success';
+										$scope.getPaginationServerSideFE();
+										console.log('rpta.payload ==> ', rpta.payload);
+									}else if(rpta.flag == 0){
+										var pTitle = 'Error!';
+										var pType = 'danger';
+									}else{
+										alert('Error inesperado');
+									}
+									pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 2500 });
+									blockUI.stop();
+								});
+							}
+						});
+					}
+
 
 					/* BOTONES FINALES */
 					$scope.cancel = function () {

@@ -354,10 +354,22 @@
 					<label class="control-label mb-n"> Anotaciones </label>
 					<textarea class="form-control input-sm" ng-model="fData.anotacionesPago" placeholder="Anotaciones" tabindex="200" rows="5"></textarea>
 				</div>
-				<div class="col-sm-12 ">
-					<button class="btn btn-info pull-right" type="button">GENERAR FACTURA ELECTRÓNICA</button>
+				
+			</div>
+
+			<!-- FACTRACION ELECTRONICA -->
+			<div class="row" ng-if="fData.tipoCita == '3'">
+				<div class="col-sm-12">
+					<h3> Facturación Electrónica</h3>
+				</div>
+				<div class="col-sm-12 mb">
+					<button ng-click="btnGenerarFact()" class="btn btn-info pull-right" type="button">GENERAR FACTURA ELECTRÓNICA</button>
+				</div>
+				<div class="col-lg-12">
+					<div ui-grid="gridOptionsFE" ui-grid-auto-resize ui-grid-resize-columns ui-grid-edit class="grid table-responsive fs-mini-grid" ng-style="getTableHeightFE();"></div>
 				</div>
 			</div>
+
 			<hr>
 			<div class="row" ng-if="fData.tipoCita == '3'">
 				<div class="col-sm-12">

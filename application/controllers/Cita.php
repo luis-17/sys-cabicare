@@ -418,6 +418,251 @@ class Cita extends CI_Controller {
 		    ->set_output(json_encode($arrData));
 	}
 
+	public function listar_detalle_facturas()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+
+		$arrListado = $this->model_cita->m_cargar_detalle_facturas($allInputs['citaId']);
+		foreach($arrListado as $key => $row) {
+			$strTipoDocumento = null;
+			if ($row['tipoDocumento'] == '1') {
+				$strTipoDocumento = 'BOLETA';
+			}
+			if ($row['tipoDocumento'] == '2') {
+				$strTipoDocumento = 'FACTURA';
+			}
+			if ($row['tipoDocumento'] == '3') {
+				$strTipoDocumento = 'NOTA DE CRÉDITO';
+			}
+			if ($row['tipoDocumento'] == '4') {
+				$strTipoDocumento = 'NOTA DE DÉBITO';
+			}
+			if ($row['estado'] == '1') {
+				$strEstado = 'ACTIVO';
+			}
+			if ($row['estado'] == '2') {
+				$strEstado = 'ANULADO';
+			}
+			$arrListado[$key]['tipoDocumento'] = array(
+				'id' => $row['tipoDocumento'],
+				'descripcion' => $strTipoDocumento
+			);
+			$arrListado[$key]['estado'] = array(
+				'id' => $row['estado'],
+				'descripcion' => $strEstado
+			);
+		};
+
+		$arrData['datos'] = $arrListado;
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+	}
+
+	public function generar_documento_electronico(){
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$arrData['message'] = 'Error al registrar los datos, inténtelo nuevamente';
+		$arrData['flag'] = 0;
+		// VALIDACIONES
+		$fCita = $this->model_cita->m_obtener_cita($allInputs['idcita']);
+		$arrDetalleCita = $this->model_cita->m_cargar_detalle_cita(array('id'=> $allInputs['idcita']));
+		if( empty($fCita['tipoDocumentoCont']) || $fCita['tipoDocumentoCont'] == '0'){
+			$arrData['message'] = 'Debe seleccionar un tipo de documento válido.';
+			$arrData['flag'] = 0;
+			$this->output
+				->set_content_type('application/json')
+				->set_output(json_encode($arrData));
+			return;
+		}
+		if( $fCita['tipoDocumentoCont'] == 'FACTURA' && empty($fCita['ruc']) ){
+			$arrData['message'] = 'Se debe llenar el campo RUC del paciente, para generar una factura.';
+			$arrData['flag'] = 0;
+			$this->output
+				->set_content_type('application/json')
+				->set_output(json_encode($arrData));
+			return;
+		}
+		if( $fCita['tipoDocumentoCont'] == 'FACTURA' && empty($fCita['razonSocial']) ){
+			$arrData['message'] = 'Se debe llenar el campo RAZÓN SOCIAL del paciente, para generar una factura.';
+			$arrData['flag'] = 0;
+			$this->output
+				->set_content_type('application/json')
+				->set_output(json_encode($arrData));
+			return;
+		}
+
+		$clienteTipoDoc = '-';
+		$serie = null;
+		if($fCita['tipoDocumentoCont'] == 'BOLETA'){
+			$tipoDocCont = '2';
+			$serie = $fCita['serieb'];
+			// doc cliente
+			if($fCita['tipoDocumento'] == 'DNI'){
+				$clienteTipoDoc = '1';
+			}
+			if($fCita['tipoDocumento'] == 'PAS'){
+				$clienteTipoDoc = '7';
+			}
+			if($fCita['tipoDocumento'] == 'CEX'){
+				$clienteTipoDoc = '4';
+			}
+			if($fCita['tipoDocumento'] == 'DNI'){
+				$clienteTipoDoc = '1';
+			}
+			$clienteNumDoc = $fCita['numeroDocumento'];
+			$clienteDenominacion = $fCita['nombres'].' '.$fCita['apellidoPaterno'].' '.$fCita['apellidoMaterno'];
+			$clienteDireccion = $fCita['direccionPersona'];
+		}
+		if($fCita['tipoDocumentoCont'] == 'FACTURA'){
+			$tipoDocCont = '1';
+			$serie = $fCita['serief'];
+			$clienteTipoDoc = '6';
+			$clienteNumDoc = $fCita['ruc'];
+			$clienteDenominacion = $fCita['razonSocial'];
+			$clienteDireccion = $fCita['direccionFiscal'];
+		}
+
+		$fFact = $this->model_cita->m_obtener_ultimo_correlativo($serie);
+		if (empty($fFact['correlativo'])) {
+			$numDocGen = 1;
+		} else {
+			$numDocGen = (int)$fFact['correlativo'] + 1;
+		}
+		
+		// DETALLE DOCUMENTO
+		$arrDetalle = array();
+		foreach ($arrDetalleCita as $row => $key) {
+			$igvDetalle = round($row['precio'] - ($row['precio'] / 1.18), 2);
+			array_push($arrDetalle,
+				array(
+					"unidad_de_medida" 					=> 'ZZ',
+					"codigo" 										=> $row['idproducto'],
+					"descripcion" 							=> $row['producto'],
+					"cantidad" 									=> '1',
+					"valor_unitario" 						=> round($row['precio'] - $igvDetalle, 2),
+					"precio_unitario" 					=> $row['precio'],
+					"descuento"                 => "",
+					"subtotal"                  => round($row['precio'] - $igvDetalle, 2), // "500",
+					"tipo_de_igv"               => "1",
+					"igv"                       => $igvDetalle, // 90
+					"total"                     => $row['precio'], // 590
+					"anticipo_regularizacion"   => "false",
+					"anticipo_documento_serie"  => "",
+					"anticipo_documento_numero" => ""
+				)
+			);
+		}
+
+		$data = array(
+			"operacion"													=> "generar_comprobante",
+			"tipo_de_comprobante"               => $tipoDocCont,
+			"serie"                             => $serie,
+			"numero"														=> $numDocGen,
+			"sunat_transaction"									=> "1",
+			"cliente_tipo_de_documento"					=> $clienteTipoDoc, // "6"
+			"cliente_numero_de_documento"				=> $clienteNumDoc, // "20600695771",
+			"cliente_denominacion"              => $clienteDenominacion,
+			"cliente_direccion"                 => $clienteDireccion, // "CALLE LIBERTAD 116 MIRAFLORES - LIMA - PERU",
+			"cliente_email"                     => $fCita['email'],
+			"cliente_email_1"                   => "",
+			"cliente_email_2"                   => "",
+			"fecha_de_emision"                  => date('d-m-Y'),
+			"fecha_de_vencimiento"              => "",
+			"moneda"                            => "1", // soles
+			"tipo_de_cambio"                    => "",
+			"porcentaje_de_igv"                 => "18.00",
+			"descuento_global"                  => "",
+			"descuento_global"                  => "",
+			"total_descuento"                   => "",
+			"total_anticipo"                    => "",
+			"total_gravada"                     => $fCita['subtotal'],
+			"total_inafecta"                    => "",
+			"total_exonerada"                   => "",
+			"total_igv"                         => $fCita['igv'],
+			"total_gratuita"                    => "",
+			"total_otros_cargos"                => "",
+			"total"                             => $fCita['total'],
+			"percepcion_tipo"                   => "",
+			"percepcion_base_imponible"         => "",
+			"total_percepcion"                  => "",
+			"total_incluido_percepcion"         => "",
+			"detraccion"                        => "false",
+			"observaciones"                     => "",
+			"documento_que_se_modifica_tipo"    => "",
+			"documento_que_se_modifica_serie"   => "",
+			"documento_que_se_modifica_numero"  => "",
+			"tipo_de_nota_de_credito"           => "",
+			"tipo_de_nota_de_debito"            => "",
+			"enviar_automaticamente_a_la_sunat" => "true",
+			"enviar_automaticamente_al_cliente" => "true",
+			"codigo_unico"                      => $fCita['id'],
+			"condiciones_de_pago"               => "",
+			"medio_de_pago"                     => "",
+			"placa_vehiculo"                    => "",
+			"orden_compra_servicio"             => "",
+			"tabla_personalizada_codigo"        => "",
+			"formato_de_pdf"                    => "",
+			"items" => $arrDetalle
+		);
+		$data_json = json_encode($data);
+
+		$ch = curl_init();
+		
+		print_r($ch);
+		print_r(NB_LINK);
+		curl_setopt($ch, CURLOPT_URL, NB_LINK);
+		curl_setopt(
+			$ch, CURLOPT_HTTPHEADER, array(
+			'Authorization: Token token="'.NB_AUTH.'"',
+			'Content-Type: application/json',
+			)
+		);
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($ch, CURLOPT_POSTFIELDS,$data_json);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		$respuesta  = curl_exec($ch);
+		curl_close($ch);
+
+		$leer_respuesta = json_decode($respuesta, true);
+		print_r('Leer respuesta:');
+		print_r($leer_respuesta);
+		print_r('...End');
+		if (isset($leer_respuesta['errors'])) {
+			//Mostramos los errores si los hay
+			$arrData['message'] = $leer_respuesta['errors'].'| CÓDIGO: '.$leer_respuesta['codigo'];
+			$arrData['flag'] = 0;
+			$this->output
+				->set_content_type('application/json')
+				->set_output(json_encode($arrData));
+			return;
+		}
+
+		// registramos en tabla facturacion
+
+		$this->db->trans_start();
+		
+		$arrDataFact = array(
+			'tipoDocumento' => $tipoDocCont,
+			'numSerie' => $serie,
+			'numDocumento' => $numDocGen,
+			'estado' => 1,
+			'citaId' => $allInputs['idcita'],
+			'fechaRegistro' => date('Y-m-d H:i:s'),
+			'link_pdf' => $leer_respuesta['enlace_del_pdf'],
+			'key_nubefact' => $leer_respuesta['key']
+		);
+		$this->model_cita->m_registrar_facturacion($arrDataFact);
+
+		$this->db->trans_complete();
+		$arrData['message'] = 'Se generó correctamente el documento electrónico.';
+		$arrData['flag'] = 1;
+		$arrData['payload'] = $arrDataFact;
+		$this->output
+			->set_content_type('application/json')
+			->set_output(json_encode($arrData));
+	}
+
 	public function ver_popup_form_cita(){
 		$this->load->view('cita/cita_formView');
 	}

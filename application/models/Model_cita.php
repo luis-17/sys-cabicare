@@ -373,7 +373,7 @@ class Model_cita extends CI_Model {
 		$this->db->order_by('cp.id', 'ASC');
 		return $this->db->get()->result_array();
 	}
-	public function m_cargar_detalle_pagos($citaId) // ME QUEDE AQUI, MODIFICAR ESTE METODO
+	public function m_cargar_detalle_pagos($citaId)
 	{
 		$this->db->select("
 			pg.id,
@@ -387,6 +387,23 @@ class Model_cita extends CI_Model {
 		$this->db->where('pg.citaId', $citaId);
 		$this->db->where('estado', 1);
 		$this->db->order_by('fechaRegistro', 'ASC');
+		// $this->db->order_by('cp.id', 'ASC');
+		return $this->db->get()->result_array();
+	}
+	public function m_cargar_detalle_facturas($citaId)
+	{
+		$this->db->select("
+			fc.id,
+			fc.citaId,
+			fc.tipoDocumento,
+			fc.numSerie,
+			fc.numDocumento,
+			fc.estado
+		", FALSE);
+		$this->db->from('facturacion fc');
+		$this->db->where('fc.citaId', $citaId);
+		$this->db->where_in('fc.estado', array(1, 2));
+		$this->db->order_by('fc.fechaRegistro', 'DESC');
 		// $this->db->order_by('cp.id', 'ASC');
 		return $this->db->get()->result_array();
 	}
@@ -421,13 +438,25 @@ class Model_cita extends CI_Model {
 		return $this->db->get()->result_array();
 	}
 	public function m_obtener_cita($citaId) {
-		$this->db->select("ci.id, ci.estado, pa.celular");
+		$this->db->select("ci.id, ci.estado, pa.celular, pa.tipoDocumento, pa.numeroDocumento, 
+			pa.nombres, pa.apellidoPaterno, pa.ruc, pa.direccionPersona, pa.direccionFiscal, pa.razonSocial,
+			pa.apellidoMaterno, pa.email, ci.tipoDocumentoCont, ci.subtotal, ci.igv, ci.total, se.nombre AS sede, se.serief, se.serieb", FALSE);
 		$this->db->from('cita ci');
 		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
+		$this->db->join('sede se', 'ci.sedeId = se.id');
 		$this->db->where('ci.id', $citaId);
 		$this->db->limit('1');
 		return $this->db->get()->row_array();
 	}
+
+	public function m_obtener_ultimo_correlativo($serie) {
+		$this->db->select("MAX(numDocumento) AS correlativo", FALSE);
+		$this->db->from('facturacion fc');
+		$this->db->where('fc.numSerie', $serie);
+		$this->db->limit(1);
+		return $this->db->get()->row_array();
+	}
+
 	public function m_cargar_cita_por_id($datos){
 		$this->db->select("
 			ci.id,
@@ -482,6 +511,12 @@ class Model_cita extends CI_Model {
 	public function m_registrar($data)
 	{
 		$this->db->insert('cita', $data);
+		return $this->db->insert_id();
+	}
+
+	public function m_registrar_facturacion($data)
+	{
+		$this->db->insert('facturacion', $data);
 		return $this->db->insert_id();
 	}
 

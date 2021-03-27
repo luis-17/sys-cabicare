@@ -82,6 +82,10 @@ class Paciente extends CI_Controller {
 						'id'=> $row['operador'],
 						'descripcion'=> $row['operador']
 					),
+					'ruc' => $row['ruc'],
+					'razonSocial' => $row['razonSocial'],
+					'direccionFiscal' => $row['direccionFiscal'],
+					'direccionPersona' => $row['direccionPersona'],
 					'celular' => $row['celular'],
 					'email' => strtoupper($row['email']),
 					'alergias' => $row['alergias'],
@@ -195,10 +199,10 @@ class Paciente extends CI_Controller {
 			    ->set_output(json_encode($arrData));
 		    return;
     	}
-		/* VALIDAR SI EL RUC YA EXISTE */
+		/* VALIDAR SI EL DNI YA EXISTE */
     	$fCliente = $this->model_paciente->m_validar_paciente_num_documento($allInputs['num_documento'],TRUE,$allInputs['idpaciente']);
     	if( $fCliente ) {
-    		$arrData['message'] = 'El RUC ingresado, ya existe.';
+    		$arrData['message'] = 'El DNI ingresado, ya existe.';
 			$arrData['flag'] = 0;
 			$this->output
 			    ->set_content_type('application/json')
