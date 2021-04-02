@@ -604,30 +604,56 @@ class Cita extends CI_Controller {
 			"formato_de_pdf"                    => "",
 			"items" => $arrDetalle
 		);
-		$data_json = json_encode($data);
+		// $data_json = json_encode($data);
+
+		$dataBB = array('name' => 'value', 'name2' => 'value2');
+		$encoded = '';
+		foreach($dataBB as $name => $value){
+				$encoded .= urlencode($name).'='.urlencode($value).'&';
+		}
+		// chop off the last ampersand
+		$encoded = substr($encoded, 0, strlen($encoded)-1);
 
 		$ch = curl_init();
 		
 		print_r($ch);
-		print_r(NB_LINK);
+		// print_r(NB_AUTH);
 		curl_setopt($ch, CURLOPT_URL, NB_LINK);
 		curl_setopt(
 			$ch, CURLOPT_HTTPHEADER, array(
 			'Authorization: Token token="'.NB_AUTH.'"',
 			'Content-Type: application/json',
+			// 'Expect:',
 			)
 		);
 		curl_setopt($ch, CURLOPT_POST, 1);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-		curl_setopt($ch, CURLOPT_POSTFIELDS,$data_json);
+		// curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+		curl_setopt($ch, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1);
+		// 'CURLOPT_SSLVERSION' => 'CURL_SSLVERSION_TLSv1',
+		curl_setopt($ch, CURLOPT_TIMEOUT, 30); // CURLOPT_TIMEOUT        => 30,
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $encoded);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+		print_r(curl_getinfo($ch, CURLINFO_HTTP_CODE));
+
 		$respuesta  = curl_exec($ch);
+
+		if ($respuesta === false) {
+			$respuesta = curl_error($ch);
+			echo stripslashes($respuesta);
+		}
+    	
+
 		curl_close($ch);
 
 		$leer_respuesta = json_decode($respuesta, true);
 		print_r('Leer respuesta:');
 		print_r($leer_respuesta);
 		print_r('...End');
+
+		
+
 		if (isset($leer_respuesta['errors'])) {
 			//Mostramos los errores si los hay
 			$arrData['message'] = $leer_respuesta['errors'].'| CÓDIGO: '.$leer_respuesta['codigo'];

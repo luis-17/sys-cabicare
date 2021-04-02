@@ -745,6 +745,7 @@ class Model_cita extends CI_Model {
 		return $this->db->get()->result_array();
 	}
 
+	// PRODUCCION GENERAL 
 	public function m_obtener_produccion_general($params)
 	{
 		$this->db->select("
@@ -836,6 +837,33 @@ class Model_cita extends CI_Model {
 		}
 		return $this->db->get()->result_array();
 	}
+
+	public function m_obtener_produccion_general_group_metodo_pago($params)
+	{
+		$this->db->select("COUNT(*) AS contador, SUM(pg.monto) AS total, pg.metodoPago", FALSE);
+		$this->db->from('cita ci');
+		$this->db->join('pago pg', 'ci.id = pg.citaId');
+		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
+		$this->db->where('ci.estado', 3);
+		// $this->db->where('pa.estado', 1);
+		$this->db->where('pg.estado', 1);
+		// if($params['origen']['id'] === 'INT'){
+		// 	$this->db->where('pr.procedencia', 'INT');
+		// }
+		// if($params['origen']['id'] === 'EXT'){
+		// 	$this->db->where('pr.procedencia', 'EXT');
+		// }
+		$this->db->where("DATE(pg.fechaRegistro) BETWEEN '" . darFormatoYMD($params['desde']) ."' AND '" . darFormatoYMD($params['hasta'])."'");
+		$this->db->group_by('pg.metodoPago');
+		// if($params['orden']['id'] == 'OC'){
+		// 	$this->db->order_by('COUNT(*)', 'DESC');
+		// }
+		// if($params['orden']['id'] == 'OM'){
+		// 	$this->db->order_by('SUM(cp.precioReal)', 'DESC');
+		// }
+		return $this->db->get()->result_array();
+	}
+
 	public function m_actualizar_cita_sms($idcita)
 	{
 		$data = array(

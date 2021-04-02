@@ -229,15 +229,6 @@ class Reportes extends CI_Controller {
 		$arrListadoProd = array();
 		$i = 1;
 		foreach ($lista as $row) {
-			// if ( $row['estado'] == 1 ){
-			// 	$estado = 'POR CONFIRMAR';
-			// }elseif ( $row['estado'] == 2 ){
-			// 	$estado = 'CONFIRMADO';
-			// }elseif ( $row['estado'] == 3 ) {
-			// 	$estado = 'ATENDIDO';
-			// }else {
-			// 	$estado = '';
-			// }
 			array_push($arrListadoProd,
 				array(
 					$i++,

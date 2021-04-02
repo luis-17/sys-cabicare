@@ -37,7 +37,8 @@ app.controller('CentralReportesCtrl', ['$scope', '$filter', '$uibModal', '$bootb
       { id : '', descripcion:'--Seleccione tipo--'},
       { id : 'DET', descripcion:'DETALLADO'},
       { id : 'RPP', descripcion:'RESUMIDO POR PRODUCTO'},
-      { id : 'RPM', descripcion:'RESUMIDO POR MÉDICO'}
+      { id : 'RPM', descripcion:'RESUMIDO POR MÉDICO'},
+      { id : 'RPMP', descripcion:'RESUMIDO POR MÉTODO DE PAGO'}
     ];
     $scope.fBusqueda.tipoReporte = $scope.fArr.listaTipoReporte[0];
     $scope.fBusqueda.tipoReporte2 = $scope.fArr.listaTipoReporte2[0];

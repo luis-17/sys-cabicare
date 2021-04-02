@@ -449,7 +449,7 @@ class CentralReportes extends CI_Controller {
     $this->pdf->SetFont('Arial','',8);
     $this->pdf->Cell(0,5,$allInputs['medico']['descripcion']);
     $this->pdf->Ln();
-    // $this->pdf->Ln();
+    // $this->pdf->Ln(); RPM
 
     $fill = TRUE;
     $headerDetalle = array('N°', 'FECHA AT.', 'PACIENTE', 'N° DOC.', 'TIPO PROD.', 'PRODUCTO', 'M. PAGO', 'PRECIO');
@@ -598,6 +598,11 @@ class CentralReportes extends CI_Controller {
       $this->pdf->SetAligns(array('L', 'C', 'R', 'R'));
       $this->pdf->SetWidths(array(5, 90, 30, 40));
     }
+    if($allInputs['tipoReporte']['id'] === 'RPMP'){
+      $headerDetalle = array('N°', 'MÉTODO DE PAGO', 'CANTIDAD', 'MONTO');
+      $this->pdf->SetAligns(array('L', 'C', 'R', 'R'));
+      $this->pdf->SetWidths(array(5, 90, 30, 40));
+    }
 
     $wDetalle = $this->pdf->GetWidths();
     $this->pdf->Ln();
@@ -669,6 +674,23 @@ class CentralReportes extends CI_Controller {
         $totalAtenciones += $row['total'];
       }
     }
+    if($allInputs['tipoReporte']['id'] === 'RPMP'){
+      $lista = $this->model_cita->m_obtener_produccion_general_group_metodo_pago($allInputs);
+      $this->pdf->SetFont('Arial','',8);
+      foreach ($lista as $key => $row) {
+        $this->pdf->Row( 
+          array( 
+            ++$i,
+            utf8_decode($row['metodoPago']),
+            $row['contador'],
+            'S/. '.number_format(round($row['total'],2),2)
+          )
+          ,$fill
+        );
+        $fill = !$fill;
+        $totalAtenciones += $row['total'];
+      }
+    }
     if($allInputs['tipoReporte']['id'] === 'DET'){
       $this->pdf->SetWidths(array(255, 25));
       $this->pdf->SetFont('Arial','B',12);
@@ -685,7 +707,7 @@ class CentralReportes extends CI_Controller {
         ),TRUE,0,$arrBolds
       );
     }
-    if($allInputs['tipoReporte']['id'] === 'RPP' || $allInputs['tipoReporte']['id'] === 'RPM'){
+    if($allInputs['tipoReporte']['id'] === 'RPP' || $allInputs['tipoReporte']['id'] === 'RPM' || $allInputs['tipoReporte']['id'] === 'RPMP'){
       $this->pdf->SetWidths(array(125, 40));
       $this->pdf->SetFont('Arial','B',12);
       $this->pdf->SetFillColor(224,235,255);
@@ -717,4 +739,3 @@ class CentralReportes extends CI_Controller {
         ->set_output(json_encode($arrData));
   }
 }
-?>
