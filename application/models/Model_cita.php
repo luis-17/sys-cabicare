@@ -438,9 +438,9 @@ class Model_cita extends CI_Model {
 		return $this->db->get()->result_array();
 	}
 	public function m_obtener_cita($citaId) {
-		$this->db->select("ci.id, ci.estado, pa.celular, pa.tipoDocumento, pa.numeroDocumento, 
+		$this->db->select("ci.id, ci.estado, pa.celular, pa.tipoDocumento, pa.numeroDocumento, se.serief, se.serieb, se.token,
 			pa.nombres, pa.apellidoPaterno, pa.ruc, pa.direccionPersona, pa.direccionFiscal, pa.razonSocial,
-			pa.apellidoMaterno, pa.email, ci.tipoDocumentoCont, ci.subtotal, ci.igv, ci.total, se.nombre AS sede, se.serief, se.serieb", FALSE);
+			pa.apellidoMaterno, pa.email, ci.tipoDocumentoCont, ci.subtotal, ci.igv, ci.total, se.nombre AS sede", FALSE);
 		$this->db->from('cita ci');
 		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
 		$this->db->join('sede se', 'ci.sedeId = se.id');
@@ -449,10 +449,11 @@ class Model_cita extends CI_Model {
 		return $this->db->get()->row_array();
 	}
 
-	public function m_obtener_ultimo_correlativo($serie) {
+	public function m_obtener_ultimo_correlativo($serie, $tipoDoc) {
 		$this->db->select("MAX(numDocumento) AS correlativo", FALSE);
 		$this->db->from('facturacion fc');
 		$this->db->where('fc.numSerie', $serie);
+		$this->db->where('fc.tipoDocumento', $tipoDoc);
 		$this->db->limit(1);
 		return $this->db->get()->row_array();
 	}

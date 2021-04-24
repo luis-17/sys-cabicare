@@ -61,8 +61,20 @@
 						required
 					></select>
 	      </div>
-
-				<div class="form-group col-md-6">
+				<div class="form-group col-md-3 mb-md">
+					<label class="control-label mb-n"> Tipo de Documento </label>
+					<select class="form-control input-sm" ng-model="fData.tipoDocumentoCont" ng-options="item as item.descripcion for item in fArr.listaTipoDocumentoCont" tabindex="60" ></select> 
+				</div>
+				<div class="form-group col-md-3 mb-md">
+					<label class="control-label mb-n"> N° Serie / Factura </label>
+					<div class="group-bloque" style="display:flex;">
+						<input type="text" class="form-control input-sm" ng-model="fData.numSerie" placeholder="Ingrese N° Serie" 
+							style="width: 100px; margin-right: 4px;" />
+						<input type="text" class="form-control input-sm" ng-model="fData.numDoc" placeholder="Ingrese N° Doc." 
+							style="" />
+					</div>
+				</div>
+				<div class="form-group col-md-4">
 	            	<label for="name" class="control-label minotaur-label">Médico : </label>
 					<input
 						type="text"
@@ -83,7 +95,7 @@
 					</div>
 				</div>
 
-				<div class="form-group col-md-3">
+				<div class="form-group col-md-2">
 					<label for="name" class="control-label minotaur-label">Fecha <span class="text-danger">*</span>: </label>
 					<div class="input-group">
 						<input type="text" required class="form-control input-sm" uib-datepicker-popup ng-model="fData.fecha" is-open="configDP.popup.opened"
@@ -275,19 +287,6 @@
 			<div class="row" ng-if="fData.tipoCita == '3'">
 				<div class="col-sm-12">
 					<h3> Datos de Pago</h3>
-				</div>
-				<div class="form-group col-md-4 mb-md">
-					<label class="control-label mb-n"> Tipo de Documento </label>
-					<select class="form-control input-sm" ng-model="fData.tipoDocumentoCont" ng-options="item as item.descripcion for item in fArr.listaTipoDocumentoCont" tabindex="60" ></select> 
-				</div>
-				<div class="form-group col-md-4 mb-md">
-					<label class="control-label mb-n"> N° Serie / Factura </label>
-					<div class="group-bloque" style="display:flex;">
-						<input type="text" class="form-control input-sm" ng-model="fData.numSerie" placeholder="Ingrese N° Serie" 
-							style="width: 100px; margin-right: 4px;" />
-						<input type="text" class="form-control input-sm" ng-model="fData.numDoc" placeholder="Ingrese N° Doc." 
-							style="" />
-					</div>
 				</div>
 				<!-- <hr class="col-lg-12"> -->
 				<div class="col-lg-12">

@@ -4,8 +4,16 @@
 <div class="modal-body">
 	<form class="row" name="formMant">
 		<div class="form-group col-sm-6 mb-md">
-			<label class="control-label mb-n"> TipoNota <small class="text-danger">*</small>: </label>
+			<label class="control-label mb-n"> Tipo Nota <small class="text-danger">*</small>: </label>
 			<select class="form-control input-sm" ng-model="fDataNota.tipoNota" required ng-options="item as item.descripcion for item in fArr.listaTipoNota"></select>
+		</div>
+		<div class="form-group col-sm-6 mb-md" ng-if="fDataNota.tipoNota.id == 'NOTA DE DEBITO'">
+			<label class="control-label mb-n"> Tipo Nota Débito <small class="text-danger">*</small>: </label>
+			<select class="form-control input-sm" ng-model="fDataNota.tipoNotaDebito" required ng-options="item as item.descripcion for item in fArr.listaTipoNotaDebito"></select>
+		</div>
+		<div class="form-group col-sm-6 mb-md" ng-if="fDataNota.tipoNota.id == 'NOTA DE CREDITO'">
+			<label class="control-label mb-n"> Tipo Nota Crédito <small class="text-danger">*</small>: </label>
+			<select class="form-control input-sm" ng-model="fDataNota.tipoNotaCredito" required ng-options="item as item.descripcion for item in fArr.listaTipoNotaCredito"></select>
 		</div>
 		<div class="form-group col-md-6 mb-md">
 			<label class="control-label mb-n"> N° Serie / Factura </label>

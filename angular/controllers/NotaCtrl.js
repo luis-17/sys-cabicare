@@ -24,6 +24,32 @@ app.controller('NotaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$log'
         { id: 'NOTA DE CREDITO', descripcion: 'NOTA DE CREDITO' }
     ];
 
+    $scope.fArr.listaTipoNotaDebito = [
+      { id: '', descripcion: '--Seleccione tipo--' },
+      { id: '1', descripcion: 'INTERESES POR MORA' },
+      { id: '2', descripcion: 'AUMENTO DE VALOR' },
+      { id: '3', descripcion: 'PENALIDADES' },
+      { id: '4', descripcion: 'AJUSTES AFECTOS AL IVAP' },
+      { id: '5', descripcion: 'AJUSTES DE OPERACIONES DE EXPORTACION' }
+    ];
+
+    $scope.fArr.listaTipoNotaCredito = [
+      { id: '', descripcion: '--Seleccione tipo--' },
+      { id: '1', descripcion: 'ANULACION DE LA OPERACION' },
+      { id: '2', descripcion: 'ANULACION POR ERROR EN EL RUC' },
+      { id: '3', descripcion: 'CORRECCION POR ERROR EN LA DESCRIPCION' },
+      { id: '4', descripcion: 'DESCUENTO GLOBAL' },
+      { id: '5', descripcion: 'DESCUENTO POR ITEM' },
+      { id: '6', descripcion: 'DEVOLUCION TOTAL' },
+      { id: '7', descripcion: 'DEVOLUCION POR ITEM' },
+      { id: '8', descripcion: 'BONIFICACION' },
+      { id: '9', descripcion: 'DISMINUCION EN EL VALOR' },
+      { id: '10', descripcion: 'OTROS CONCEPTOS' },
+      { id: '11', descripcion: 'AJUSTES AFECTOS AL IVAP' },
+      { id: '12', descripcion: 'AJUSTES DE OPERACIONES DE EXPORTACION' },
+      { id: '13', descripcion: 'AJUSTES - MONTOS Y/O FECHAS DE PAGO' }
+    ];
+
     $scope.fBusqueda.tipoNota = $scope.fArr.listaTipoNotaFiltro[0];
     $scope.fBusqueda.desde = $filter('date')(new Date(),'01-MM-yyyy');
     $scope.fBusqueda.desdeHora = '00';
@@ -63,7 +89,8 @@ app.controller('NotaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$log'
         { field: 'numDoc', name: 'no.numDoc', displayName: 'N° Documento', width: 100 },
         { field: 'total', name: 'no.total', displayName: 'Total', width: 120, enableFiltering: false },
         { field: 'numDocAsoc', name: 'no.numDocAsoc', displayName: 'Doc. asociado', width: 120, enableFiltering: false },
-		    { field: 'usuarioRegistro', name: 'us.nombres', displayName: 'Usuario Creación', width: 140, enableFiltering: false }
+		    { field: 'usuarioRegistro', name: 'us.nombres', displayName: 'Usuario Creación', width: 140, enableFiltering: false },
+		    { field: 'motivo', name: 'no.motivo', displayName: 'Motivo', minWidth: 140, enableFiltering: false }
       ],
       onRegisterApi: function(gridApi) {
         $scope.gridApi = gridApi;
@@ -254,6 +281,9 @@ app.factory("NotaFactory", function($uibModal, pinesNotifications, blockUI, Nota
 					$scope.fArr = arrParams.fArr;
 					$scope.fDataNota = {};
 					$scope.fDataNota.tipoNota = $scope.fArr.listaTipoNota[0];
+          $scope.fDataNota.tipoNotaDebito = $scope.fArr.listaTipoNotaDebito[0];
+          $scope.fDataNota.tipoNotaCredito = $scope.fArr.listaTipoNotaCredito[0];
+
 					
 					$scope.titleForm = 'Registra documento';
 					$scope.aceptar = function(){

@@ -493,6 +493,7 @@ class Cita extends CI_Controller {
 
 		$clienteTipoDoc = '-';
 		$serie = null;
+		$tokenSede = $fCita['token'];
 		if($fCita['tipoDocumentoCont'] == 'BOLETA'){
 			$tipoDocCont = '2';
 			$serie = $fCita['serieb'];
@@ -522,7 +523,7 @@ class Cita extends CI_Controller {
 			$clienteDireccion = $fCita['direccionFiscal'];
 		}
 
-		$fFact = $this->model_cita->m_obtener_ultimo_correlativo($serie);
+		$fFact = $this->model_cita->m_obtener_ultimo_correlativo($serie, $tipoDocCont);
 		if (empty($fFact['correlativo'])) {
 			$numDocGen = 1;
 		} else {
@@ -604,7 +605,7 @@ class Cita extends CI_Controller {
 			"formato_de_pdf"                    => "",
 			"items" => $arrDetalle
 		);
-		// $data_json = json_encode($data);
+		$data_json = json_encode($data);
 
 		$dataBB = array('name' => 'value', 'name2' => 'value2');
 		$encoded = '';
@@ -615,13 +616,13 @@ class Cita extends CI_Controller {
 		$encoded = substr($encoded, 0, strlen($encoded)-1);
 
 		$ch = curl_init();
-		
-		print_r($ch);
+
+		// print_r($ch);
 		// print_r(NB_AUTH);
 		curl_setopt($ch, CURLOPT_URL, NB_LINK);
 		curl_setopt(
 			$ch, CURLOPT_HTTPHEADER, array(
-			'Authorization: Token token="'.NB_AUTH.'"',
+			'Authorization: Token token="'.$tokenSede.'"',
 			'Content-Type: application/json',
 			// 'Expect:',
 			)
@@ -632,10 +633,10 @@ class Cita extends CI_Controller {
 		curl_setopt($ch, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1);
 		// 'CURLOPT_SSLVERSION' => 'CURL_SSLVERSION_TLSv1',
 		curl_setopt($ch, CURLOPT_TIMEOUT, 30); // CURLOPT_TIMEOUT        => 30,
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $encoded);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $data_json);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
-		print_r(curl_getinfo($ch, CURLINFO_HTTP_CODE));
+		// print_r(curl_getinfo($ch, CURLINFO_HTTP_CODE));
 
 		$respuesta  = curl_exec($ch);
 
@@ -652,7 +653,6 @@ class Cita extends CI_Controller {
 		print_r($leer_respuesta);
 		print_r('...End');
 
-		
 
 		if (isset($leer_respuesta['errors'])) {
 			//Mostramos los errores si los hay
