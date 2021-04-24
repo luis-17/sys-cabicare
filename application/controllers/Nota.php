@@ -108,6 +108,15 @@ class Nota extends CI_Controller {
 				->set_output(json_encode($arrData));
 			return;
 		}
+		if (empty($fCita['tipoDocumentoCont'])) {
+			$arrData['message'] = 'La cita asociada no está preparada para generar notas electrónicas.';
+			$arrData['flag'] = 0;
+			$this->output
+				->set_content_type('application/json')
+				->set_output(json_encode($arrData));
+			return;
+		}
+
 		$allInputs['citaId'] = $fCita['citaId'];
 		// calculo
 		$allInputs['igv'] = $allInputs['total'] * 0.18;
