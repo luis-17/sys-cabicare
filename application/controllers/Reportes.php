@@ -38,7 +38,7 @@ class Reportes extends CI_Controller {
 			$total = 0;
 			$arrListadoProd = array();
 			$i = 1;
-			foreach ($lista as $row) {
+			foreach ($listaHist as $row) {
 				if ( $row['estado'] == 1 ){
 					$estado = 'POR CONFIRMAR';
 				}elseif ( $row['estado'] == 2 ){
@@ -50,7 +50,7 @@ class Reportes extends CI_Controller {
 				}
 				$existRow = false;
 				$filaHistTemp = array();
-				foreach ($listaHist as $rowHist) {
+				foreach ($lista as $rowHist) {
 					if ($rowHist['id'] == $row['id']) {
 						$existRow = true;
 						$filaHistTemp = $rowHist;
