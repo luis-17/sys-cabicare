@@ -465,6 +465,9 @@ class Cita extends CI_Controller {
 		$arrData['flag'] = 0;
 		// VALIDACIONES
 		$fCita = $this->model_cita->m_obtener_cita($allInputs['idcita']);
+		$fCita['igv'] = floatval($fCita['igv']);
+		$fCita['subtotal'] = floatval($fCita['subtotal']);
+		$fCita['total'] = floatval($fCita['total']);
 		$arrDetalleCita = $this->model_cita->m_cargar_detalle_cita(array('id'=> $allInputs['idcita']));
 		if( empty($fCita['tipoDocumentoCont']) || $fCita['tipoDocumentoCont'] == '0'){
 			$arrData['message'] = 'Debe seleccionar un tipo de documento válido.';
@@ -529,31 +532,37 @@ class Cita extends CI_Controller {
 		} else {
 			$numDocGen = (int)$fFact['correlativo'] + 1;
 		}
-		
+
 		// DETALLE DOCUMENTO
 		$arrDetalle = array();
-		foreach ($arrDetalleCita as $row => $key) {
-			$igvDetalle = round($row['precio'] - ($row['precio'] / 1.18), 2);
+		foreach ($arrDetalleCita as $key => $row) {
+			// print_r($row['precio']);
+			$rowPrecio = floatval($row['precio']);
+			// print_r($rowPrecio);
+			$subtotal = round($rowPrecio / 1.18, 2);
+			$igvDetalle = round(($rowPrecio - $subtotal), 2);
+			// print_r($igvDetalle);
 			array_push($arrDetalle,
 				array(
 					"unidad_de_medida" 					=> 'ZZ',
 					"codigo" 										=> $row['idproducto'],
 					"descripcion" 							=> $row['producto'],
 					"cantidad" 									=> '1',
-					"valor_unitario" 						=> round($row['precio'] - $igvDetalle, 2),
-					"precio_unitario" 					=> $row['precio'],
+					"valor_unitario" 						=> $subtotal,
+					"precio_unitario" 					=> $rowPrecio,
 					"descuento"                 => "",
-					"subtotal"                  => round($row['precio'] - $igvDetalle, 2), // "500",
+					"subtotal"                  => $subtotal, // "500",
 					"tipo_de_igv"               => "1",
 					"igv"                       => $igvDetalle, // 90
-					"total"                     => $row['precio'], // 590
+					"total"                     => $rowPrecio, // 590
 					"anticipo_regularizacion"   => "false",
 					"anticipo_documento_serie"  => "",
 					"anticipo_documento_numero" => ""
 				)
 			);
+			// print_r($igvDetalle);
 		}
-
+		// print_r(floatval($fCita['igv']));
 		$data = array(
 			"operacion"													=> "generar_comprobante",
 			"tipo_de_comprobante"               => $tipoDocCont,
@@ -607,13 +616,14 @@ class Cita extends CI_Controller {
 		);
 		$data_json = json_encode($data);
 
-		$dataBB = array('name' => 'value', 'name2' => 'value2');
-		$encoded = '';
-		foreach($dataBB as $name => $value){
-				$encoded .= urlencode($name).'='.urlencode($value).'&';
-		}
-		// chop off the last ampersand
-		$encoded = substr($encoded, 0, strlen($encoded)-1);
+		// print_r($data_json);
+		// $dataBB = array('name' => 'value', 'name2' => 'value2');
+		// $encoded = '';
+		// foreach($dataBB as $name => $value){
+		// 		$encoded .= urlencode($name).'='.urlencode($value).'&';
+		// }
+		// // chop off the last ampersand
+		// $encoded = substr($encoded, 0, strlen($encoded)-1);
 
 		$ch = curl_init();
 
@@ -622,41 +632,38 @@ class Cita extends CI_Controller {
 		curl_setopt($ch, CURLOPT_URL, NB_LINK);
 		curl_setopt(
 			$ch, CURLOPT_HTTPHEADER, array(
-			'Authorization: Token token="'.$tokenSede.'"',
+			'Authorization: Bearer "'.$tokenSede.'"',
 			'Content-Type: application/json',
 			// 'Expect:',
 			)
 		);
 		curl_setopt($ch, CURLOPT_POST, 1);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-		// curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-		curl_setopt($ch, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+		// curl_setopt($ch, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1);
 		// 'CURLOPT_SSLVERSION' => 'CURL_SSLVERSION_TLSv1',
-		curl_setopt($ch, CURLOPT_TIMEOUT, 30); // CURLOPT_TIMEOUT        => 30,
+		// curl_setopt($ch, CURLOPT_TIMEOUT, 30); // CURLOPT_TIMEOUT        => 30,
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $data_json);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
 		// print_r(curl_getinfo($ch, CURLINFO_HTTP_CODE));
-
 		$respuesta  = curl_exec($ch);
-
-		if ($respuesta === false) {
-			$respuesta = curl_error($ch);
-			echo stripslashes($respuesta);
-		}
-    	
+		// if ($respuesta === false) {
+		// 	$respuesta = curl_error($ch);
+		// 	echo stripslashes($respuesta);
+		// }
 
 		curl_close($ch);
 
 		$leer_respuesta = json_decode($respuesta, true);
-		print_r('Leer respuesta:');
-		print_r($leer_respuesta);
-		print_r('...End');
+		// print_r('Leer respuesta:');
+		// print_r($leer_respuesta);
+		// print_r('...End');
 
 
 		if (isset($leer_respuesta['errors'])) {
 			//Mostramos los errores si los hay
 			$arrData['message'] = $leer_respuesta['errors'].'| CÓDIGO: '.$leer_respuesta['codigo'];
+			$arrData['data'] = $data;
 			$arrData['flag'] = 0;
 			$this->output
 				->set_content_type('application/json')
@@ -754,8 +761,8 @@ class Cita extends CI_Controller {
 		    return;
 		}
 
-		$igv = round($allInputs['total_a_pagar'] * 0.18, 2);
-		$subtotal =  round($allInputs['total_a_pagar'] - $igv, 2);
+		$subtotal = round($allInputs['total_a_pagar'] / 1.18, 2);
+		$igv =  round($allInputs['total_a_pagar'] - $subtotal, 2);
 
 		$data = array(
 			'pacienteId'			=> $allInputs['pacienteId'],
@@ -768,7 +775,7 @@ class Cita extends CI_Controller {
 			'medicoId'				=> empty($allInputs['medico']) ? NULL : $allInputs['medico']['id'],
 			'total'					=> $allInputs['total_a_pagar'],
 			'igv'					=> $igv,
-			'subtotal'					=> $subtotal,
+			'subtotal'				=> $subtotal,
 			'peso'					=> empty($allInputs['peso']) ? NULL : $allInputs['peso'],
 			'talla'					=> empty($allInputs['talla']) ? NULL : $allInputs['talla'],
 			'imc'					=> empty($allInputs['imc']) ? NULL : $allInputs['imc'],
@@ -777,7 +784,7 @@ class Cita extends CI_Controller {
 			'temperaturaCorporal'	=> empty($allInputs['temperaturaCorporal']) ? NULL : $allInputs['temperaturaCorporal'],
 			'perimetroAbdominal'	=> empty($allInputs['perimetroAbdominal']) ? NULL : $allInputs['perimetroAbdominal'],
 			'observaciones'			=> empty($allInputs['observaciones']) ? NULL : $allInputs['observaciones'],
-      'estado'				=> $allInputs['tipoCita'],
+      		'estado'				=> $allInputs['tipoCita'],
 			'medioContacto'			=> empty($allInputs['medioContacto']) ? NULL : $allInputs['medioContacto']['id'],
 			'smsEnviadoCita'	=> 'POR_ENVIAR',
 			'metodoPago' => $allInputs['metodoPago']['id'],
@@ -890,8 +897,10 @@ class Cita extends CI_Controller {
 		    ->set_output(json_encode($arrData));
 		    return;
 		}
-		$igv = round($allInputs['total_a_pagar'] * 0.18, 2);
-		$subtotal =  round($allInputs['total_a_pagar'] - $igv, 2);
+		// $igv = round($allInputs['total_a_pagar'] * 0.18, 2);
+		// $subtotal =  round($allInputs['total_a_pagar'] - $igv, 2);
+		$subtotal = round($allInputs['total_a_pagar'] / 1.18, 2);
+		$igv =  round($allInputs['total_a_pagar'] - $subtotal, 2);
 		$data = array(
 			'sedeId'				=> $allInputs['sede']['id'],
 			'fechaCita'				=> Date('Y-m-d',strtotime($allInputs['fecha'])),

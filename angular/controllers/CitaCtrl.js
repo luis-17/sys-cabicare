@@ -1631,9 +1631,13 @@ app.factory("ReservaCitasFactory",
 							{ field: 'numDocumento', name: 'numDocumento', displayName: 'N° DOCUMENTO', width: 170 },
 							{ field: 'estado', name: 'estado', displayName: 'ESTADO', width: 170, 
 								cellTemplate:'<div class="ui-grid-cell-contents text-left ">'+ '{{ COL_FIELD.descripcion }}</div>' },
+							// {
+							// 	field: 'eliminar', name: 'eliminar', displayName: '', width: 100,
+							// 	cellTemplate: '<button class="btn btn-default btn-sm text-danger btn-action" ng-click="grid.appScope.btnVerDocumento(row);$event.stopPropagation();"> <i class="fa fa-eye" tooltip-placement="left" uib-tooltip="VER DOC."></i> </button>'
+							// }
 							{
 								field: 'eliminar', name: 'eliminar', displayName: '', width: 100,
-								cellTemplate: '<button class="btn btn-default btn-sm text-danger btn-action" ng-click="grid.appScope.btnVerDocumento(row);$event.stopPropagation();"> <i class="fa fa-eye" tooltip-placement="left" uib-tooltip="VER DOC."></i> </button>'
+								cellTemplate: '<a target="_blank" class="btn btn-default btn-sm text-danger btn-action" href="{{row.entity.link_pdf}}" > <i class="fa fa-eye" tooltip-placement="left" uib-tooltip="VER DOC."></i> </button>'
 							}
 						],
 						onRegisterApi: function (gridApi) {
@@ -1698,6 +1702,10 @@ app.factory("ReservaCitasFactory",
 						});
 					}
 
+					$scope.btnVerDocumento = function(row) {
+						console.log('clic me', row);
+
+					}
 
 					/* BOTONES FINALES */
 					$scope.cancel = function () {

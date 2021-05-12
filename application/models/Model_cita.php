@@ -455,7 +455,8 @@ class Model_cita extends CI_Model {
 			fc.tipoDocumento,
 			fc.numSerie,
 			fc.numDocumento,
-			fc.estado
+			fc.estado,
+			fc.link_pdf
 		", FALSE);
 		$this->db->from('facturacion fc');
 		$this->db->where('fc.citaId', $citaId);
@@ -911,7 +912,7 @@ class Model_cita extends CI_Model {
 		// if($params['origen']['id'] === 'EXT'){
 		// 	$this->db->where('pr.procedencia', 'EXT');
 		// }
-		$this->db->where("DATE(pg.fechaCita) BETWEEN '" . darFormatoYMD($params['desde']) ."' AND '" . darFormatoYMD($params['hasta'])."'");
+		$this->db->where("DATE(pg.fechaRegistro) BETWEEN '" . darFormatoYMD($params['desde']) ."' AND '" . darFormatoYMD($params['hasta'])."'");
 		$this->db->group_by('pg.metodoPago');
 		// if($params['orden']['id'] == 'OC'){
 		// 	$this->db->order_by('COUNT(*)', 'DESC');
