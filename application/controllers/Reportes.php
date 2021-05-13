@@ -38,7 +38,7 @@ class Reportes extends CI_Controller {
 			$total = 0;
 			$arrListadoProd = array();
 			$i = 1;
-			foreach ($listaHist as $row) {
+			foreach ($lista as $row) {
 				if ( $row['estado'] == 1 ){
 					$estado = 'POR CONFIRMAR';
 				}elseif ( $row['estado'] == 2 ){
@@ -48,64 +48,64 @@ class Reportes extends CI_Controller {
 				}else {
 					$estado = '';
 				}
-				$existRow = false;
-				$filaHistTemp = array();
-				foreach ($lista as $rowHist) {
-					if ($rowHist['id'] == $row['id']) {
-						$existRow = true;
-						$filaHistTemp = $rowHist;
-					}
-				}
-				if ($existRow === false) {
-					array_push($arrListadoProd,
-						array(
-							$i++,
-							$row['id'],
-							darFormatoDMY($row['fechaCita']),
-							darFormatoHora($row['horaHasta']),
-							$row['tipoDocumento'],
-							$row['numeroDocumento'],
-							$row['paciente'],
-							$row['celular'],
-							$row['medico'],
-							$row['subtotal'],
-							$row['igv'],
-							$row['total'],
-							$row['numSerie'],
-							$row['numDoc'],
-							$row['metodoPago'],
-							$row['numOperacion'],
-							$row['monto'],
-							$row['anotacionesPago'],
-							$estado
-						)
-					);
-				}
-				if ($existRow === true) {
-					array_push($arrListadoProd,
-						array(
-							$i++,
-							$filaHistTemp['id'],
-							darFormatoDMY($filaHistTemp['fechaCita']),
-							darFormatoHora($filaHistTemp['horaHasta']),
-							$filaHistTemp['tipoDocumento'],
-							$filaHistTemp['numeroDocumento'],
-							$filaHistTemp['paciente'],
-							$filaHistTemp['celular'],
-							$filaHistTemp['medico'],
-							$filaHistTemp['subtotal'],
-							$filaHistTemp['igv'],
-							$filaHistTemp['total'],
-							$filaHistTemp['numSerie'],
-							$filaHistTemp['numDoc'],
-							$filaHistTemp['metodoPago'],
-							$filaHistTemp['numOperacion'],
-							$filaHistTemp['monto'],
-							$filaHistTemp['anotacionesPago'],
-							$estado
-						)
-					);
-				}
+				// $existRow = false;
+				// $filaHistTemp = array();
+				// foreach ($lista as $rowHist) {
+				// 	if ($rowHist['id'] == $row['id']) {
+				// 		$existRow = true;
+				// 		$filaHistTemp = $rowHist;
+				// 	}
+				// }
+				// if ($existRow === false) {
+				array_push($arrListadoProd,
+					array(
+						$i++,
+						$row['id'],
+						darFormatoDMY($row['fechaCita']),
+						darFormatoHora($row['horaHasta']),
+						$row['tipoDocumento'],
+						$row['numeroDocumento'],
+						$row['paciente'],
+						$row['celular'],
+						$row['medico'],
+						$row['subtotal'],
+						$row['igv'],
+						$row['total'],
+						$row['numSerie'],
+						$row['numDoc'],
+						$row['metodoPago'],
+						$row['numOperacion'],
+						$row['monto'],
+						$row['anotacionesPago'],
+						$estado
+					)
+				);
+				// }
+				// if ($existRow === true) {
+				// array_push($arrListadoProd,
+				// 	array(
+				// 		$i++,
+				// 		$filaHistTemp['id'],
+				// 		darFormatoDMY($filaHistTemp['fechaCita']),
+				// 		darFormatoHora($filaHistTemp['horaHasta']),
+				// 		$filaHistTemp['tipoDocumento'],
+				// 		$filaHistTemp['numeroDocumento'],
+				// 		$filaHistTemp['paciente'],
+				// 		$filaHistTemp['celular'],
+				// 		$filaHistTemp['medico'],
+				// 		$filaHistTemp['subtotal'],
+				// 		$filaHistTemp['igv'],
+				// 		$filaHistTemp['total'],
+				// 		$filaHistTemp['numSerie'],
+				// 		$filaHistTemp['numDoc'],
+				// 		$filaHistTemp['metodoPago'],
+				// 		$filaHistTemp['numOperacion'],
+				// 		$filaHistTemp['monto'],
+				// 		$filaHistTemp['anotacionesPago'],
+				// 		$estado
+				// 	)
+				// );
+				// }
 			}
 
 			// SETEO DE VARIABLES
