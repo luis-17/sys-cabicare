@@ -8,17 +8,18 @@ class Model_nota extends CI_Model {
 		$this->db->select("no.id AS notaId, no.tipoNota, no.numSerie, no.numDoc, no.numDocAsoc, no.anotaciones, 
         no.subtotal, no.igv, no.total, no.fechaNota, no.fechaRegistro, us.id AS usuarioId, 
         concat_ws(' ', us.nombres, us.apellidos) AS usuarioRegistro, no.tipoNotaCreditoId,
-				no.tipoNotaCreditoVal, no.tipoNotaDebitoId, no.tipoNotaDebitoVal", FALSE);
+				no.tipoNotaCreditoVal, no.tipoNotaDebitoId, no.tipoNotaDebitoVal, fa.id AS facturacionId, fa.link_pdf, fa.link_pdf_anulacion", FALSE);
 		$this->db->from('nota no');
 		$this->db->join('usuario us', 'no.usuarioCreacionId = us.id');
-    $this->db->where('no.estado', 1);
+		$this->db->join('facturacion fa', 'no.id = fa.notaId');
+    $this->db->where_in('no.estado', array(1, 2));
 
 		if( $paramDatos['tipoNota']['id'] != 'ALL' ){
 				$this->db->where('no.tipoNota', $paramDatos['tipoNota']['id']);
 		}
 		$this->db->where('no.fechaNota BETWEEN '. $this->db->escape( darFormatoYMD($paramDatos['desde']).' '.$paramDatos['desdeHora'].':'.$paramDatos['desdeMinuto']) .' AND ' 
 			. $this->db->escape( darFormatoYMD($paramDatos['hasta']).' '.$paramDatos['hastaHora'].':'.$paramDatos['hastaMinuto']));
-		
+
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
 			foreach ($paramPaginate['searchColumn'] as $key => $value) {
 				if(! empty($value)){
@@ -39,11 +40,12 @@ class Model_nota extends CI_Model {
 		$this->db->select('COUNT(*) AS contador');
 		$this->db->from('nota no');
 		$this->db->join('usuario us', 'no.usuarioCreacionId = us.id');
-        $this->db->where('no.estado', 1);
-        if( $paramDatos['tipoNota']['id'] != 'ALL' ){
-            $this->db->where('no.tipoNota', $paramDatos['tipoNota']['id']);
-        }
-        $this->db->where('no.fechaNota BETWEEN '. $this->db->escape( darFormatoYMD($paramDatos['desde']).' '.$paramDatos['desdeHora'].':'.$paramDatos['desdeMinuto']) .' AND ' 
+		$this->db->join('facturacion fa', 'no.id = fa.notaId');
+		$this->db->where('no.estado', 1);
+		if( $paramDatos['tipoNota']['id'] != 'ALL' ){
+				$this->db->where('no.tipoNota', $paramDatos['tipoNota']['id']);
+		}
+		$this->db->where('no.fechaNota BETWEEN '. $this->db->escape( darFormatoYMD($paramDatos['desde']).' '.$paramDatos['desdeHora'].':'.$paramDatos['desdeMinuto']) .' AND ' 
 			. $this->db->escape( darFormatoYMD($paramDatos['hasta']).' '.$paramDatos['hastaHora'].':'.$paramDatos['hastaMinuto']));
 		
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
@@ -71,10 +73,10 @@ class Model_nota extends CI_Model {
 		return $this->db->get()->row_array();
 	}
 
-	public function m_obtener_ultimo_correlativo($numSerie)
-	{
+	// public function m_obtener_ultimo_correlativo($numSerie)
+	// {
 
-	}
+	// }
 
 	public function m_registrar($datos)
 	{
@@ -101,7 +103,24 @@ class Model_nota extends CI_Model {
 		$this->db->insert('nota', $data);
 		return $this->db->insert_id();
 	}
-
+	public function m_obtener_serie_asociada($datos) {
+		$this->db->select("ci.numSerie", FALSE);
+		$this->db->from('cita ci');
+		// $this->db->join('paciente pa', 'ci.pacienteId = pa.id');
+		// $this->db->join('sede se', 'ci.sedeId = se.id');
+		$this->db->where('ci.estado <> ', 0);
+		$this->db->where('UPPER(ci.numDoc)', strtoupper($datos['numero']));
+		$this->db->where('UPPER(ci.numSerie)', strtoupper($datos['serie']));
+		return $this->db->get()->row_array();
+	}
+	public function m_obtener_nota($notaId) {
+		$this->db->select("no.id, no.tipoNota, no.numSerie, no.numDoc, se.token", FALSE);
+		$this->db->from('nota no');
+		$this->db->join('cita ci', 'no.citaId = ci.id');
+		$this->db->join('sede se', 'ci.sedeId = se.id');
+		$this->db->where('no.id', $notaId);
+		return $this->db->get()->row_array();
+	}
 	public function m_anular($datos)
 	{
 		$data = array(

@@ -51,7 +51,7 @@ class Model_cita extends CI_Model {
 		// $this->db->where('ci.estado <> ', 0);
 		$this->db->where('pa.estado', 1);
 		$this->db->where('ci.fechaCita BETWEEN ' . $desde .' AND ' . $hasta);
-
+		$this->db->where('ci.sedeId', $this->sessionFactur['idsede']);
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
 			foreach ($paramPaginate['searchColumn'] as $key => $value) {
 				if(! empty($value)){
@@ -122,7 +122,7 @@ class Model_cita extends CI_Model {
 		$this->db->where('pa.estado', 1);
 		$this->db->where('pg.estado', 1);
 		$this->db->where('ci.fechaCita BETWEEN ' . $desde .' AND ' . $hasta);
-
+		$this->db->where('ci.sedeId', $this->sessionFactur['idsede']);
 		// if( isset($paramPaginate['search'] ) && @$paramPaginate['search'] ){
 		// 	foreach (@$paramPaginate['searchColumn'] as $key => $value) {
 		// 		if(! empty($value)){
@@ -206,6 +206,7 @@ class Model_cita extends CI_Model {
 		// $this->db->where('ci.estado <> ', 0);
 		$this->db->where('pa.estado', 1);
 		$this->db->where('ci.fechaCita BETWEEN ' . $desde .' AND ' . $hasta);
+		$this->db->where('ci.sedeId', $this->sessionFactur['idsede']);
 
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
 			foreach ($paramPaginate['searchColumn'] as $key => $value) {
@@ -264,7 +265,7 @@ class Model_cita extends CI_Model {
 		$this->db->where_in('ci.estado', array(0, 2, 3));
 		$this->db->where('pa.estado', 1);
 		$this->db->where('ci.fechaCita BETWEEN ' . $desde .' AND ' . $hasta);
-
+		$this->db->where('ci.sedeId', $this->sessionFactur['idsede']);
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
 			foreach ($paramPaginate['searchColumn'] as $key => $value) {
 				if(! empty($value)){
@@ -292,6 +293,7 @@ class Model_cita extends CI_Model {
 		$this->db->where_in('ci.estado', array(0, 2, 3));
 		$this->db->where('pa.estado', 1);
 		$this->db->where('ci.fechaCita BETWEEN ' . $desde .' AND ' . $hasta);
+		$this->db->where('ci.sedeId', $this->sessionFactur['idsede']);
 
 		if( isset($paramPaginate['search'] ) && $paramPaginate['search'] ){
 			foreach ($paramPaginate['searchColumn'] as $key => $value) {
@@ -353,8 +355,10 @@ class Model_cita extends CI_Model {
 	}
 
 	public function m_cargar_citas($datos){
+		$desde = $this->db->escape(darFormatoYMD($datos['desde']));
+ 		$hasta = $this->db->escape(darFormatoYMD($datos['hasta']));
 		$arrEstados = array(1, 2, 3);
-		if ($datos['origen'] === 'ate') {
+		if ($datos['origen'] === 'ate') { // atencion
 			$arrEstados = array(2, 3);
 		}
 		$this->db->select("
@@ -397,6 +401,8 @@ class Model_cita extends CI_Model {
 		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
 		$this->db->join('usuario us', 'ci.medicoId = us.id','left');
 		$this->db->where_in('ci.estado', $arrEstados);
+		$this->db->where('ci.fechaCita BETWEEN ' . $desde .' AND ' . $hasta);
+		$this->db->where('ci.sedeId', $this->sessionFactur['idsede']);
 		$this->db->where('pa.estado', 1);
 		return $this->db->get()->result_array();
 	}
@@ -456,12 +462,24 @@ class Model_cita extends CI_Model {
 			fc.numSerie,
 			fc.numDocumento,
 			fc.estado,
-			fc.link_pdf
+			fc.link_pdf,
+			fc.link_pdf_anulacion,
+			fc.fechaEmision
 		", FALSE);
 		$this->db->from('facturacion fc');
 		$this->db->where('fc.citaId', $citaId);
 		$this->db->where_in('fc.estado', array(1, 2));
 		$this->db->order_by('fc.fechaRegistro', 'DESC');
+		// $this->db->order_by('cp.id', 'ASC');
+		return $this->db->get()->result_array();
+	}
+	public function m_validar_existencia_facturacion($citaId)
+	{
+		$this->db->select("fc.id");
+		$this->db->from('facturacion fc');
+		$this->db->where('fc.citaId', $citaId);
+		$this->db->where_in('fc.estado', array(1)); // solo activos
+		$this->db->where_in('fc.tipoDocumento', array(1, 2)); // solo  boleta 2 o factura 1
 		// $this->db->order_by('cp.id', 'ASC');
 		return $this->db->get()->result_array();
 	}
@@ -497,7 +515,7 @@ class Model_cita extends CI_Model {
 	}
 	public function m_obtener_cita($citaId) {
 		$this->db->select("ci.id, ci.estado, pa.celular, pa.tipoDocumento, pa.numeroDocumento, se.serief, se.serieb, se.token,
-			pa.nombres, pa.apellidoPaterno, pa.ruc, pa.direccionPersona, pa.direccionFiscal, pa.razonSocial,
+			pa.nombres, pa.apellidoPaterno, pa.ruc, pa.direccionPersona, pa.direccionFiscal, pa.razonSocial, ci.numDoc, 
 			pa.apellidoMaterno, pa.email, ci.tipoDocumentoCont, ci.subtotal, ci.igv, ci.total, se.nombre AS sede", FALSE);
 		$this->db->from('cita ci');
 		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
@@ -631,6 +649,22 @@ class Model_cita extends CI_Model {
 		);
 		$this->db->where('id',$datos['idCita']);
 		return $this->db->update('cita', $data);
+	}
+	public function m_obtener_facturacion($facturacionId){
+		$this->db->select("fa.id, fa.tipoDocumento, fa.notaId, fa.citaId, fa.fechaEmision");
+		$this->db->from('facturacion fa');
+		$this->db->where('fa.id', $facturacionId);
+		return $this->db->get()->row_array();
+	}
+	public function m_anular_facturacion($datos)
+	{
+		$data = array(
+			'estado' => 2, // anulado
+			'link_pdf_anulacion' => $datos['link_pdf_anulacion'],
+			'userAnulacion'=> $datos['username']
+		);
+		$this->db->where('id',$datos['facturacionId']);
+		return $this->db->update('facturacion', $data);
 	}
 	public function m_liberar_cita($datos)
 	{
@@ -923,6 +957,22 @@ class Model_cita extends CI_Model {
 		return $this->db->get()->result_array();
 	}
 
+	public function m_actualizar_doc_cita_facturas($arrData)
+	{
+		$data = array(
+			'numDoc' => $arrData['numDocGen']
+		);
+		$this->db->where('id', $arrData['citaId']);
+		return $this->db->update('cita', $data);
+	}
+	public function m_actualizar_doc_cita_notas($arrData)
+	{
+		$data = array(
+			'numDoc' => $arrData['numDocGen']
+		);
+		$this->db->where('id', $arrData['notaId']);
+		return $this->db->update('nota', $data);
+	}
 	public function m_actualizar_cita_sms($idcita)
 	{
 		$data = array(

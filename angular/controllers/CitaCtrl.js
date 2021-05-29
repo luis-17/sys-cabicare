@@ -97,7 +97,6 @@ app.controller('CitaCtrl',
 			{ id: 'BITEL', descripcion: 'BITEL' }
 		];
 
-
 		/* EVENTOS */
 		$scope.alertOnClick = function (event, jsEvent, view) {
 			console.log('event', event);
@@ -229,8 +228,8 @@ app.controller('CitaCtrl',
 			var events = [];
 			blockUI.start('Actualizando calendario...');
 
-			$scope.fBusqueda.desde = moment(start).tz('America/Lima').format('YYYY-MM-DD');
-			$scope.fBusqueda.hasta = moment(end).tz('America/Lima').format('YYYY-MM-DD');
+			$scope.fBusqueda.desde = moment(start).tz('America/Lima').format('DD-MM-YYYY');
+			$scope.fBusqueda.hasta = moment(end).tz('America/Lima').format('DD-MM-YYYY');
 			$scope.fBusqueda.origen = 'cit';
 			CitaServices.sListarCitaCalendario($scope.fBusqueda).then(function (rpta) {
 				if (rpta.flag == 1) {
@@ -450,6 +449,7 @@ app.service("CitaServices", function ($http, $q, handleBehavior) {
     sMoverCita: sMoverCita,
     sAgregarMetodoPago: sAgregarMetodoPago,
 		sAnular: sAnular,
+		sAnularFacturacion: sAnularFacturacion,
 		sListarAtencionEnCita: sListarAtencionEnCita,
 		
 	});
@@ -538,6 +538,14 @@ app.service("CitaServices", function ($http, $q, handleBehavior) {
 		var request = $http({
 			method: "post",
 			url: angular.patchURLCI + "Cita/anular",
+			data: datos
+		});
+		return (request.then(handleBehavior.success, handleBehavior.error));
+	}
+	function sAnularFacturacion(datos) {
+		var request = $http({
+			method: "post",
+			url: angular.patchURLCI + "Cita/anular_facturacion",
 			data: datos
 		});
 		return (request.then(handleBehavior.success, handleBehavior.error));
@@ -865,7 +873,7 @@ app.factory("ReservaCitasFactory",
 					/* PRODUCTO */
 					$scope.getProductoAutocomplete = function (value) {
 						var params = {
-							sedeId: $scope.fData.sede.id,
+							// sedeId: $scope.fData.sede.id,
 							searchText: value
 						};
 						return ProductoServices.sListarProductoAutocomplete(params).then(function (rpta) {
@@ -883,6 +891,15 @@ app.factory("ReservaCitasFactory",
 						$scope.fData.temporal.producto = model.producto;
 						$scope.fData.temporal.tipoProducto = model.tipo_producto.descripcion;
 						$scope.fData.temporal.precio = model.precio;
+					}
+
+					$scope.onChangeTipoDoc = function () {
+						if ($scope.fData.tipoDocumentoCont.id == 'BOLETA') {
+							$scope.fData.numSerie = $scope.fSessionCI.serieb;
+						}
+						if ($scope.fData.tipoDocumentoCont.id == 'FACTURA') {
+							$scope.fData.numSerie = $scope.fSessionCI.serief;
+						}
 					}
 
 					/* GRILLA DE PRODUCTOS */
@@ -988,8 +1005,8 @@ app.factory("ReservaCitasFactory",
 						angular.forEach($scope.gridOptions.data, function (value, key) {
 							totales += parseFloat($scope.gridOptions.data[key].precio);
 						});
-						$scope.fData.igv = (totales * 0.18).toFixed(2);
-						$scope.fData.subtotal = (totales - $scope.fData.igv).toFixed(2);
+						$scope.fData.subtotal = (totales / 1.18).toFixed(2);
+						$scope.fData.igv = (totales - $scope.fData.subtotal).toFixed(2);
 						$scope.fData.total_a_pagar = totales.toFixed(2);
 					}
 
@@ -1099,7 +1116,7 @@ app.factory("ReservaCitasFactory",
 					$scope.Form = {}
 					$scope.fData.temporal = {};
 					$scope.fData.temporalCont = {};
-					
+
 					$scope.fArr = arrParams.fArr;
 					$scope.metodos = arrParams.metodos;
 					$scope.fData.eliminados = [];
@@ -1108,6 +1125,8 @@ app.factory("ReservaCitasFactory",
 					$scope.bool = arrParams.bool;
 					$scope.fSessionCI = arrParams.fSessionCI;
 					$scope.titleForm = 'Edición de Cita';
+
+					console.log('$scope.fSessionCI, ', $scope.fSessionCI);
 
 					$scope.fData.temporalCont.metodoPago = $scope.fArr.listaMetodoPago[0];
 					$scope.fData.sede = $scope.fArr.listaSedes[0];
@@ -1128,14 +1147,6 @@ app.factory("ReservaCitasFactory",
 
 					/* DATEPICKERS */
 					$scope.configDP = {};
-					// $scope.configDP.today = function () {
-						// if (arrParams.start) {
-						// 	$scope.fData.fecha = arrParams.start.toDate();
-						// } else {
-						// 	$scope.fData.fecha = new Date();
-						// }
-					// };
-					// $scope.configDP.today();
 
 					$scope.configDP.clear = function () {
 						$scope.fData.fecha = null;
@@ -1190,6 +1201,18 @@ app.factory("ReservaCitasFactory",
 					}
 					/* END TIMEPICKERS */
 
+					$scope.onChangeTipoDoc = function () {
+						console.log('change mee');
+						if ($scope.fData.tipoDocumentoCont.id == 'BOLETA') {
+							$scope.fData.numSerie = $scope.fSessionCI.serieb;
+						}
+						if ($scope.fData.tipoDocumentoCont.id == 'FACTURA') {
+							$scope.fData.numSerie = $scope.fSessionCI.serief;
+						}
+						console.log('$scope.fData.numSerie', $scope.fData.numSerie);
+					}
+					// listaTipoDocumentoCont
+
 					/* AUTOCOMPLETADO */
 					/* MEDICOS */
 					$scope.getMedicoAutocomplete = function (value) {
@@ -1213,7 +1236,7 @@ app.factory("ReservaCitasFactory",
 					$scope.getProductoAutocomplete = function (value) {
 						var params = {
 							searchText: value,
-							sedeId: $scope.fData.sede.id
+							// sedeId: $scope.fData.sede.id
 						}
 						return ProductoServices.sListarProductoAutocomplete(params).then(function (rpta) {
 							$scope.noResultsPr = false;
@@ -1378,10 +1401,13 @@ app.factory("ReservaCitasFactory",
 						angular.forEach($scope.gridOptions.data, function (value, key) {
 							totales += parseFloat($scope.gridOptions.data[key].precio);
 						});
-						$scope.fData.igv = (totales * 0.18).toFixed(2);
-						$scope.fData.subtotal = (totales - $scope.fData.igv).toFixed(2);
-						
+						$scope.fData.subtotal = (totales / 1.18).toFixed(2);
+						$scope.fData.igv = (totales - $scope.fData.subtotal).toFixed(2);
 						$scope.fData.total_a_pagar = totales.toFixed(2);
+						// $scope.fData.igv = (totales * 0.18).toFixed(2);
+						// $scope.fData.subtotal = (totales - $scope.fData.igv).toFixed(2);
+						
+						// $scope.fData.total_a_pagar = totales.toFixed(2);
 					}
 
 					$scope.btnQuitarDeLaCesta = function (row) {
@@ -1625,11 +1651,12 @@ app.factory("ReservaCitasFactory",
 						data: [],
 						columnDefs: [
 							// { field: 'id', name: 'id', displayName: 'ID', minWidth: 80, width: 80 },
-							{ field: 'tipoDocumento', name: 'tipoDocumento', displayName: 'TIPO DE DOC.', width: 160,
+							{ field: 'tipoDocumento', name: 'tipoDocumento', displayName: 'TIPO DE DOC.', width: 150,
 								cellTemplate:'<div class="ui-grid-cell-contents text-left ">'+ '{{ COL_FIELD.descripcion }}</div>' },
-							{ field: 'numSerie', name: 'numSerie', displayName: 'N° SERIE', width: 140 },
-							{ field: 'numDocumento', name: 'numDocumento', displayName: 'N° DOCUMENTO', width: 170 },
-							{ field: 'estado', name: 'estado', displayName: 'ESTADO', width: 170, 
+							{ field: 'numSerie', name: 'numSerie', displayName: 'N° SERIE', width: 80 },
+							{ field: 'numDocumento', name: 'numDocumento', displayName: 'N° DOCUMENTO', width: 110 },
+							{ field: 'fechaEmision', name: 'fechaEmision', displayName: 'FECHA EMISION', width: 170 },
+							{ field: 'estado', name: 'estado', displayName: 'ESTADO', width: 150, 
 								cellTemplate:'<div class="ui-grid-cell-contents text-left ">'+ '{{ COL_FIELD.descripcion }}</div>' },
 							// {
 							// 	field: 'eliminar', name: 'eliminar', displayName: '', width: 100,
@@ -1637,7 +1664,8 @@ app.factory("ReservaCitasFactory",
 							// }
 							{
 								field: 'eliminar', name: 'eliminar', displayName: '', width: 100,
-								cellTemplate: '<a target="_blank" class="btn btn-default btn-sm text-danger btn-action" href="{{row.entity.link_pdf}}" > <i class="fa fa-eye" tooltip-placement="left" uib-tooltip="VER DOC."></i> </button>'
+								cellTemplate: '<a target="_blank" class="btn btn-default btn-sm text-success btn-action" href="{{row.entity.link_pdf}}" > <i class="fa fa-eye" tooltip-placement="left" uib-tooltip="VER DOC."></i> </a>' + 
+									'<button ng-if="row.entity.estado.id == 1" class="btn btn-default btn-sm text-danger btn-action" ng-click="grid.appScope.btnAnularDocumento(row);$event.stopPropagation();"> <i class="fa fa-close" tooltip-placement="left" uib-tooltip="ANULAR DOC."></i> </button>'
 							}
 						],
 						onRegisterApi: function (gridApi) {
@@ -1701,10 +1729,33 @@ app.factory("ReservaCitasFactory",
 							}
 						});
 					}
-
-					$scope.btnVerDocumento = function(row) {
-						console.log('clic me', row);
-
+					$scope.btnAnularDocumento = function(row) {
+						var pMensaje = '¿Realmente desea anular el registro de facturación?';
+						$bootbox.confirm(pMensaje, function (result) {
+							if (result) {
+								var arrParams = {
+									facturacionId: row.entity.id
+									// citaId: row.entity.citaId
+								};
+								blockUI.start('Procesando información...');
+								CitaServices.sAnularFacturacion(arrParams).then(function (rpta) {
+									if (rpta.flag == 1) {
+										var pTitle = 'OK!';
+										var pType = 'success';
+										// $uibModalInstance.dismiss($scope.fData);
+										// $scope.metodos.actualizarCalendario(true);
+										$scope.getPaginationServerSideFE(true);
+									} else if (rpta.flag == 0) {
+										var pTitle = 'Error!';
+										var pType = 'danger';
+									} else {
+										alert('Error inesperado');
+									}
+									pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 2500 });
+									blockUI.stop();
+								});
+							}
+						});
 					}
 
 					/* BOTONES FINALES */

@@ -197,7 +197,8 @@ app.controller('NotaCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '$log'
       $bootbox.confirm(pMensaje, function(result) {
         if (result) {
           var arrParams = {
-            notaId: $scope.mySelectionGrid[0].notaId
+            // notaId: $scope.mySelectionGrid[0].notaId,
+            facturacionId: $scope.mySelectionGrid[0].facturacionId
           };
           blockUI.start('Procesando información...');
           NotaServices.sAnular(arrParams).then(function (rpta) {
@@ -237,6 +238,7 @@ app.service("NotaServices",function($http, $q, handleBehavior) {
 		sListar: sListar,
 		sRegistrar: sRegistrar,
 		sAnular: sAnular,
+    sObtenerSerie: sObtenerSerie,
 	});
 	function sListar(datos) {
 		var request = $http({
@@ -249,7 +251,7 @@ app.service("NotaServices",function($http, $q, handleBehavior) {
 	function sAnular (datos) {
 		var request = $http({
 					method : "post",
-					url : angular.patchURLCI+"Nota/anular",
+					url : angular.patchURLCI+"Cita/anular_facturacion",
 					data : datos
 		});
 		return (request.then(handleBehavior.success,handleBehavior.error));
@@ -263,6 +265,14 @@ app.service("NotaServices",function($http, $q, handleBehavior) {
 			// headers: { 'Content-Type': undefined }
 		});
 		return (request.then(handleBehavior.success, handleBehavior.error));
+	}
+  function sObtenerSerie(datos) {
+		var request = $http({
+					method : "post",
+					url : angular.patchURLCI+"Nota/obtener_serie",
+					data : datos
+		});
+		return (request.then(handleBehavior.success,handleBehavior.error));
 	}
 });
 
@@ -286,6 +296,48 @@ app.factory("NotaFactory", function($uibModal, pinesNotifications, blockUI, Nota
 
 					
 					$scope.titleForm = 'Registra documento';
+
+          $scope.btnBuscarSerie = function() {
+            if(!$scope.fDataNota.numSerieAsoc){
+              pinesNotifications.notify({
+								title: 'Advertencia.',
+								text: 'Debe colocar un numero de serie asociado.',
+								type: 'warning',
+								delay: 5000
+							});
+							return;
+            }
+            if(!$scope.fDataNota.numDocAsoc){
+              pinesNotifications.notify({
+								title: 'Advertencia.',
+								text: 'Debe colocar un numero de documento asociado.',
+								type: 'warning',
+								delay: 5000
+							});
+							return;
+            }
+            var params = {
+							serie: $scope.fDataNota.numSerieAsoc,
+              numero: $scope.fDataNota.numDocAsoc,
+						};
+						NotaServices.sObtenerSerie(params).then(function (rpta) {
+							// $scope.noResultsPr = false;
+							if (rpta.flag === 0) {
+                pinesNotifications.notify({
+                  title: 'Advertencia.',
+                  text: 'No se encontró un número de serie y documento asociado.',
+                  type: 'warning',
+                  delay: 5000
+                });
+                $scope.fDataNota.numSerie = null;
+                return;
+							}
+              $scope.fDataNota.numSerie = rpta.datos.numSerie;
+							// console.log('datos producto', rpta.datos);
+							// return rpta.datos;
+						});
+          }
+
 					$scope.aceptar = function(){
 						blockUI.start("Registrando documento...");
 						NotaServices.sRegistrar($scope.fDataNota).then(function (rpta) {

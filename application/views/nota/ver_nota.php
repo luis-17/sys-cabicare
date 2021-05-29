@@ -46,7 +46,7 @@
 		<div class="form-group mb-md col-sm-6">
             <label class="control-label minotaur-label mb-xs"> ARCHIVO </label>
             <div class="block">
-                <a class="btn btn-link" target="_blank" href="{{fDataNota.nombreArchivo.link}}"> {{ fDataNota.nombreArchivo.texto }} </a>
+                <a class="btn btn-link" target="_blank" href="{{fDataNota.link_pdf}}"> VER DOCUMENTO </a>
             </div>
 			<!-- <div class="fileinput fileinput-new" data-provides="fileinput" style="width: 100%;">
 				<div class="fileinput-preview thumbnail mb20" data-trigger="fileinput" style="width: 100%; text-align: center;">

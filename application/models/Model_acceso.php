@@ -6,39 +6,41 @@ class Model_acceso extends CI_Model {
 	}
  	// ACCESO AL SISTEMA
 	public function m_logging_user($data){
-		$this->db->select('us.id AS usuarioId, us.username, us.nombres, us.apellidos, 
-			us.correo, pe.id AS perfilId, pe.nombre AS perfil, pe.keyPerfil', FALSE);
+		$this->db->select('us.id AS usuarioId, us.username, us.nombres, us.apellidos, se.serief, se.serieb, se.token, se.nombre AS sede,
+			us.correo, pe.id AS perfilId, pe.nombre AS perfil, pe.keyPerfil, uss.default, uss.sedeId AS idsede', FALSE);
 		$this->db->from('usuario us');
 		$this->db->join('perfil pe', 'us.perfilId = pe.id AND pe.estado = 1');
+		$this->db->join('usuariosede uss', 'us.id = uss.usuarioId');
+		$this->db->join('sede se', 'uss.sedeId = se.id');
+		$this->db->where('uss.default', 1);
 		$this->db->where('us.username', $data['usuario']);
 		$this->db->where('us.password', do_hash($data['password'] , 'md5'));
 		$this->db->where('us.estado', 1);
 		$this->db->limit(1);
 		return $this->db->get()->row_array();
 	}
-	public function m_cargar_combo_empresa_admin_matriz_session($idusuario=FALSE) 
+	public function m_cargar_combo_sede_matriz_session()
 	{
-		/* LOGICA MULTIEMPRESA: */ 
+		/* LOGICA MULTISEDE: */
 		
-		$this->db->select('uea.idusuarioempresaadmin, ea.idempresaadmin, ea.razon_social AS empresa_admin');
-		$this->db->from('usuario_empresa_admin uea');
-		$this->db->join('empresa_admin ea','uea.idempresaadmin = ea.idempresaadmin');
-		$this->db->where('estado_uea', 1);
-		$this->db->where('estado_ea', 1);
-		if( empty($idusuario) ){
-			$this->db->where('idusuario', $this->sessionFactur['idusuario']);
-		}else{
-			$this->db->where('idusuario', $idusuario);
-		}
+		$this->db->select('uss.idusuariosede, uss.usuarioId, uss.sedeId, se.nombre AS sede', FALSE);
+		$this->db->from('usuariosede uss');
+		$this->db->join('sede se','uss.sedeId = se.id');
+		$this->db->where('se.estado', 1);
+		// $this->db->where('estado_ea', 1);
+		$this->db->where('uss.usuarioId', $this->sessionFactur['usuarioId']);
 		return $this->db->get()->result_array();
 	}
-	public function m_cambiar_empresa_session($idusuarioempresaadmin)
+	public function m_cambiar_sede_session($idusuariosede)
 	{
-		$this->db->select('ea.idempresaadmin, ea.razon_social, ea.nombre_comercial, ea.ruc, ea.nombre_logo, 
-			uea.select_por_defecto, uea.idusuarioempresaadmin');
-		$this->db->from('usuario_empresa_admin uea');
-		$this->db->join('empresa_admin ea','uea.idempresaadmin = ea.idempresaadmin'); 
-		$this->db->where('uea.idusuarioempresaadmin',$idusuarioempresaadmin);
+		$this->db->select('us.id AS usuarioId, us.username, us.nombres, us.apellidos, se.serief, se.serieb, se.token, se.nombre AS sede,
+			us.correo, pe.id AS perfilId, pe.nombre AS perfil, pe.keyPerfil, uss.default, uss.sedeId AS idsede', FALSE);
+		$this->db->from('usuario us');
+		$this->db->join('perfil pe', 'us.perfilId = pe.id AND pe.estado = 1');
+		$this->db->join('usuariosede uss', 'us.id = uss.usuarioId');
+		$this->db->join('sede se', 'uss.sedeId = se.id');
+		$this->db->where('uss.idusuariosede',$idusuariosede);
+		$this->db->where('us.estado', 1);
 		$this->db->limit(1);
 		return $this->db->get()->row_array();
 	}

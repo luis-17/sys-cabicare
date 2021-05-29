@@ -69,7 +69,7 @@ class Model_producto extends CI_Model {
 		$this->db->join('tipoproducto tp', 'pr.tipoProductoId = tp.id');
 		$this->db->join('sede se', 'pr.sedeId = se.id');
 		$this->db->where('pr.estado', 1);
-		$this->db->where('pr.sedeId', $datos['sedeId']);
+		$this->db->where('pr.sedeId', $this->sessionFactur['idsede']);
 		$this->db->like('pr.nombre', $datos['searchText']);
 		$this->db->limit(10);
 

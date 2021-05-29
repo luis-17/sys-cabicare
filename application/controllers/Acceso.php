@@ -43,6 +43,54 @@ class Acceso extends CI_Controller {
 	    ->set_content_type('application/json')
 	    ->set_output(json_encode($arrData));
 	}
+
+	public function lista_sede_session()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true); 
+		$this->sessionFactur = @$this->session->userdata('sess_cabi_'.substr(base_url(),-20,7)); 
+		$lista = $this->model_acceso->m_cargar_combo_sede_matriz_session();
+		$arrListado = array();
+		foreach ($lista as $row) { 
+			array_push($arrListado, 
+				array( 
+					'id' => @$row['idusuariosede'],
+					'idusuariosede' => @$row['idusuariosede'],
+					'idusuario' => @$row['usuarioId'],
+					'idsede' => @$row['sedeId'],
+					'descripcion' => @$row['sede'] 
+				)
+			);
+		}
+		$arrData['datos'] = $arrListado;
+		$arrData['message'] = '';
+		$arrData['flag'] = 1;
+		if(empty($lista)){
+			$arrData['flag'] = 0;
+		}
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+	}
+
+	public function cambiar_sede_session(){
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true); 
+		$this->sessionFactur = @$this->session->userdata('sess_cabi_'.substr(base_url(),-20,7));
+		$fila = $this->model_acceso->m_cambiar_sede_session($allInputs['datos']['idusuariosede']);
+		foreach ($fila as $key => $val) {
+			$_SESSION['sess_cabi_'.substr(base_url(),-20,7)][$key] = $val;
+		} 
+		if($allInputs['datos']){
+			$arrData['flag'] = 1;
+			$arrData['message'] = 'La sede a sido cambiada.';
+		}else{
+			$arrData['flag'] = 0;
+			$arrData['message'] = 'Ocurrio un error.';
+		}
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+	}
+
 	public function getSessionCI(){
 		$arrData['flag'] = 0;
 		$arrData['datos'] = array();
@@ -66,4 +114,5 @@ class Acceso extends CI_Controller {
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 	}
+
 }

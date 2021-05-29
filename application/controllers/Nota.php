@@ -39,6 +39,7 @@ class Nota extends CI_Controller {
 				$arrListado,
 				array(
 					'notaId' => $row['notaId'],
+					'facturacionId' => $row['facturacionId'],
 					'tipoNota' => array(
 						'id' => $row['tipoNota'],
 						'descripcion' => $row['tipoNota'],
@@ -50,6 +51,7 @@ class Nota extends CI_Controller {
 					'subtotal' => $row['subtotal'],
 					'total' => $row['total'],
 					'igv' => $row['igv'],
+					'link_pdf' => empty($row['link_pdf_anulacion']) ? $row['link_pdf'] : $row['link_pdf_anulacion'],
 					'fechaNota' => darFormatoDMY($row['fechaNota']),
 					'fechaRegistro' => darFormatoDMY($row['fechaRegistro']),
 					'usuarioRegistro' => $row['usuarioRegistro'],
@@ -116,11 +118,37 @@ class Nota extends CI_Controller {
 				->set_output(json_encode($arrData));
 			return;
 		}
+		if (empty($allInputs['total'])) {
+			$arrData['message'] = 'No puede dejar en blanco el campo "Monto".';
+			$arrData['flag'] = 0;
+			$this->output
+				->set_content_type('application/json')
+				->set_output(json_encode($arrData));
+			return;
+		}
+		if ($allInputs['total'] > $fCita['total']) {
+			$arrData['message'] = 'El monto colocado excede al monto total del documento. Ingresar un monto válido';
+			$arrData['flag'] = 0;
+			$this->output
+				->set_content_type('application/json')
+				->set_output(json_encode($arrData));
+			return;
+		}
+		// validacion, no puedes generar una nota duplicada en sistema
+		// $arrDetalleFact = $this->model_cita->m_validar_existencia_nota($allInputs['idnota']);
+		// if(!empty($arrDetalleFact)) {
+		// 	$arrData['message'] = 'Ya se tiene una facturación asociada a esta nota. Puede anular y generar nuevamente';
+		// 	$arrData['flag'] = 0;
+		// 	$this->output
+		// 		->set_content_type('application/json')
+		// 		->set_output(json_encode($arrData));
+		// 	return;
+		// }
 
 		$allInputs['citaId'] = $fCita['citaId'];
 		// calculo
-		$allInputs['igv'] = $allInputs['total'] * 0.18;
-		$allInputs['subtotal'] =  $allInputs['total'] - $allInputs['igv'];
+		$allInputs['subtotal'] = $allInputs['total'] / 1.18;
+		$allInputs['igv'] =  $allInputs['total'] - $allInputs['subtotal'];
 
 		$clienteTipoDoc = '-';
 		$serie = null;
@@ -192,7 +220,7 @@ class Nota extends CI_Controller {
 				"anticipo_documento_numero" => ""
 			)
 		);
-
+		$fechaActual = date('d-m-Y');
 		$data = array(
 			"operacion"													=> "generar_comprobante",
 			"tipo_de_comprobante"               => $tipoDocCont,
@@ -206,7 +234,7 @@ class Nota extends CI_Controller {
 			"cliente_email"                     => $fCita['email'],
 			"cliente_email_1"                   => "",
 			"cliente_email_2"                   => "",
-			"fecha_de_emision"                  => date('d-m-Y'),
+			"fecha_de_emision"                  => $fechaActual,
 			"fecha_de_vencimiento"              => "",
 			"moneda"                            => "1", // soles
 			"tipo_de_cambio"                    => "",
@@ -227,7 +255,7 @@ class Nota extends CI_Controller {
 			"total_percepcion"                  => "",
 			"total_incluido_percepcion"         => "",
 			"detraccion"                        => "false",
-			"observaciones"                     => $allInputs['anotaciones'],
+			"observaciones"                     => @$allInputs['anotaciones'],
 			"documento_que_se_modifica_tipo"    => $docModificaTipo,
 			"documento_que_se_modifica_serie"   => $docModificaSerie,
 			"documento_que_se_modifica_numero"  => $docModificaNumero,
@@ -253,18 +281,13 @@ class Nota extends CI_Controller {
 			$ch, CURLOPT_HTTPHEADER, array(
 			'Authorization: Token token="'.$tokenSede.'"',
 			'Content-Type: application/json',
-			// 'Expect:',
 			)
 		);
 		curl_setopt($ch, CURLOPT_POST, 1);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-		// curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-		curl_setopt($ch, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1);
-		// 'CURLOPT_SSLVERSION' => 'CURL_SSLVERSION_TLSv1',
-		curl_setopt($ch, CURLOPT_TIMEOUT, 30); // CURLOPT_TIMEOUT        => 30,
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $data_json);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
 		$respuesta  = curl_exec($ch);
 
 		if ($respuesta === false) {
@@ -274,9 +297,9 @@ class Nota extends CI_Controller {
 		curl_close($ch);
 
 		$leer_respuesta = json_decode($respuesta, true);
-		print_r('Leer respuesta:');
-		print_r($leer_respuesta);
-		print_r('...End');
+		// print_r('Leer respuesta:');
+		// print_r($leer_respuesta);
+		// print_r('...End');
 
 		if (isset($leer_respuesta['errors'])) {
 			//Mostramos los errores si los hay
@@ -289,23 +312,24 @@ class Nota extends CI_Controller {
 		}
 
 		$this->db->trans_start();
-
-		if($this->model_nota->m_registrar($allInputs) ){
-			$arrData['message'] = 'Se registraron los datos correctamente.';
-			$arrData['flag'] = 1;
-			// $arrData['idreceta'] = $allInputs['idreceta'];
-			$arrDataFact = array(
-				'tipoDocumento' => $tipoDocCont,
-				'numSerie' => $serie,
-				'numDocumento' => $numDocGen,
-				'estado' => 1,
-				'citaId' => $fCita['citaId'],
-				'fechaRegistro' => date('Y-m-d H:i:s'),
-				'link_pdf' => $leer_respuesta['enlace_del_pdf'],
-				'key_nubefact' => $leer_respuesta['key']
-			);
-			$this->model_cita->m_registrar_facturacion($arrDataFact);
-		}
+		$allInputs['numDoc'] = $numDocGen;
+		$notaId = $this->model_nota->m_registrar($allInputs);
+		$arrData['message'] = 'Se registraron los datos correctamente.';
+		$arrData['flag'] = 1;
+		// $arrData['idreceta'] = $allInputs['idreceta'];
+		$arrDataFact = array(
+			'tipoDocumento' => $tipoDocCont,
+			'numSerie' => $serie,
+			'numDocumento' => $numDocGen,
+			'estado' => 1,
+			'citaId' => $fCita['citaId'],
+			'notaId' => $notaId,
+			'fechaRegistro' => date('Y-m-d H:i:s'),
+			'fechaEmision' => $fechaActual,
+			'link_pdf' => $leer_respuesta['enlace_del_pdf'],
+			'key_nubefact' => $leer_respuesta['key']
+		);
+		$this->model_cita->m_registrar_facturacion($arrDataFact);
 
 		$this->db->trans_complete();
 		$this->output
@@ -335,5 +359,26 @@ class Nota extends CI_Controller {
 	public function ver_nota()
 	{
 		$this->load->view('nota/ver_nota');
+	}
+
+	public function obtener_serie()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$fSerie = $this->model_nota->m_obtener_serie_asociada($allInputs);
+		if (empty($fSerie)) {
+			//Mostramos los errores si los hay
+			$arrData['message'] = 'No se encontró serie y número en base de datos. Intente con serie y número válidos';
+			$arrData['flag'] = 0;
+			$this->output
+				->set_content_type('application/json')
+				->set_output(json_encode($arrData));
+			return;
+		}
+		$arrData['datos']['numSerie'] = $fSerie['numSerie'];
+    $arrData['message'] = '';
+    $arrData['flag'] = 1;
+		$this->output
+			->set_content_type('application/json')
+			->set_output(json_encode($arrData));
 	}
 }

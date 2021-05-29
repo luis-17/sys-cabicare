@@ -8,7 +8,7 @@ class Cita extends CI_Controller {
 	public function __construct(){
     parent::__construct();
 		$this->load->helper(array('fechas_helper', 'otros_helper', 'imagen_helper'));
-		$this->load->model(array('model_cita', 'model_diagnostico', 'model_paciente'));
+		$this->load->model(array('model_cita', 'model_diagnostico', 'model_paciente', 'model_nota'));
 
 		$this->output->set_header("Cache-Control: no-store, no-cache, must-revalidate, no-transform, max-age=0, post-check=0, pre-check=0");
 		$this->output->set_header("Pragma: no-cache");
@@ -426,10 +426,10 @@ class Cita extends CI_Controller {
 		foreach($arrListado as $key => $row) {
 			$strTipoDocumento = null;
 			if ($row['tipoDocumento'] == '1') {
-				$strTipoDocumento = 'BOLETA';
+				$strTipoDocumento = 'FACTURA';
 			}
 			if ($row['tipoDocumento'] == '2') {
-				$strTipoDocumento = 'FACTURA';
+				$strTipoDocumento = 'BOLETA';
 			}
 			if ($row['tipoDocumento'] == '3') {
 				$strTipoDocumento = 'NOTA DE CRÉDITO';
@@ -451,6 +451,11 @@ class Cita extends CI_Controller {
 				'id' => $row['estado'],
 				'descripcion' => $strEstado
 			);
+			$arrListado[$key]['link_pdf'] = $row['link_pdf'];
+			if(!empty($row['link_pdf_anulacion']) && $row['estado'] == '2'){
+				$arrListado[$key]['link_pdf'] = $row['link_pdf_anulacion'];
+			}
+			$arrListado[$key]['fechaEmision'] = formatoFechaReporte3($row['fechaEmision']);
 		};
 
 		$arrData['datos'] = $arrListado;
@@ -469,6 +474,32 @@ class Cita extends CI_Controller {
 		$fCita['subtotal'] = floatval($fCita['subtotal']);
 		$fCita['total'] = floatval($fCita['total']);
 		$arrDetalleCita = $this->model_cita->m_cargar_detalle_cita(array('id'=> $allInputs['idcita']));
+
+		// validacion, no puedes generar la factura sin antes haberla pagado en su totalidad
+		$arrPagos = $this->model_cita->m_cargar_detalle_pagos($allInputs['idcita']);
+		$totalPagos = 0;
+		foreach($arrPagos as $key => $row) {
+			$totalPagos += floatval($row['monto']);
+		}
+		if (!($totalPagos == floatval($fCita['total']))) {
+			$arrData['flag'] = 0;
+			$arrData['message'] = 'Debe registrar el pago completo en el sistema, para poder emitir la facturación';
+			$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+		  return;
+		}
+		// validacion, no puedes generar una factura duplicada en sistema
+		$arrDetalleFact = $this->model_cita->m_validar_existencia_facturacion($allInputs['idcita']);
+		if(!empty($arrDetalleFact)) {
+			$arrData['message'] = 'Ya se tiene una facturación asociada a esta cita. Puede anular y generar nuevamente';
+			$arrData['flag'] = 0;
+			$this->output
+				->set_content_type('application/json')
+				->set_output(json_encode($arrData));
+			return;
+		}
+
 		if( empty($fCita['tipoDocumentoCont']) || $fCita['tipoDocumentoCont'] == '0'){
 			$arrData['message'] = 'Debe seleccionar un tipo de documento válido.';
 			$arrData['flag'] = 0;
@@ -535,6 +566,7 @@ class Cita extends CI_Controller {
 
 		// DETALLE DOCUMENTO
 		$arrDetalle = array();
+		$fechaActual = date('d-m-Y');
 		foreach ($arrDetalleCita as $key => $row) {
 			// print_r($row['precio']);
 			$rowPrecio = floatval($row['precio']);
@@ -560,9 +592,7 @@ class Cita extends CI_Controller {
 					"anticipo_documento_numero" => ""
 				)
 			);
-			// print_r($igvDetalle);
 		}
-		// print_r(floatval($fCita['igv']));
 		$data = array(
 			"operacion"													=> "generar_comprobante",
 			"tipo_de_comprobante"               => $tipoDocCont,
@@ -576,7 +606,7 @@ class Cita extends CI_Controller {
 			"cliente_email"                     => $fCita['email'],
 			"cliente_email_1"                   => "",
 			"cliente_email_2"                   => "",
-			"fecha_de_emision"                  => date('d-m-Y'),
+			"fecha_de_emision"                  => $fechaActual,
 			"fecha_de_vencimiento"              => "",
 			"moneda"                            => "1", // soles
 			"tipo_de_cambio"                    => "",
@@ -615,51 +645,24 @@ class Cita extends CI_Controller {
 			"items" => $arrDetalle
 		);
 		$data_json = json_encode($data);
-
-		// print_r($data_json);
-		// $dataBB = array('name' => 'value', 'name2' => 'value2');
-		// $encoded = '';
-		// foreach($dataBB as $name => $value){
-		// 		$encoded .= urlencode($name).'='.urlencode($value).'&';
-		// }
-		// // chop off the last ampersand
-		// $encoded = substr($encoded, 0, strlen($encoded)-1);
-
 		$ch = curl_init();
-
-		// print_r($ch);
-		// print_r(NB_AUTH);
 		curl_setopt($ch, CURLOPT_URL, NB_LINK);
 		curl_setopt(
 			$ch, CURLOPT_HTTPHEADER, array(
 			'Authorization: Bearer "'.$tokenSede.'"',
 			'Content-Type: application/json',
-			// 'Expect:',
 			)
 		);
 		curl_setopt($ch, CURLOPT_POST, 1);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-		// curl_setopt($ch, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1);
-		// 'CURLOPT_SSLVERSION' => 'CURL_SSLVERSION_TLSv1',
-		// curl_setopt($ch, CURLOPT_TIMEOUT, 30); // CURLOPT_TIMEOUT        => 30,
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $data_json);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		// print_r(curl_getinfo($ch, CURLINFO_HTTP_CODE));
 		$respuesta  = curl_exec($ch);
-		// if ($respuesta === false) {
-		// 	$respuesta = curl_error($ch);
-		// 	echo stripslashes($respuesta);
-		// }
 
 		curl_close($ch);
 
 		$leer_respuesta = json_decode($respuesta, true);
-		// print_r('Leer respuesta:');
-		// print_r($leer_respuesta);
-		// print_r('...End');
-
-
 		if (isset($leer_respuesta['errors'])) {
 			//Mostramos los errores si los hay
 			$arrData['message'] = $leer_respuesta['errors'].'| CÓDIGO: '.$leer_respuesta['codigo'];
@@ -672,7 +675,6 @@ class Cita extends CI_Controller {
 		}
 
 		// registramos en tabla facturacion
-
 		$this->db->trans_start();
 		
 		$arrDataFact = array(
@@ -682,10 +684,18 @@ class Cita extends CI_Controller {
 			'estado' => 1,
 			'citaId' => $allInputs['idcita'],
 			'fechaRegistro' => date('Y-m-d H:i:s'),
+			'fechaEmision' => $fechaActual,
 			'link_pdf' => $leer_respuesta['enlace_del_pdf'],
 			'key_nubefact' => $leer_respuesta['key']
 		);
+		// registro facturacion
 		$this->model_cita->m_registrar_facturacion($arrDataFact);
+		// actualizar numero de documento
+		$arrUpdateCita = array(
+			'citaId' => $allInputs['idcita'],
+			'numDocGen' => $numDocGen
+		);
+		$this->model_cita->m_actualizar_doc_cita_facturas($arrUpdateCita);
 
 		$this->db->trans_complete();
 		$arrData['message'] = 'Se generó correctamente el documento electrónico.';
@@ -767,7 +777,7 @@ class Cita extends CI_Controller {
 		$data = array(
 			'pacienteId'			=> $allInputs['pacienteId'],
 			'usuarioId'				=> $this->sessionFactur['usuarioId'],
-			'sedeId'				=> $allInputs['sede']['id'],
+			'sedeId'					=> $this->sessionFactur['idsede'],  // $allInputs['sede']['id'],
 			'fechaCita'				=> date('Y-m-d',strtotime($allInputs['fecha'])),
 			'horaDesde' 			=> date('H:i',$horadesde),
 			'horaHasta' 			=> date('H:i',$horahasta),
@@ -786,6 +796,7 @@ class Cita extends CI_Controller {
 			'observaciones'			=> empty($allInputs['observaciones']) ? NULL : $allInputs['observaciones'],
       		'estado'				=> $allInputs['tipoCita'],
 			'medioContacto'			=> empty($allInputs['medioContacto']) ? NULL : $allInputs['medioContacto']['id'],
+			'tipoDocumentoCont' => empty($allInputs['tipoDocumentoCont']) ? NULL : $allInputs['tipoDocumentoCont']['id'],
 			'smsEnviadoCita'	=> 'POR_ENVIAR',
 			'metodoPago' => $allInputs['metodoPago']['id'],
 			'numSerie' => empty($allInputs['numSerie']) ? NULL : $allInputs['numSerie'],
@@ -880,7 +891,7 @@ class Cita extends CI_Controller {
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 		  return;
-    }
+    	}
 
 		$hora_inicio_calendar = strtotime('07:00:00');
 		$hora_fin_calendar = strtotime('23:00:00');
@@ -902,7 +913,7 @@ class Cita extends CI_Controller {
 		$subtotal = round($allInputs['total_a_pagar'] / 1.18, 2);
 		$igv =  round($allInputs['total_a_pagar'] - $subtotal, 2);
 		$data = array(
-			'sedeId'				=> $allInputs['sede']['id'],
+			// 'sedeId'				=> $allInputs['sede']['id'],
 			'fechaCita'				=> Date('Y-m-d',strtotime($allInputs['fecha'])),
 			'horaDesde' 			=> Date('H:i',$horadesde),
 			'horaHasta' 			=> Date('H:i',$horahasta),
@@ -929,7 +940,6 @@ class Cita extends CI_Controller {
 			'anotacionesPago' => empty($allInputs['anotacionesPago']) ? NULL : $allInputs['anotacionesPago'],
 			'updatedAt'				=> date('Y-m-d H:i:s')
 		);
-
 
 		$this->db->trans_start();
 		$fCita = $this->model_cita->m_obtener_cita($allInputs['id']);
@@ -1093,6 +1103,135 @@ class Cita extends CI_Controller {
 		    ->set_output(json_encode($arrData));
 	}
 
+	public function anular_facturacion()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$arrData['message'] = 'No se pudo anular los datos';
+		$arrData['flag'] = 0;
+
+		// consultar facturacion
+		$fFactur = $this->model_cita->m_obtener_facturacion($allInputs['facturacionId']);
+		$tipoDoc = $fFactur['tipoDocumento'];
+
+		// boleta o factura
+		if ($tipoDoc == 2 || $tipoDoc == 1) {
+			// validacion: No puedes anular si pasan mas de 7 dias desde la fecha de emision
+			$fechaReg = strtotime($fFactur['fechaEmision']);
+			$fechaRegMasSiete = strtotime("+ 7 day", $fechaReg);
+			$fechaHoy = strtotime(date('Y-m-d'));
+			if ($fechaHoy > $fechaRegMasSiete) {
+				// error
+				$arrData['flag'] = 0;
+				$arrData['message'] = 'Solo se puede anular boletas o facturas dentro de los 7 dias de emitida la misma.';
+				$this->output
+					->set_content_type('application/json')
+					->set_output(json_encode($arrData));
+					return;
+			}
+			$fCita = $this->model_cita->m_obtener_cita($fFactur['citaId']);
+			$tipoDocCont = 	NULL;
+			$serie = NULL;
+			if($fCita['tipoDocumentoCont'] == 'FACTURA'){
+				$tipoDocCont = '1';
+				$serie = $fCita['serief'];
+			}
+			if($fCita['tipoDocumentoCont'] == 'BOLETA'){
+				$tipoDocCont = '2';
+				$serie = $fCita['serieb'];
+			}
+			$tokenSede = $fCita['token'];
+			$dataRequest = array(
+				'operacion' => 'generar_anulacion',
+				'tipo_de_comprobante' => $tipoDocCont,
+				'serie' => $serie,
+				'numero' => $fCita['numDoc'],
+				'motivo' => 'ERROR DE USUARIO',
+				'codigo_unico' => 'CAB'.$tipoDocCont.$serie.$fCita['numDoc']
+			);
+		}
+
+		// nota debito o credito
+		if ($tipoDoc == 3 || $tipoDoc == 4) {
+			$fNota = $this->model_nota->m_obtener_nota($fFactur['notaId']);
+			$tipoDocCont = 	NULL;
+			// $serie = $fNota['numSerie'];
+			if($fNota['tipoNota'] == 'NOTA DE DEBITO'){
+				$tipoDocCont = '4';
+				// $serie = $fNota['serief'];
+			}
+			if($fNota['tipoNota'] == 'NOTA DE CREDITO'){
+				$tipoDocCont = '3';
+				// $serie = $fNota['serieb'];
+			}
+			$tokenSede = $fNota['token'];
+			$dataRequest = array(
+				'operacion' => 'generar_anulacion',
+				'tipo_de_comprobante' => $tipoDocCont,
+				'serie' => $fNota['numSerie'],
+				'numero' => $fNota['numDoc'],
+				'motivo' => 'ERROR DE USUARIO',
+				'codigo_unico' => 'CAB'.$tipoDocCont.$fNota['numSerie'].$fNota['numDoc']
+			);
+		}
+
+		$data_json = json_encode($dataRequest);
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, NB_LINK);
+		curl_setopt(
+			$ch, CURLOPT_HTTPHEADER, array(
+			'Authorization: Bearer "'.$tokenSede.'"',
+			'Content-Type: application/json',
+			)
+		);
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $data_json);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		$respuesta  = curl_exec($ch);
+
+		curl_close($ch);
+
+		$leer_respuesta = json_decode($respuesta, true);
+		if (isset($leer_respuesta['errors'])) {
+			//Mostramos los errores si los hay
+			$arrData['message'] = $leer_respuesta['errors'].'| CÓDIGO: '.$leer_respuesta['codigo'];
+			$arrData['data'] = $dataRequest;
+			$arrData['flag'] = 0;
+			$this->output
+				->set_content_type('application/json')
+				->set_output(json_encode($arrData));
+			return;
+		}
+		$this->db->trans_start();
+		$allInputs['username'] = $this->sessionFactur['username'];
+		$allInputs['link_pdf_anulacion'] = $leer_respuesta['enlace_del_pdf'];
+		if( $this->model_cita->m_anular_facturacion($allInputs) ){
+			
+			// facturas o boletas
+			if ($tipoDoc == 2 || $tipoDoc == 1) {
+				$arrUpdateCita = array(
+					'citaId' => $fCita['id'],
+					'numDocGen' => NULL
+				);
+				$this->model_cita->m_actualizar_doc_cita_facturas($arrUpdateCita);
+			}
+			// nota debito o credito
+			if ($tipoDoc == 3 || $tipoDoc == 4) {
+				$arrUpdateNota = array(
+					'notaId' => $fNota['id']
+				);
+				// $this->model_cita->m_actualizar_doc_cita_notas($arrUpdateNota);
+				$this->model_nota->m_anular($arrUpdateNota);
+			}
+			$arrData['message'] = 'Se anularon los datos correctamente';
+    	$arrData['flag'] = 1;
+		}
+		$this->db->trans_complete();
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+	}
 	// public function liberar_atencion()
 	// {
 	// 	$allInputs = json_decode(trim($this->input->raw_input_stream),true);

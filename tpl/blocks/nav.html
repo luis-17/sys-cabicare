@@ -1,4 +1,9 @@
-<!-- <li class="line dk"></li> -->
+<div class="block text-center mt ambiente">
+  <label class="label" > SEDE </label>
+  <select class="form-control input-sm" ng-change="onChangeSedeSession(); $event.preventDefault();" ng-model="arrMain.sede" 
+    ng-options="item as item.descripcion for item in arrMain.listaSedeUsuario"> </select>
+</div>
+<li class="line dk"></li>
 <!-- list -->
 <ul class="nav" ng-show="isLoggedIn">
   <li class="hidden-folded padder m-t m-b-sm text-muted text-xs">

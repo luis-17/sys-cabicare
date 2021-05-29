@@ -54,23 +54,25 @@
 	      </div>
 				<div class="form-group col-md-3">
 					<label for="name" class="control-label minotaur-label">Sede : </label>
-					<select
+					<label for="name" class="control-label" style="font-weight:bold;color:blue;display: block;font-size: 20px;"> {{ fSessionCI.sede }} </label>
+					<!-- <select
 						class="form-control input-sm"
 						ng-model="fData.sede"
 						ng-options="item as item.descripcion for item in fArr.listaSedes"
 						required
-					></select>
+					></select> -->
 	      </div>
 				<div class="form-group col-md-3 mb-md">
 					<label class="control-label mb-n"> Tipo de Documento </label>
-					<select class="form-control input-sm" ng-model="fData.tipoDocumentoCont" ng-options="item as item.descripcion for item in fArr.listaTipoDocumentoCont" tabindex="60" ></select> 
+					<select class="form-control input-sm" ng-change="onChangeTipoDoc(); $event.preventDefault();" ng-model="fData.tipoDocumentoCont" 
+						ng-options="item as item.descripcion for item in fArr.listaTipoDocumentoCont" tabindex="60" ></select> 
 				</div>
 				<div class="form-group col-md-3 mb-md">
 					<label class="control-label mb-n"> N° Serie / Factura </label>
 					<div class="group-bloque" style="display:flex;">
-						<input type="text" class="form-control input-sm" ng-model="fData.numSerie" placeholder="Ingrese N° Serie" 
+						<input type="text" class="form-control input-sm" disabled ng-model="fData.numSerie" placeholder="Ingrese N° Serie" 
 							style="width: 100px; margin-right: 4px;" />
-						<input type="text" class="form-control input-sm" ng-model="fData.numDoc" placeholder="Ingrese N° Doc." 
+						<input type="text" class="form-control input-sm" disabled ng-model="fData.numDoc" placeholder="Ingrese N° Doc." 
 							style="" />
 					</div>
 				</div>

@@ -62,7 +62,7 @@ angular.module('app')
         console.log('Ir a : ', param);
         $location.path(param); // Ejm: '/access/login'
       }
-      $scope.listaEmpresaAdminSession = [];
+      $scope.listaSedeUsuario = [];
       // save settings to local storage
       if ( angular.isDefined($localStorage.settings) ) {
         $scope.app.settings = $localStorage.settings;
@@ -103,8 +103,8 @@ angular.module('app')
 
       /* SESSION */
       $scope.arrMain = {};
-      $scope.arrMain.empresaadmin = {};
-      $scope.arrMain.listaEmpresaAdminSession = [];
+      $scope.arrMain.sede = {};
+      $scope.arrMain.listaSedeUsuario = [];
       $scope.fSessionCI = {};
       $scope.fConfigSys = {};
 
@@ -119,17 +119,17 @@ angular.module('app')
       $scope.logIn = function() {
         $scope.isLoggedIn = true;
       };
-      // $scope.getListaEmpresasSession = function(){
-      //   $timeout(function() {
-      //     rootServices.sListarEmpresaAdminSession().then(function (rpta) {
-      //       $scope.arrMain.listaEmpresaAdminSession = rpta.datos;
-      //       var objIndex = $scope.arrMain.listaEmpresaAdminSession.filter(function(obj) {
-      //         return obj.idempresaadmin == $scope.fSessionCI.idempresaadmin;
-      //       }).shift();
-      //       $scope.arrMain.empresaadmin = objIndex;
-      //     });
-      //   }, 50);
-      // }
+      $scope.getListaEmpresasSession = function(){
+        $timeout(function() {
+          rootServices.sListarSedeSession().then(function (rpta) {
+            $scope.arrMain.listaSedeUsuario = rpta.datos;
+            var objIndex = $scope.arrMain.listaSedeUsuario.filter(function(obj) {
+              return obj.idsede == $scope.fSessionCI.idsede;
+            }).shift();
+            $scope.arrMain.sede = objIndex;
+          });
+        }, 50);
+      }
       $scope.getValidateSession = function () {
         rootServices.sGetSessionCI().then(function (response) {
           if(response.flag == 1){
@@ -147,7 +147,7 @@ angular.module('app')
             if($scope.fSessionCI.keyPerfil == 'key_cont'){
               $scope.fConfigSys.valores = [false,false,false,false,false,false,true,true, true];
             }
-            // $scope.getListaEmpresasSession();
+            $scope.getListaEmpresasSession();
             $scope.logIn();
             // $scope.CargaMenu();
             if( $location.path() == '/access/login' ){
@@ -186,35 +186,35 @@ angular.module('app')
       //     }
       //   });
       // }
-      // $scope.onChangeEmpresaSession = function() {
-      //   var arrData = {
-      //     'datos' : $scope.arrMain.empresaadmin,
-      //     'session' : $scope.fSessionCI
-      //   }
-      //   blockUI.start('Ejecutando proceso...');
-      //   rootServices.sCambiarEmpresaSession(arrData).then(function (rpta) {
-      //     if(rpta.flag == 1){
-      //       var pTitle = 'OK!';
-      //       var pType = 'success';
-      //       $scope.getValidateSession();
-      //     }else if(rpta.flag == 0){
-      //       var pTitle = 'Error!';
-      //       var pType = 'warning';
-      //     }else{
-      //       alert('Contacte con el Área de Sistemas');
-      //     }
-      //     blockUI.stop();
-      //     pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 2000 });
-      //   });
-      // }
+      $scope.onChangeSedeSession = function() {
+        var arrData = {
+          'datos' : $scope.arrMain.sede,
+          'session' : $scope.fSessionCI
+        }
+        blockUI.start('Ejecutando proceso...');
+        rootServices.sCambiarSedeSession(arrData).then(function (rpta) {
+          if(rpta.flag == 1){
+            var pTitle = 'OK!';
+            var pType = 'success';
+            $scope.getValidateSession();
+          }else if(rpta.flag == 0){
+            var pTitle = 'Error!';
+            var pType = 'warning';
+          }else{
+            alert('Contacte con el Área de Sistemas');
+          }
+          blockUI.stop();
+          pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 2000 });
+        });
+      }
       $scope.btnLogoutToSystem = function () {
         blockUI.start('Cerrando sesión...');
         rootServices.sLogoutSessionCI().then(function () {
           blockUI.stop();
           $scope.fSessionCI = {};
           $scope.arrMain = {};
-          $scope.arrMain.empresaadmin = {};
-          // $scope.arrMain.listaEmpresaAdminSession = [];
+          $scope.arrMain.sede = {};
+          $scope.arrMain.listaSedeUsuario = [];
           $scope.logOut();
           $location.path('/access/login');
         });
@@ -230,8 +230,8 @@ angular.module('app')
         sLogoutSessionCI: sLogoutSessionCI,
         sGetSessionCI: sGetSessionCI,
         // sGetConfiguracionSys : sGetConfiguracionSys,
-        // sListarEmpresaAdminSession: sListarEmpresaAdminSession,
-        // sCambiarEmpresaSession: sCambiarEmpresaSession,
+        sListarSedeSession: sListarSedeSession,
+        sCambiarSedeSession: sCambiarSedeSession,
         sLoginToSystem: sLoginToSystem
     });
     function sLogoutSessionCI(pDatos) {
@@ -261,22 +261,22 @@ angular.module('app')
     //   });
     //   return (request.then(handleBehavior.success,handleBehavior.error));
     // }
-    // function sListarEmpresaAdminSession(datos) {
-    //   var request = $http({
-    //         method : "post",
-    //         url : angular.patchURLCI+"Acceso/lista_empresa_admin_session",
-    //         data : datos
-    //   });
-    //   return (request.then(handleBehavior.success,handleBehavior.error));
-    // }
-    // function sCambiarEmpresaSession(datos) {
-    //   var request = $http({
-    //         method : "post",
-    //         url : angular.patchURLCI+"Acceso/cambiar_empresa_admin_session",
-    //         data : datos
-    //   });
-    //   return (request.then(handleBehavior.success,handleBehavior.error));
-    // }
+    function sListarSedeSession(datos) {
+      var request = $http({
+            method : "post",
+            url : angular.patchURLCI+"Acceso/lista_sede_session",
+            data : datos
+      });
+      return (request.then(handleBehavior.success,handleBehavior.error));
+    }
+    function sCambiarSedeSession(datos) {
+      var request = $http({
+            method : "post",
+            url : angular.patchURLCI+"Acceso/cambiar_sede_session",
+            data : datos
+      });
+      return (request.then(handleBehavior.success,handleBehavior.error));
+    }
     function sLoginToSystem(datos) {
       var request = $http({
             method : "post",
