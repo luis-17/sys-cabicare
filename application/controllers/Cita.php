@@ -1091,6 +1091,16 @@ class Cita extends CI_Controller {
 	public function anular()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$arrFact = $this->model_cita->m_validar_existencia_facturacion($allInputs['idCita']);
+		if (!empty($arrFact)) {
+			// error
+			$arrData['flag'] = 0;
+			$arrData['message'] = 'Solo se puede anular una cita que no tenga facturacion electrónica generada.';
+			$this->output
+				->set_content_type('application/json')
+				->set_output(json_encode($arrData));
+			return;
+		}
 		$arrData['message'] = 'No se pudo anular los datos';
 		$arrData['flag'] = 0;
 		$allInputs['username'] = $this->sessionFactur['username'];
@@ -1126,7 +1136,7 @@ class Cita extends CI_Controller {
 				$this->output
 					->set_content_type('application/json')
 					->set_output(json_encode($arrData));
-					return;
+				return;
 			}
 			$fCita = $this->model_cita->m_obtener_cita($fFactur['citaId']);
 			$tipoDocCont = 	NULL;
