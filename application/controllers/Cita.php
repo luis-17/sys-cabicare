@@ -687,33 +687,33 @@ class Cita extends CI_Controller {
 			"items" => $arrDetalle
 		);
 		$data_json = json_encode($data);
-		// $ch = curl_init();
-		// curl_setopt($ch, CURLOPT_URL, NB_LINK);
-		// curl_setopt(
-		// 	$ch, CURLOPT_HTTPHEADER, array(
-		// 	'Authorization: Bearer "'.$tokenSede.'"',
-		// 	'Content-Type: application/json',
-		// 	)
-		// );
-		// curl_setopt($ch, CURLOPT_POST, 1);
-		// curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-		// curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-		// curl_setopt($ch, CURLOPT_POSTFIELDS, $data_json);
-		// curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		// $respuesta  = curl_exec($ch);
-		// curl_close($ch);
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, NB_LINK);
+		curl_setopt(
+			$ch, CURLOPT_HTTPHEADER, array(
+			'Authorization: Bearer "'.$tokenSede.'"',
+			'Content-Type: application/json',
+			)
+		);
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $data_json);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		$respuesta  = curl_exec($ch);
+		curl_close($ch);
 
-		// $leer_respuesta = json_decode($respuesta, true);
-		// if (isset($leer_respuesta['errors'])) {
-		// 	//Mostramos los errores si los hay
-		// 	$arrData['message'] = $leer_respuesta['errors'].'| CÓDIGO: '.$leer_respuesta['codigo'];
-		// 	$arrData['data'] = $data;
-		// 	$arrData['flag'] = 0;
-		// 	$this->output
-		// 		->set_content_type('application/json')
-		// 		->set_output(json_encode($arrData));
-		// 	return;
-		// }
+		$leer_respuesta = json_decode($respuesta, true);
+		if (isset($leer_respuesta['errors'])) {
+			//Mostramos los errores si los hay
+			$arrData['message'] = $leer_respuesta['errors'].'| CÓDIGO: '.$leer_respuesta['codigo'];
+			$arrData['data'] = $data;
+			$arrData['flag'] = 0;
+			$this->output
+				->set_content_type('application/json')
+				->set_output(json_encode($arrData));
+			return;
+		}
 
 		// registramos en tabla facturacion
 		$this->db->trans_start();
