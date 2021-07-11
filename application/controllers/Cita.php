@@ -558,7 +558,7 @@ class Cita extends CI_Controller {
 
 		// validacion, token inválido
 		$fCita = $this->model_cita->m_obtener_cita($allInputs['idcita']);
-		if ($allInputs['token'] == $fCita['tokenFactDestiempo']) {
+		if (!($allInputs['token'] == $fCita['tokenFactDestiempo'])) {
 			$arrData['message'] = 'Token inválido, vuelve a intentarlo con el token correcto.';
 			$arrData['flag'] = 0;
 			$this->output
