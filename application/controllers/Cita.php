@@ -8,7 +8,7 @@ class Cita extends CI_Controller {
 	public function __construct(){
     parent::__construct();
 		$this->load->helper(array('fechas_helper', 'otros_helper', 'imagen_helper'));
-		$this->load->model(array('model_cita', 'model_diagnostico', 'model_paciente', 'model_nota'));
+		$this->load->model(array('model_cita', 'model_diagnostico', 'model_paciente', 'model_nota', 'model_producto'));
 
 		$this->output->set_header("Cache-Control: no-store, no-cache, must-revalidate, no-transform, max-age=0, post-check=0, pre-check=0");
 		$this->output->set_header("Pragma: no-cache");
@@ -525,6 +525,47 @@ class Cita extends CI_Controller {
 			return;
 		}
 
+		// validacion, no puedes generar factura a destiempo sin tener un token que te respalde
+		$fechaActual = strtotime(date("d-m-Y"));
+		$fechaCita = strtotime($fCita['fechaCita']);
+		if ($fechaActual != $fechaCita && empty($allInputs['token'])) {
+			// enviar token
+			$account_sid = TW_SID;
+			$auth_token = TW_TOKEN;
+			$twilio_number = TW_NUMBER; // "+18442780963";
+			$client = new Client($account_sid, $auth_token);
+			$tokenOTP = random_int(10000, 99999);
+			$body = 'Codigo para aprobar generacion de factura. Paciente: '.$fCita['nombres'].'. Codigo: '.$tokenOTP;
+			$arrTelefonos = array('+51969464709', '+966562891080');
+			foreach($arrTelefonos as $value){
+				$client->messages->create(
+					$value,
+					array(
+							'from' => $twilio_number,
+							'body' => $body
+					)
+				);
+			}
+			$this->model_cita->m_actualizar_cita_token($fCita['id'], $tokenOTP);
+			// fin enviar token
+			$arrData['message'] = 'Se envió un token a los siguientes celulares: +51 969464709, +966 562891080';
+			$arrData['flag'] = 5;
+			$this->output
+				->set_content_type('application/json')
+				->set_output(json_encode($arrData));
+			return;
+		}
+
+		// validacion, token inválido
+		if ($allInputs['token'] == $fCita['tokenFactDestiempo']) {
+			$arrData['message'] = 'Token inválido, vuelve a intentarlo con el token correcto.';
+			$arrData['flag'] = 0;
+			$this->output
+				->set_content_type('application/json')
+				->set_output(json_encode($arrData));
+			return;
+		}
+
 		$clienteTipoDoc = '-';
 		$serie = null;
 		$tokenSede = $fCita['token'];
@@ -645,34 +686,33 @@ class Cita extends CI_Controller {
 			"items" => $arrDetalle
 		);
 		$data_json = json_encode($data);
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, NB_LINK);
-		curl_setopt(
-			$ch, CURLOPT_HTTPHEADER, array(
-			'Authorization: Bearer "'.$tokenSede.'"',
-			'Content-Type: application/json',
-			)
-		);
-		curl_setopt($ch, CURLOPT_POST, 1);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $data_json);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		$respuesta  = curl_exec($ch);
+		// $ch = curl_init();
+		// curl_setopt($ch, CURLOPT_URL, NB_LINK);
+		// curl_setopt(
+		// 	$ch, CURLOPT_HTTPHEADER, array(
+		// 	'Authorization: Bearer "'.$tokenSede.'"',
+		// 	'Content-Type: application/json',
+		// 	)
+		// );
+		// curl_setopt($ch, CURLOPT_POST, 1);
+		// curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		// curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+		// curl_setopt($ch, CURLOPT_POSTFIELDS, $data_json);
+		// curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		// $respuesta  = curl_exec($ch);
+		// curl_close($ch);
 
-		curl_close($ch);
-
-		$leer_respuesta = json_decode($respuesta, true);
-		if (isset($leer_respuesta['errors'])) {
-			//Mostramos los errores si los hay
-			$arrData['message'] = $leer_respuesta['errors'].'| CÓDIGO: '.$leer_respuesta['codigo'];
-			$arrData['data'] = $data;
-			$arrData['flag'] = 0;
-			$this->output
-				->set_content_type('application/json')
-				->set_output(json_encode($arrData));
-			return;
-		}
+		// $leer_respuesta = json_decode($respuesta, true);
+		// if (isset($leer_respuesta['errors'])) {
+		// 	//Mostramos los errores si los hay
+		// 	$arrData['message'] = $leer_respuesta['errors'].'| CÓDIGO: '.$leer_respuesta['codigo'];
+		// 	$arrData['data'] = $data;
+		// 	$arrData['flag'] = 0;
+		// 	$this->output
+		// 		->set_content_type('application/json')
+		// 		->set_output(json_encode($arrData));
+		// 	return;
+		// }
 
 		// registramos en tabla facturacion
 		$this->db->trans_start();
@@ -754,6 +794,23 @@ class Cita extends CI_Controller {
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 		    return;
+		}
+
+		// validar precio del producto
+		$precioDistinto = 0;
+		foreach($allInputs['detalle'] as $row){
+			$fProd = $this->model_producto->m_obtener_producto($row['idproducto']);
+			if ($fProd['precio'] != $row['precio']) {
+				$precioDistinto += 1;
+			}
+		}
+		if( $precioDistinto > 0 ){
+			$arrData['message'] = 'El precio no coincide. Recarge la página e intente nuevamente.';
+			$arrData['flag'] = 0;
+			$this->output
+				->set_content_type('application/json')
+				->set_output(json_encode($arrData));
+			return;
 		}
 
 		$hora_inicio_calendar = strtotime('07:00:00');
@@ -1242,19 +1299,6 @@ class Cita extends CI_Controller {
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
 	}
-	// public function liberar_atencion()
-	// {
-	// 	$allInputs = json_decode(trim($this->input->raw_input_stream),true);
-	// 	$arrData['message'] = 'No se pudo anular los datos';
-    // 	$arrData['flag'] = 0;
-	// 	if( $this->model_cita->m_liberar_cita($allInputs) ){
-	// 		$arrData['message'] = 'Se liberó la cita correctamente.';
-    // 	$arrData['flag'] = 1;
-	// 	}
-	// 	$this->output
-	// 	    ->set_content_type('application/json')
-	// 	    ->set_output(json_encode($arrData));
-	// }
 
 	public function registrar_atencion()
 	{

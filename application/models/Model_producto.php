@@ -76,6 +76,24 @@ class Model_producto extends CI_Model {
 		return $this->db->get()->result_array();
 	}
 
+	public function m_obtener_producto($id){
+		$this->db->select("
+			pr.id AS productoId,
+			pr.nombre,
+			pr.precio,
+			pr.procedencia,
+			pr.tipoProductoId,
+			tp.nombre AS tipoProducto
+		", FALSE);
+		$this->db->from('producto pr');
+		$this->db->join('tipoproducto tp', 'pr.tipoProductoId = tp.id');
+		$this->db->where('pr.estado', 1);
+		$this->db->where('pr.id', $id);
+		$this->db->limit(1);
+
+		return $this->db->get()->row_array();
+	}
+
 	public function m_registrar($datos)
 	{
 		$data = array(

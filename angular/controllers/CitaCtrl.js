@@ -1272,7 +1272,7 @@ app.factory("ReservaCitasFactory",
 							{ field: 'idproducto', name: 'id', displayName: 'ID', minWidth: 80, width: 80 },
 							{ field: 'producto', name: 'nombre', displayName: 'PRODUCTO', minWidth: 120 },
 							{ field: 'tipoProducto', name: 'tipoProducto', displayName: 'Tipo Producto', minWidth: 120 },
-							{ field: 'precio', name: 'precio', displayName: 'PRECIO (S/)', width: 120, enableCellEdit: true, cellClass: 'ui-editCell' },
+							{ field: 'precio', name: 'precio', displayName: 'PRECIO (S/)', width: 120, enableCellEdit: false, cellClass: '' },
 							{
 								field: 'eliminar', name: 'eliminar', displayName: '', width: 50,
 								cellTemplate: '<button ng-if="!(row.entity.idproducto == 70)" class="btn btn-default btn-sm text-danger btn-action" ng-click="grid.appScope.btnQuitarDeLaCesta(row);$event.stopPropagation();"> <i class="fa fa-trash" tooltip-placement="left" uib-tooltip="ELIMINAR!"></i> </button>'
@@ -1720,11 +1720,39 @@ app.factory("ReservaCitasFactory",
 									}else if(rpta.flag == 0){
 										var pTitle = 'Error!';
 										var pType = 'danger';
+									}else if(rpta.flag == 5){ // envio token
+										var pTitle = 'Error!';
+										var pType = 'danger';
 									}else{
 										alert('Error inesperado');
 									}
 									pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 2500 });
 									blockUI.stop();
+									if (rpta.flag == 5) {
+										$bootbox.prompt('Ingrese el token enviado al celular', function(result){
+											// console.log('result === ', result);
+											var arrParamsTwo = {
+												idcita: $scope.fData.id,
+												token: result
+											};
+											blockUI.start('Procesando información...');
+											CitaServices.sGenerarDocumento(arrParamsTwo).then(function (rpta) {
+												if(rpta.flag == 1){
+													var pTitle = 'OK!';
+													var pType = 'success';
+													$scope.getPaginationServerSideFE();
+													console.log('rpta.payload ==> ', rpta.payload);
+												}else if(rpta.flag == 0){
+													var pTitle = 'Error!';
+													var pType = 'danger';
+												}else{
+													alert('Error inesperado');
+												}
+												pinesNotifications.notify({ title: pTitle, text: rpta.message, type: pType, delay: 2500 });
+												blockUI.stop();
+											});
+										});
+									}
 								});
 							}
 						});

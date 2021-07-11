@@ -515,8 +515,8 @@ class Model_cita extends CI_Model {
 	}
 	public function m_obtener_cita($citaId) {
 		$this->db->select("ci.id, ci.estado, pa.celular, pa.tipoDocumento, pa.numeroDocumento, se.serief, se.serieb, se.token,
-			pa.nombres, pa.apellidoPaterno, pa.ruc, pa.direccionPersona, pa.direccionFiscal, pa.razonSocial, ci.numDoc, 
-			pa.apellidoMaterno, pa.email, ci.tipoDocumentoCont, ci.subtotal, ci.igv, ci.total, se.nombre AS sede", FALSE);
+			pa.nombres, pa.apellidoPaterno, pa.ruc, pa.direccionPersona, pa.direccionFiscal, pa.razonSocial, ci.numDoc, ci.fechaCita,
+			pa.apellidoMaterno, pa.email, ci.tipoDocumentoCont, ci.subtotal, ci.igv, ci.total, se.nombre AS sede, ci.tokenFactDestiempo", FALSE);
 		$this->db->from('cita ci');
 		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
 		$this->db->join('sede se', 'ci.sedeId = se.id');
@@ -612,6 +612,7 @@ class Model_cita extends CI_Model {
 		$this->db->where('id',$id);
 		return $this->db->update('cita', $data);
 	}
+
 	public function m_eliminar_detalle($datos)
 	{
 		$data = array(
@@ -977,6 +978,14 @@ class Model_cita extends CI_Model {
 	{
 		$data = array(
 			'smsEnviadoCita' => 'ENVIADO'
+		);
+		$this->db->where('id', $idcita);
+		return $this->db->update('cita', $data);
+	}
+	public function m_actualizar_cita_token($idcita, $token)
+	{
+		$data = array(
+			'tokenFactDestiempo' => $token
 		);
 		$this->db->where('id', $idcita);
 		return $this->db->update('cita', $data);

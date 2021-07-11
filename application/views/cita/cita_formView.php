@@ -100,10 +100,11 @@
 				<div class="form-group col-md-2">
 					<label for="name" class="control-label minotaur-label">Fecha <span class="text-danger">*</span>: </label>
 					<div class="input-group">
-						<input type="text" required class="form-control input-sm" uib-datepicker-popup ng-model="fData.fecha" is-open="configDP.popup.opened"
-								datepicker-options="configDP.dateOptions" close-text="Cerrar" />
+						<input type="text" required class="form-control input-sm" uib-datepicker-popup ng-model="fData.fecha" 
+						is-open="configDP.popup.opened" datepicker-options="configDP.dateOptions" close-text="Cerrar" 
+						ng-disabled="fData.tipoCita == 3"/>
 						<span class="input-group-btn">
-							<button type="button" class="btn btn-default btn-sm" ng-click="configDP.open()"><i class="fa fa-calendar"></i></button>
+							<button type="button" class="btn btn-default btn-sm" ng-click="configDP.open()" ng-disabled="fData.tipoCita == 3"><i class="fa fa-calendar"></i></button>
 						</span>
 					</div>
 				</div>
@@ -242,8 +243,11 @@
 						No se encontró resultados
 					</div>
 				</div>
-
 				<div class="form-group col-md-3 col-sm-6 mb-md">
+					<label class="control-label mb-xs"> Precio </label>
+					<label class="control-label mb-xs" style="display: block;font-weight: bold;font-size: 20px;"> {{fData.temporal.precio}} </label>
+				</div>
+				<!-- <div class="form-group col-md-3 col-sm-6 mb-md">
 					<label class="control-label mb-xs"> Precio </label>
 					<input
 						type="text"
@@ -251,7 +255,7 @@
 						class="form-control input-sm"
 						autocomplete="off"
 					/>
-				</div>
+				</div> -->
 
 				<div class="form-group col-md-3 mb-md  mt-xs">
 					<button
