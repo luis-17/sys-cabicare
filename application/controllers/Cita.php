@@ -557,15 +557,18 @@ class Cita extends CI_Controller {
 		}
 
 		// validacion, token inválido
-		$fCita = $this->model_cita->m_obtener_cita($allInputs['idcita']);
-		if (!($allInputs['token'] == $fCita['tokenFactDestiempo'])) {
-			$arrData['message'] = 'Token inválido, vuelve a intentarlo con el token correcto.';
-			$arrData['flag'] = 0;
-			$this->output
-				->set_content_type('application/json')
-				->set_output(json_encode($arrData));
-			return;
+		if (!empty($allInputs['token'])) {
+			$fCita = $this->model_cita->m_obtener_cita($allInputs['idcita']);
+			if (!($allInputs['token'] == $fCita['tokenFactDestiempo'])) {
+				$arrData['message'] = 'Token inválido, vuelve a intentarlo con el token correcto.';
+				$arrData['flag'] = 0;
+				$this->output
+					->set_content_type('application/json')
+					->set_output(json_encode($arrData));
+				return;
+			}
 		}
+		
 
 		$clienteTipoDoc = '-';
 		$serie = null;
@@ -714,7 +717,6 @@ class Cita extends CI_Controller {
 				->set_output(json_encode($arrData));
 			return;
 		}
-
 		// registramos en tabla facturacion
 		$this->db->trans_start();
 		
