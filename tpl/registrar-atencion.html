@@ -396,7 +396,15 @@
 					</uib-tab>
         </uib-tabset>
         <div class="col-xs-12 block pt mb text-center" style="border-top: 1px solid #e0e0e0;">
-          <button type="button" class="btn btn-warning" ng-click="goToUrl('app/atencion-medica'); $event.preventDefault();"
+          <button ng-if="fData.bloqueoMedico == 'si'" type="button" class="btn btn-info" ng-click="bloquearAtencionMedica('no'); $event.preventDefault();"
+            style="width: 150px;">
+            <i class="fa fa-check"></i> Desbloquear
+          </button>
+					<button ng-if="fData.bloqueoMedico == 'no'" type="button" class="btn btn-danger" ng-click="bloquearAtencionMedica('si'); $event.preventDefault();"
+            style="width: 150px;">
+            <i class="fa fa-ban"></i> Bloquear
+          </button>
+					<button type="button" class="btn btn-warning" ng-click="goToUrl('app/atencion-medica'); $event.preventDefault();"
             style="width: 150px;">
             <i class="fa fa-step-backward"></i> Regresar
           </button>

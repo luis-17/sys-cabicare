@@ -756,7 +756,9 @@ class Cita extends CI_Controller {
 	public function ver_popup_form_metodo_pago(){
 			$this->load->view('cita/metodo_pago_formView');
 	}
-
+	public function ver_popup_motivo_anulacion_cita_detalle(){
+		$this->load->view('cita/motivoAnulacionCitaDetalle_formView');
+}
 	public function registrar()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
@@ -1124,7 +1126,7 @@ class Cita extends CI_Controller {
 		$this->output
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
-  	}
+  }
 	public function agregar_metodo_pago()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
@@ -1167,6 +1169,21 @@ class Cita extends CI_Controller {
 		if( $this->model_cita->m_anular($allInputs) ){
 			$arrData['message'] = 'Se anularon los datos correctamente';
     		$arrData['flag'] = 1;
+		}
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+	}
+
+	public function bloquear_desbloquear_cita_medico()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$arrData['message'] = 'No se pudo bloquear/desbloquear los datos';
+		$arrData['flag'] = 0;
+		// $allInputs['username'] = $this->sessionFactur['username'];
+		if( $this->model_cita->m_bloqueo_desbloqueo_medico($allInputs['citaId'], $allInputs['decision']) ){
+			$arrData['message'] = 'Se ejecutó la función correctamente.';
+    	$arrData['flag'] = 1;
 		}
 		$this->output
 		    ->set_content_type('application/json')
@@ -1598,6 +1615,16 @@ class Cita extends CI_Controller {
 		}else{
 			$arrData['datos'] = $arrListado; 
 		}
+		$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+	}
+
+	public function consultar_bloqueo_medico()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$fBloqueo = $this->model_cita->m_obtener_bloqueo_medico($allInputs['citaId']);
+		$arrData['bloqueoMedico'] = $fBloqueo['bloqueoMedico']; 
 		$this->output
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));

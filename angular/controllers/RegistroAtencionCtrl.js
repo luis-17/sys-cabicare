@@ -119,6 +119,30 @@ app.controller('RegistroAtencionCtrl', [
 			var talla = parseInt($scope.fData.talla) / 100;
 			$scope.fData.imc = (parseFloat($scope.fData.peso) / (parseFloat(talla*talla))).toFixed(2);
 		}
+		$scope.bloquearAtencionMedica = function(decision){
+			blockUI.start("Procesando...");
+			var arrParams = {
+				citaId: $stateParams.id,
+				decision: decision
+			};
+			RegistroAtencionService.sBloquearDesbloquearMedico(arrParams).then(function (rpta) {
+				if (rpta.flag === 1) {
+					var pTitle = 'OK!';
+					var pType = 'success';
+				} else {
+					var pTitle = 'Advertencia!';
+					var pType = 'warning';
+				}
+				blockUI.stop();
+				pinesNotifications.notify({
+					title: pTitle,
+					text: rpta.message,
+					type: pType,
+					delay: 5000
+				});
+				$state.reload();
+			});
+		}
 		$scope.grabarAtencionMedica = function(){
       $scope.fData.diagnostico = $scope.gridOptions.data;
       var tieneConsulta = false;
@@ -692,6 +716,7 @@ app.service("RegistroAtencionService", function ($http, $q, handleBehavior){
 		sQuitarImagen: sQuitarImagen,
 		sCalcularSemanaGestacion: sCalcularSemanaGestacion,
 		sCalcularFPP: sCalcularFPP,
+		sBloquearDesbloquearMedico: sBloquearDesbloquearMedico,
 	});
 	function sGetCitaById(datos) {
 		var request = $http({
@@ -784,5 +809,13 @@ app.service("RegistroAtencionService", function ($http, $q, handleBehavior){
 					data : datos
 		});
 		return (request.then( handleSuccess,handleError ));
+	}
+	function sBloquearDesbloquearMedico(datos) {
+		var request = $http({
+			method: "post",
+			url: angular.patchURLCI + "Cita/bloquear_desbloquear_cita_medico",
+			data: datos
+		});
+		return (request.then(handleBehavior.success, handleBehavior.error));
 	}
 });

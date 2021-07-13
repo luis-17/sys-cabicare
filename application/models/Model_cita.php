@@ -560,6 +560,7 @@ class Model_cita extends CI_Model {
 			ci.medioContacto,
 			ci.gestando,
 			ci.estado,
+			ci.bloqueoMedico,
 			concat_ws(' ', pa.nombres, pa.apellidoPaterno, pa.apellidoMaterno) AS paciente,
 			pa.tipoDocumento,
 			pa.numeroDocumento,
@@ -617,7 +618,9 @@ class Model_cita extends CI_Model {
 	{
 		$data = array(
 			'estado' 		=> 0,
-			'updatedAt'		=> date('Y-m-d H:i:s')
+			'updatedAt'		=> date('Y-m-d H:i:s'),
+			'motivoAnulacionDet' =>  $datos['motivo'],
+			'usuarioAnulacionDet' =>  $this->sessionFactur['username']
 		);
 		$this->db->where('id',$datos['id']);
 		return $this->db->update('citaproducto', $data);
@@ -771,6 +774,17 @@ class Model_cita extends CI_Model {
 		$this->db->from('citaproducto cp');
 		$this->db->where('cp.citaId', $citaId);
 		$this->db->order_by('cp.productoId', 'ASC');
+		$this->db->limit(1);
+		return $this->db->get()->row_array();
+	}
+
+	public function m_obtener_bloqueo_medico($citaId)
+	{
+		$this->db->select("
+			ci.bloqueoMedico
+		", FALSE);
+		$this->db->from('cita ci');
+		$this->db->where('ci.id', $citaId);
 		$this->db->limit(1);
 		return $this->db->get()->row_array();
 	}
@@ -973,6 +987,14 @@ class Model_cita extends CI_Model {
 		);
 		$this->db->where('id', $arrData['notaId']);
 		return $this->db->update('nota', $data);
+	}
+	public function m_bloqueo_desbloqueo_medico($idcita, $decision)
+	{
+		$data = array(
+			'bloqueoMedico' => $decision
+		);
+		$this->db->where('id', $idcita);
+		return $this->db->update('cita', $data);
 	}
 	public function m_actualizar_cita_sms($idcita)
 	{

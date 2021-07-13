@@ -451,7 +451,7 @@ app.service("CitaServices", function ($http, $q, handleBehavior) {
 		sAnular: sAnular,
 		sAnularFacturacion: sAnularFacturacion,
 		sListarAtencionEnCita: sListarAtencionEnCita,
-		
+		sConsultarBloqueoMedico: sConsultarBloqueoMedico,
 	});
 
 	function sListarCitasGrilla(datos) {
@@ -498,6 +498,14 @@ app.service("CitaServices", function ($http, $q, handleBehavior) {
 		var request = $http({
 			method: "post",
 			url: angular.patchURLCI + "Cita/generar_documento_electronico",
+			data: datos
+		});
+		return (request.then(handleBehavior.success, handleBehavior.error));
+	}
+	function sConsultarBloqueoMedico(datos) {
+		var request = $http({
+			method: "post",
+			url: angular.patchURLCI + "Cita/consultar_bloqueo_medico",
 			data: datos
 		});
 		return (request.then(handleBehavior.success, handleBehavior.error));
@@ -565,6 +573,7 @@ app.factory("ReservaCitasFactory",
 		$uibModal,
 		pinesNotifications,
 		blockUI,
+		$timeout,
 		ProductoServices,
 		PacienteServices,
 		UsuarioServices,
@@ -1275,7 +1284,7 @@ app.factory("ReservaCitasFactory",
 							{ field: 'precio', name: 'precio', displayName: 'PRECIO (S/)', width: 120, enableCellEdit: false, cellClass: '' },
 							{
 								field: 'eliminar', name: 'eliminar', displayName: '', width: 50,
-								cellTemplate: '<button ng-if="!(row.entity.idproducto == 70)" class="btn btn-default btn-sm text-danger btn-action" ng-click="grid.appScope.btnQuitarDeLaCesta(row);$event.stopPropagation();"> <i class="fa fa-trash" tooltip-placement="left" uib-tooltip="ELIMINAR!"></i> </button>'
+								cellTemplate: '<button ng-if="!(row.entity.idproducto == 70)" class="btn btn-default btn-sm text-danger btn-action" ng-click="grid.appScope.btnQuitarDeLaCesta(row);$event.stopPropagation();$event.preventDefault();"> <i class="fa fa-trash" tooltip-placement="left" uib-tooltip="ELIMINAR!"></i> </button>'
 							}
 						],
 						onRegisterApi: function (gridApi) {
@@ -1412,17 +1421,67 @@ app.factory("ReservaCitasFactory",
 
 					$scope.btnQuitarDeLaCesta = function (row) {
 						if( row.entity.id > 0 ){
-							row.entity.estado = 0;
-							$scope.fData.eliminados.push(row.entity);
+							blockUI.start('Validar bloqueo de cita...'); 
+							var arrParams = {
+								citaId: $scope.fData.id
+							};
+							CitaServices.sConsultarBloqueoMedico(arrParams).then(function (rpta) {
+								blockUI.stop();
+								if (rpta.bloqueoMedico == 'si') { // bloqueo
+									pinesNotifications.notify({
+										title: 'Advertencia.',
+										text: 'No puedes anular el producto porque se encuentra bloqueado. Contacte con el médico para desbloquear.',
+										type: 'warning',
+										delay: 5000
+									});
+									return false;
+								}
+								if (rpta.bloqueoMedico == 'no') {
+									blockUI.start('Procesando información...'); 
+									$uibModal.open({ 
+										templateUrl: angular.patchURLCI+'Cita/ver_popup_motivo_anulacion_cita_detalle',
+										size: 'md',
+										backdrop: 'static',
+										keyboard:false,
+										scope: $scope,
+										controller: function ($scope, $uibModalInstance) {
+											blockUI.stop();
+											$scope.fDataMAD = {};
+											$scope.titleForm = 'Ingrese el motivo de anulación';
+											$scope.aceptar = function () { 
+												if (!$scope.fDataMAD.motivoAnulacion) {
+													pinesNotifications.notify({
+														title: 'Advertencia.',
+														text: 'Debe ingresar un motivo de anulación.',
+														type: 'warning',
+														delay: 5000
+													});
+													return;
+												}
+												row.entity.estado = 0;
+												row.entity.motivo = $scope.fDataMAD.motivoAnulacion;
+												$scope.fData.eliminados.push(row.entity);
+												var index = $scope.gridOptions.data.findIndex(function(elm){
+													return elm.id == row.entity.id;
+												});
+												$scope.gridOptions.data.splice(index, 1);
+												$scope.calcularTotales();
+												$uibModalInstance.dismiss('cancel');
+											} 
+											$scope.cancel = function () {
+												$uibModalInstance.dismiss('cancel');
+											}
+										}
+									});
+								}
+							});
+						} else {
+							var index = $scope.gridOptions.data.findIndex(function(elm){
+								return elm.id == row.entity.id;
+							});
+							$scope.gridOptions.data.splice(index, 1);
+							$scope.calcularTotales();
 						}
-						console.log('eliminados', $scope.fData.eliminados);
-						// var index = $scope.gridOptions.data.indexOf(row.entity);
-						var index = $scope.gridOptions.data.findIndex(function(elm){
-							return elm.id == row.entity.id;
-						});
-						console.log('elimina', index);
-						$scope.gridOptions.data.splice(index, 1);
-						$scope.calcularTotales();
 					}
 
 					/* CALCULO DE IMC */
