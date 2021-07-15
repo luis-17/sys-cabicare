@@ -288,22 +288,22 @@ class Reportes extends CI_Controller {
 			// SETEO DE VARIABLES
 			$dataColumnsTP = array(
 				array( 'col' => '#',                'ancho' =>  7, 	'align' => 'L' ),
-				array( 'col' => 'PACIENTE',			'ancho' => 10, 	'align' => 'C' ),
+				array( 'col' => 'PACIENTE',			'ancho' => 35, 	'align' => 'C' ),
 				array( 'col' => "FECHA CITA",	'ancho' => 12, 	'align' => 'C' ),
 				array( 'col' => 'HORA CITA', 		'ancho' => 12, 	'align' => 'C' ),
-				array( 'col' => 'FECHA CREACION',	'ancho' => 12, 	'align' => 'C' ),
-				array( 'col' => 'FECHA ULTIMA ACTUALIZACION',		'ancho' => 15, 	'align' => 'C' ),
-				array( 'col' => 'FECHA ATENCION',			'ancho' => 60, 	'align' => 'L' ),
-				array( 'col' => 'USUARIO CREACION',			'ancho' => 60, 	'align' => 'L' ),
-				array( 'col' => 'USUARIO ANULACION',			'ancho' => 60, 	'align' => 'L' ),
-				array( 'col' => 'MOTIVO ANULACION',			'ancho' => 15, 	'align' => 'R' ),
+				array( 'col' => 'FECHA CREACION',	'ancho' => 26, 	'align' => 'C' ),
+				array( 'col' => 'FECHA ULTIMA ACTUALIZACION',		'ancho' => 26, 	'align' => 'C' ),
+				array( 'col' => 'FECHA ATENCION',			'ancho' => 26, 	'align' => 'L' ),
+				array( 'col' => 'USUARIO CREACION',			'ancho' => 16, 	'align' => 'L' ),
+				array( 'col' => 'USUARIO ANULACION',			'ancho' => 16, 	'align' => 'L' ),
+				array( 'col' => 'MOTIVO ANULACION',			'ancho' => 35, 	'align' => 'R' ),
 				array( 'col' => 'PRECIO',			'ancho' => 15, 	'align' => 'R' ),
-				array( 'col' => 'PRODUCTO',			'ancho' => 15, 	'align' => 'R' ),
-				array( 'col' => 'MEDICO',			'ancho' => 15, 	'align' => 'R' ),
-				array( 'col' => 'INFORME MEDICO',			'ancho' => 15, 	'align' => 'L' ),
-				array( 'col' => 'OBSERVACIONES',			'ancho' => 15, 	'align' => 'L' ),
-				array( 'col' => 'MOTIVO DE CONSULTA',			'ancho' => 15, 	'align' => 'L' ),
-				array( 'col' => 'PLAN',			'ancho' => 15, 	'align' => 'L' )
+				array( 'col' => 'PRODUCTO',			'ancho' => 30, 	'align' => 'R' ),
+				array( 'col' => 'MEDICO',			'ancho' => 35, 	'align' => 'R' ),
+				array( 'col' => 'INFORME MEDICO',			'ancho' => 38, 	'align' => 'L' ),
+				array( 'col' => 'OBSERVACIONES',			'ancho' => 38, 	'align' => 'L' ),
+				array( 'col' => 'MOTIVO DE CONSULTA',			'ancho' => 38, 	'align' => 'L' ),
+				array( 'col' => 'PLAN',			'ancho' => 38, 	'align' => 'L' )
 			);
 			$titulo = 'LISTADO DE PRODUCTOS ANULADOS';
 			$nombre_hoja = 'Citas';
