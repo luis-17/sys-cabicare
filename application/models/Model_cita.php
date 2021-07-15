@@ -123,22 +123,53 @@ class Model_cita extends CI_Model {
 		$this->db->where('pg.estado', 1);
 		$this->db->where('ci.fechaCita BETWEEN ' . $desde .' AND ' . $hasta);
 		$this->db->where('ci.sedeId', $this->sessionFactur['idsede']);
-		// if( isset($paramPaginate['search'] ) && @$paramPaginate['search'] ){
-		// 	foreach (@$paramPaginate['searchColumn'] as $key => $value) {
-		// 		if(! empty($value)){
-		// 			$this->db->like($key ,strtoupper_total($value) ,FALSE);
-		// 		}
-		// 	}
-		// }
-
-		// if( @$paramPaginate['sortName'] ){
 		$this->db->order_by('ci.fechaCita', 'ASC');
-		// }
-		// if( @$paramPaginate['firstRow'] || @$paramPaginate['pageSize'] ){
-		// 	$this->db->limit(@$paramPaginate['pageSize'],@$paramPaginate['firstRow'] );
-		// }
 		return $this->db->get()->result_array();
 	}
+
+	public function m_cargar_detalle_citas_eliminadas_excel($paramDatos){
+		$desde = $this->db->escape(darFormatoYMD($paramDatos['fechaDesde']));
+ 		$hasta = $this->db->escape(darFormatoYMD($paramDatos['fechaHasta']));
+		$this->db->select("
+			ci.id,
+			ci.fechaAtencion,
+			ci.fechaAtencion,
+			ci.fechaCita,
+			ci.horaDesde,
+			ci.observaciones,
+			ci.estado,
+			ci.createdAt,
+			ci.updatedAt,
+			concat_ws(' ', pa.nombres, pa.apellidoPaterno, pa.apellidoMaterno) AS paciente,
+			pa.tipoDocumento,
+			pa.numeroDocumento,
+			pa.celular,
+			ci.medicoId,
+			concat_ws(' ', med.nombres, med.apellidos) AS medico,
+			us.username,
+			cp.precioReal,
+			pr.nombre AS producto,
+			cp.informe,
+			cp.observaciones,
+			cp.motivoConsulta,
+			cp.plan,
+			cp.motivoAnulacionDet,
+			cp.usuarioAnulacionDet
+		", FALSE);
+		$this->db->from('cita ci');
+		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
+		$this->db->join('usuario med', 'ci.medicoId = med.id');
+		$this->db->join('usuario us', 'ci.usuarioId = us.id');
+		$this->db->join('citaproducto cp', 'cp.citaId = ci.id');
+		$this->db->join('producto pr', 'cp.productoId = pr.id');
+		$this->db->where('ci.estado <> ', 0);
+		$this->db->where('cp.estado', 0); // anulados det
+		$this->db->where('ci.fechaCita BETWEEN ' . $desde .' AND ' . $hasta);
+		$this->db->where('ci.sedeId', $this->sessionFactur['idsede']);
+		$this->db->order_by('ci.createdAt', 'DESC');
+		return $this->db->get()->result_array();
+	}
+
 	public function m_cargar_citas_excel_historico($paramDatos){
 		$desde = $this->db->escape(darFormatoYMD($paramDatos['fechaDesde']));
  		$hasta = $this->db->escape(darFormatoYMD($paramDatos['fechaHasta']));

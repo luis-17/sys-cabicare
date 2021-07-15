@@ -113,6 +113,11 @@ app.controller('CentralReportesCtrl', ['$scope', '$filter', '$uibModal', '$bootb
             id: 'DOC-ALL',
             tipoCuadro: 'report',
             name: 'REPORTE DE DOCUMENTOS'
+          },
+          {
+            id: 'CIT-ANUDET',
+            tipoCuadro: 'report',
+            name: 'REPORTE DE ANULADOS'
           }
         ]
       }
@@ -210,6 +215,23 @@ app.controller('CentralReportesCtrl', ['$scope', '$filter', '$uibModal', '$bootb
                 },
                 titulo: 'REPORTE DE CITAS',
                 tituloAbv: 'CIT-ALL'
+              }
+            };
+            ModalReporteFactory.getPopupReporte(arrParams); 
+            break;
+          case 'CIT-ANUDET':
+            var arrParams = {
+              url: angular.patchURLCI+'Reportes/listado_detalle_citas_eliminados',
+              metodo: 'php',
+              salida: 'excel',
+              datos: {
+                paginate: {},
+                filtro: {
+                  fechaDesde: $scope.fBusqueda.desde,
+                  fechaHasta: $scope.fBusqueda.hasta
+                },
+                titulo: 'REPORTE DE CITAS ANULADAS',
+                tituloAbv: 'CIT-ANUDET'
               }
             };
             ModalReporteFactory.getPopupReporte(arrParams); 

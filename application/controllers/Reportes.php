@@ -249,6 +249,178 @@ class Reportes extends CI_Controller {
 			->set_output(json_encode($arrData));
 	}
 
+	public function listado_detalle_citas_eliminados()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+
+		// TRATAMIENTO DE DATOS //
+			$lista = array();
+			$paramDatos = $allInputs['filtro'];
+			$nombre_reporte = 'citasAnuladas';
+			$lista = $this->model_cita->m_cargar_detalle_citas_eliminadas_excel($paramDatos);
+			$total = 0;
+			$arrListadoProd = array();
+			$i = 1;
+			foreach ($lista as $row) {
+				array_push($arrListadoProd,
+					array(
+						$i++,
+						$row['paciente'],
+						darFormatoDMY($row['fechaCita']),
+						darFormatoHora($row['horaDesde']),
+						$row['createdAt'],
+						$row['updatedAt'],
+						$row['fechaAtencion'],
+						$row['username'],
+						$row['usuarioAnulacionDet'],
+						$row['motivoAnulacionDet'],
+						$row['precioReal'],
+						$row['producto'],
+						$row['medico'],
+						$row['informe'],
+						$row['observaciones'],
+						$row['motivoConsulta'],
+						$row['plan']
+					)
+				);
+			}
+
+			// SETEO DE VARIABLES
+			$dataColumnsTP = array(
+				array( 'col' => '#',                'ancho' =>  7, 	'align' => 'L' ),
+				array( 'col' => 'PACIENTE',			'ancho' => 10, 	'align' => 'C' ),
+				array( 'col' => "FECHA CITA",	'ancho' => 12, 	'align' => 'C' ),
+				array( 'col' => 'HORA CITA', 		'ancho' => 12, 	'align' => 'C' ),
+				array( 'col' => 'FECHA CREACION',	'ancho' => 12, 	'align' => 'C' ),
+				array( 'col' => 'FECHA ULTIMA ACTUALIZACION',		'ancho' => 15, 	'align' => 'C' ),
+				array( 'col' => 'FECHA ATENCION',			'ancho' => 60, 	'align' => 'L' ),
+				array( 'col' => 'USUARIO CREACION',			'ancho' => 60, 	'align' => 'L' ),
+				array( 'col' => 'USUARIO ANULACION',			'ancho' => 60, 	'align' => 'L' ),
+				array( 'col' => 'MOTIVO ANULACION',			'ancho' => 15, 	'align' => 'R' ),
+				array( 'col' => 'PRECIO',			'ancho' => 15, 	'align' => 'R' ),
+				array( 'col' => 'PRODUCTO',			'ancho' => 15, 	'align' => 'R' ),
+				array( 'col' => 'MEDICO',			'ancho' => 15, 	'align' => 'R' ),
+				array( 'col' => 'INFORME MEDICO',			'ancho' => 15, 	'align' => 'L' ),
+				array( 'col' => 'OBSERVACIONES',			'ancho' => 15, 	'align' => 'L' ),
+				array( 'col' => 'MOTIVO DE CONSULTA',			'ancho' => 15, 	'align' => 'L' ),
+				array( 'col' => 'PLAN',			'ancho' => 15, 	'align' => 'L' )
+			);
+			$titulo = 'LISTADO DE PRODUCTOS ANULADOS';
+			$nombre_hoja = 'Citas';
+
+			$cantColumns = count($dataColumnsTP);
+			$arrColumns = array();
+			$this->excel->getActiveSheet()->getColumnDimension('A')->setWidth(2); // por defecto lo ponemos en 2 luego si se usa la columna se cambia
+			$a = 'B'; // INICIO DE COLUMNA
+			for ($x=0; $x < $cantColumns; $x++) {
+				$arrColumns[] = $a++;
+			}
+			$endColum = end($arrColumns);
+			$this->excel->setActiveSheetIndex(0);
+			$this->excel->getActiveSheet()->setTitle($nombre_hoja);
+			$this->excel->getActiveSheet()->setShowGridlines(false);
+
+		// ESTILOS
+			$styleArrayTitle = array(
+				'font'=>  array(
+					'bold'  => false,
+					'size'  => 18,
+					'name'  => 'calibri',
+					'color' => array('rgb' => 'FFFFFF')
+			  	),
+				'alignment' => array(
+					'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+					'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+				),
+				'fill' => array(
+					'type' => PHPExcel_Style_Fill::FILL_SOLID,
+					'startcolor' => array( 'rgb' => '3A3838' )
+				),
+			);
+			$styleArraySubTitle = array(
+				'font'=>  array(
+					'bold'  => false,
+					'size'  => 12,
+					'name'  => 'Microsoft Sans Serif',
+					'color' => array('rgb' => 'FFFFFF')
+				),
+				'alignment' => array(
+					'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+					'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+				),
+				'fill' => array(
+					'type' => PHPExcel_Style_Fill::FILL_SOLID,
+					'startcolor' => array( 'rgb' => '3A3838' )
+				),
+			);
+			$styleArrayHeader = array(
+				'borders' => array(
+					'allborders' => array(
+						'style' => PHPExcel_Style_Border::BORDER_THIN,
+						'color' => array('rgb' => '000000')
+					)
+				),
+				'alignment' => array(
+					'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+					'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+			  	),
+				'font'=>  array(
+					'bold'  => false,
+					'size'  => 10,
+					'name'  => 'calibri',
+					'color' => array('rgb' => 'FFFFFF')
+				),
+				'fill' => array(
+					'type' => PHPExcel_Style_Fill::FILL_SOLID,
+					'startcolor' => array( 'rgb' => '5B9BD5' )
+				),
+			);
+			// TITULO
+			$this->excel->getActiveSheet()->getCell($arrColumns[0].'1')->setValue($titulo);
+			$this->excel->getActiveSheet()->getStyle($arrColumns[0].'1')->applyFromArray($styleArrayTitle);
+			$this->excel->getActiveSheet()->mergeCells($arrColumns[0].'1:'. $endColum .'1');
+
+
+			$currentCellEncabezado = 4; // donde inicia el encabezado del listado
+			$fila_mes = $currentCellEncabezado - 1;
+			$fila = $currentCellEncabezado + 1;
+			$pieListado = $fila + count($arrListadoProd);
+
+			// ENCABEZADO DE LA LISTA
+			$i=0;
+			foreach ($dataColumnsTP as $key => $value) {
+				$this->excel->getActiveSheet()->getColumnDimension($arrColumns[$i])->setWidth($value['ancho']);
+				$this->excel->getActiveSheet()->getCell($arrColumns[$i].$currentCellEncabezado)->setValue($value['col']);
+				if( $value['align'] == 'C' ){
+					$this->excel->getActiveSheet()->getStyle($arrColumns[$i].$fila .':'.$arrColumns[$i].$pieListado)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+				}
+				$i++;
+			}
+			$c1 = $i;
+			$this->excel->getActiveSheet()->getStyle($arrColumns[0].$currentCellEncabezado.':'.$endColum.$currentCellEncabezado)->getAlignment()->setWrapText(true);
+			$this->excel->getActiveSheet()->getStyle($arrColumns[0].($currentCellEncabezado).':'.$endColum.($currentCellEncabezado))->applyFromArray($styleArrayHeader);
+			$this->excel->getActiveSheet()->getRowDimension($currentCellEncabezado)->setRowHeight(45);
+			$this->excel->getActiveSheet()->setAutoFilter($arrColumns[0].$currentCellEncabezado.':'.$endColum.$currentCellEncabezado);
+
+			// LISTA
+			$this->excel->getActiveSheet()->fromArray($arrListadoProd, null, $arrColumns[0].$fila);
+			$this->excel->getActiveSheet()->freezePane($arrColumns[0].$fila);
+
+
+		$objWriter = new PHPExcel_Writer_Excel2007($this->excel);
+		$time = date('YmdHis_His');
+		$objWriter->save('assets/dinamic/excelTemporales/'. $nombre_reporte . '_' . $time.'.xlsx');
+
+		$arrData = array(
+		  'urlTempEXCEL'=> 'assets/dinamic/excelTemporales/'. $nombre_reporte . '_' . $time.'.xlsx',
+		  'flag'=> 1
+		);
+
+		$this->output
+			->set_content_type('application/json')
+			->set_output(json_encode($arrData));
+	}
+
 	public function listado_documentos_excel()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
