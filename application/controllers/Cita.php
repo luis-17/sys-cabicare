@@ -568,7 +568,6 @@ class Cita extends CI_Controller {
 				return;
 			}
 		}
-		
 
 		$clienteTipoDoc = '-';
 		$serie = null;
@@ -588,6 +587,9 @@ class Cita extends CI_Controller {
 			}
 			if($fCita['tipoDocumento'] == 'DNI'){
 				$clienteTipoDoc = '1';
+			}
+			if($fCita['tipoDocumento'] == 'PTP'){
+				$clienteTipoDoc = '0';
 			}
 			$clienteNumDoc = $fCita['numeroDocumento'];
 			$clienteDenominacion = $fCita['nombres'].' '.$fCita['apellidoPaterno'].' '.$fCita['apellidoMaterno'];
@@ -895,7 +897,7 @@ class Cita extends CI_Controller {
 					$auth_token = TW_TOKEN;
 					$twilio_number = TW_NUMBER; // "+18442780963";
 					$client = new Client($account_sid, $auth_token);
-					$body = 'Su cita se ha reservado con éxito en CABICARE con el Dr. '.$allInputs['medico']['medico'].' el '.date('d-m-Y',strtotime($allInputs['fecha'])).' - '.date('H:i', strtotime($allInputs['hora_desde'])).'. Recuerde asistir 20 minutos antes. Para cualquier cambio de cita contactenos. "Contigo en todas tus etapas".';
+					$body = 'Su cita se ha reservado con exito en CABICARE con el Dr. '.$allInputs['medico']['medico'].' el '.date('d-m-Y',strtotime($allInputs['fecha'])).' - '.date('H:i', strtotime($allInputs['hora_desde'])).'. Para cualquier cambio de cita contactenos.';
 					$client->messages->create(
 						'+51'.$fPaciente['celular'],
 						array(
@@ -1087,8 +1089,7 @@ class Cita extends CI_Controller {
 						'+51'.$fCita['celular'],
 						array(
 								'from' => $twilio_number,
-								'body' => 'Su cita se ha reservado con éxito en CABICARE con el Dr. '.$allInputs['medico']['medico'].' el '.date('d-m-Y',strtotime($allInputs['fecha'])).' - '.date('H:i', strtotime($allInputs['hora_desde'])).'. 
-									Recuerde asistir 20 minutos antes. Para cualquier cambio de cita contactenos. "Contigo en todas tus etapas".'
+								'body' => 'Su cita se ha reservado con exito en CABICARE con el Dr. '.$allInputs['medico']['medico'].' el '.date('d-m-Y',strtotime($allInputs['fecha'])).' - '.date('H:i', strtotime($allInputs['hora_desde'])).'.Para cualquier cambio de cita contactenos.'
 						)
 					);
 				}
@@ -1642,8 +1643,7 @@ class Cita extends CI_Controller {
 				$auth_token = TW_TOKEN;
 				$twilio_number = TW_NUMBER; // "+18442780963";
 				$client = new Client($account_sid, $auth_token);
-				$body = 'Le recordamos que su cita ha sido confirmada en CABICARE con el Dr. '.$row['medico'].' el dia '.date('d-m-Y',strtotime($row['fechaCita'])).' - '.date('H:i', strtotime($row['horaDesde'])).'. 
-				"Contigo en todas tus etapas".';
+				$body = 'Le recordamos que su cita ha sido confirmada en CABICARE con el Dr. '.$row['medico'].' el dia '.date('d-m-Y',strtotime($row['fechaCita'])).' - '.date('H:i', strtotime($row['horaDesde'])).'."Contigo en todas tus etapas".';
 				$client->messages->create(
 					'+51'.$row['celular'],
 					array(
