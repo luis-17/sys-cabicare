@@ -86,6 +86,7 @@ app.controller('CitaCtrl',
 			{ id: 'TARJETA DE DÉBITO', descripcion: 'TARJETA DE DÉBITO' },
 			{ id: 'TARJETA DE CRÉDITO', descripcion: 'TARJETA DE CRÉDITO' },
 			{ id: 'TRANSFERENCIA', descripcion: 'TRANSFERENCIA' },
+			{ id: 'DEPOSITO', descripcion: 'DEPOSITO' },
 			{ id: 'SEGURO', descripcion: 'SEGURO' },
 			{ id: 'YAPE', descripcion: 'YAPE' }
 		];

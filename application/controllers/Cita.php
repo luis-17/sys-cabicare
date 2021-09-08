@@ -719,6 +719,15 @@ class Cita extends CI_Controller {
 				->set_output(json_encode($arrData));
 			return;
 		}
+		if (empty($leer_respuesta['enlace_del_pdf'])) {
+			$arrData['message'] = 'Error en el servicio de Nubefact. Operación rechazada.';
+			$arrData['data'] = $data;
+			$arrData['flag'] = 0;
+			$this->output
+				->set_content_type('application/json')
+				->set_output(json_encode($arrData));
+			return;
+		}
 		// registramos en tabla facturacion
 		$this->db->trans_start();
 		

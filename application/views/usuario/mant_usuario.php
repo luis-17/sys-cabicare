@@ -23,6 +23,14 @@
 			<label class="control-label mb-n"> Correo Electrónico: <small class="text-danger">(*)</small> </label>
  			<input type="email" class="form-control input-sm" autocomplete="off" ng-model="fData.correo" placeholder="Ingrese correo" tabindex="100" required /> 
 		</div>
+		<div class="form-group col-md-3 mb-md">
+			<label class="control-label mb-n"> SEDE HIGUERETA: </label>
+			<input type="checkbox" ng-model="fData.checkHiguereta" ng-checked="fData.checkHiguereta == 1" ng-true-value="1">
+		</div>
+		<div class="form-group col-md-3 mb-md">
+			<label class="control-label mb-n"> SEDE SAN MIGUEL: </label>
+			<input type="checkbox" ng-model="fData.checkSanMiguel" ng-checked="fData.checkSanMiguel == 2" ng-true-value="2">
+		</div>
 		<div class="hr-line"> Datos de Acceso </div>
 		<div class="form-group col-md-6 mb-md">
 			<label class="control-label mb-n"> Perfil: <small class="text-danger">(*)</small> </label>
@@ -45,7 +53,6 @@
 		<div class="form-group col-md-6 mb-md" ng-show="!modoEdit">
 			<label class="control-label mb-n"> ¿Desea cambiar clave?: </label>
 			<input type="checkbox" ng-model="fData.checkCambioClave" ng-checked="" >
-			<!-- <input type="text" class="form-control input-sm" autocomplete="off" ng-model="fData.username" placeholder="Ingrese usuario" required tabindex="100" /> -->
 		</div>
 		<div ng-show="fData.checkCambioClave">
 			<div class="form-group col-md-6 mb-md">

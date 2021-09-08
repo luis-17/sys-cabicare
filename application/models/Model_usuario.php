@@ -64,9 +64,18 @@ class Model_usuario extends CI_Model {
 		$this->db->limit('10');
 		return $this->db->get()->result_array();
 	}
+	public function m_obtener_sedes($datos)
+	{
+		$this->db->select("usd.idusuariosede, usd.sedeId, usd.default", FALSE);
+		$this->db->from('usuario us');
+		$this->db->join('usuariosede usd', 'us.id = usd.usuarioId');
+		$this->db->where('usd.usuarioId', $datos['usuarioId']);
+
+		return $this->db->get()->result_array();
+	}
 	public function m_listar_medico_cbo()
 	{
-		$this->db->select("us.id, us.nombres, us.apellidos, concat_ws(' ', us.nombres, us.apellidos) AS medico,", FALSE);
+		$this->db->select("us.id, us.nombres, us.apellidos, concat_ws(' ', us.nombres, us.apellidos) AS medico", FALSE);
 		$this->db->from('usuario us');
 		$this->db->where('us.estado', 1);
 		$this->db->where('perfilId', 3); // solo perfil médico
@@ -85,6 +94,15 @@ class Model_usuario extends CI_Model {
 		}
 		$this->db->limit(1);
 		return $this->db->get()->result_array();
+	}
+	public function m_registrar_sede_usuario($datos)
+	{
+		$data = array(
+			'usuarioId' => $datos['usuarioId'],
+			'sedeId' => $datos['sedeId'],
+			'default'=> $datos['default']
+		);
+		return $this->db->insert('usuariosede', $data);
 	}
 	public function m_registrar($datos)
 	{
@@ -134,5 +152,9 @@ class Model_usuario extends CI_Model {
 		return $this->db->update('usuario', $data);
 	}
 
+	public function eliminar_usuarios_sede($idusuario)
+	{
+		$this->db->where('usuarioId', $idusuario);
+		return $this->db->delete('usuariosede');
+	}
 }
-?>

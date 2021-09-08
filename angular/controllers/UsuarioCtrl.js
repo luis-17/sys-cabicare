@@ -165,6 +165,7 @@ app.service("UsuarioServices",function($http, $q, handleBehavior) {
     sListarMedicoAutocomplete: sListarMedicoAutocomplete,
     sListarMedicoCbo: sListarMedicoCbo,
     sListar: sListar,
+    sObtenerSedes: sObtenerSedes,
     sRegistrar: sRegistrar,
     sEditar: sEditar,
     sAnular: sAnular
@@ -189,6 +190,14 @@ app.service("UsuarioServices",function($http, $q, handleBehavior) {
     var request = $http({
           method : "post",
           url : angular.patchURLCI+"Usuario/listar_usuario",
+          data : datos
+    });
+    return (request.then(handleBehavior.success,handleBehavior.error));
+  }
+  function sObtenerSedes(datos) {
+    var request = $http({
+          method : "post",
+          url : angular.patchURLCI+"Usuario/obtener_sedes_usuario",
           data : datos
     });
     return (request.then(handleBehavior.success,handleBehavior.error));
@@ -308,6 +317,40 @@ app.factory("UsuarioFactory", function($uibModal, pinesNotifications, blockUI, U
             $scope.fData.perfil = objIndex;
           }
           $scope.metodos.listaPerfil(myCallBackCC);
+          var arrParamsUS = { usuarioId: $scope.fData.idusuario };
+          $scope.fData.checkHiguereta = undefined;
+          $scope.fData.checkSanMiguel = undefined;
+          UsuarioServices.sObtenerSedes(arrParamsUS).then(function (rpta) {
+            if(rpta.flag == 1){
+              angular.forEach(rpta.datos, function(val, key){
+                console.log(val, key);
+                
+                if (val.sedeId == '1') { // higuereta
+                  $scope.fData.checkHiguereta = val.sedeId;
+                  console.log($scope.fData.checkHiguereta, '$scope.fData.checkHiguereta');
+                }
+                
+                if (val.sedeId == '2') { // higuereta
+                  $scope.fData.checkSanMiguel = val.sedeId;
+                  console.log($scope.fData.checkSanMiguel, '$scope.fData.checkSanMiguel');
+                }
+              });
+              
+            }else{
+              alert('Error inesperado');
+            }
+          });
+          
+          // BINDEO SEDES USUARIOS
+          // var myCallBackSU = function() {
+          //   var objIndex = $scope.fArr.listaPerfil.filter(function(obj) {
+
+          //     return obj.id == $scope.fData.perfil.id;
+          //   }).shift();
+          //   $scope.fData.perfil = objIndex;
+          // }
+
+          
           $scope.modoEdit = false;
           $scope.bloqueCambioClave = false;
           $scope.aceptar = function () {

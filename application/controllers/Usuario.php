@@ -48,6 +48,28 @@ class Usuario extends CI_Controller {
 		    ->set_output(json_encode($arrData));
 	}
 
+	public function obtener_sedes_usuario()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+
+		$arrListado = array();
+		$lista = $this->model_usuario->m_obtener_sedes($allInputs);
+		foreach ($lista as $row) {
+			array_push($arrListado,
+				array(
+					'idusuariosede'=> $row['idusuariosede'],
+					'sedeId'=> strtoupper($row['sedeId']),
+				)
+			);
+		}
+		$arrData['datos'] = $arrListado;
+		$arrData['message'] = '';
+		$arrData['flag'] = 1;
+		$this->output
+			->set_content_type('application/json')
+			->set_output(json_encode($arrData));
+	}
+
 	public function listar_medico_cbo()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
@@ -112,9 +134,23 @@ class Usuario extends CI_Controller {
 		$arrData['message'] = 'Error al registrar los datos, inténtelo nuevamente';
     $arrData['flag'] = 0;
 
-    	// VALIDACIONES
+    // VALIDACIONES
 
-    	/* VALIDAR QUE SE HAYA REGISTRADO CLAVE */
+		// VALIDAR QUE AL MENOS REGISTRE UNA SEDE
+		// print_r(@$allInputs['checkHiguereta']);
+		// print_r(@$allInputs['checkSanMiguel']);
+		
+		if( empty($allInputs['checkHiguereta']) && empty($allInputs['checkSanMiguel']) ){
+			$arrData['message'] = 'Debe agregar al menos una sede.';
+	    	$arrData['flag'] = 0;
+				$this->output
+				    ->set_content_type('application/json')
+				    ->set_output(json_encode($arrData));
+				return;
+		}
+		// exit();
+
+    /* VALIDAR QUE SE HAYA REGISTRADO CLAVE */
 		if( empty($allInputs['password']) || empty($allInputs['passwordView']) ){
 			$arrData['message'] = 'Los campos de contraseña están vacios.';
 	    	$arrData['flag'] = 0;
@@ -147,11 +183,28 @@ class Usuario extends CI_Controller {
 		$this->db->trans_start();
 		if($this->model_usuario->m_registrar($allInputs)) { // registro de usuario
 			$arrData['idusuario'] = GetLastId('id','usuario');
+			// reg sede usuario
+			$arrSedes = array();
+			if (!empty($allInputs['checkHiguereta'])) {
+				array_push($arrSedes, $allInputs['checkHiguereta']);
+			}
+			if (!empty($allInputs['checkSanMiguel'])) {
+				array_push($arrSedes, $allInputs['checkSanMiguel']);
+			}
+			$default = 1;
+			foreach ($arrSedes as $key => $value) {
+				$dataSedeUser = array(
+					'usuarioId' => $arrData['idusuario'],
+					'sedeId' => $value,
+					'default' => $default
+				);
+				$this->model_usuario->m_registrar_sede_usuario($dataSedeUser);
+				$default = 0;
+			}
 			$arrData['message'] = 'Se registraron los datos correctamente';
 			$arrData['flag'] = 1;
 		}
 		$this->db->trans_complete();
-
 		$this->output
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
@@ -163,6 +216,15 @@ class Usuario extends CI_Controller {
 		$arrData['message'] = 'Error al editar los datos, inténtelo nuevamente';
     $arrData['flag'] = 0;
     // VALIDACIONES
+		// VALIDAR QUE AL MENOS REGISTRE UNA SEDE
+		if( empty($allInputs['checkHiguereta']) && empty($allInputs['checkSanMiguel']) ){
+			$arrData['message'] = 'Debe agregar al menos una sede.';
+	    	$arrData['flag'] = 0;
+				$this->output
+				    ->set_content_type('application/json')
+				    ->set_output(json_encode($arrData));
+				return;
+		}
 		/* VALIDAR SI EL USUARIO YA EXISTE */
   	$fUsuario = $this->model_usuario->m_validar_usuario_username($allInputs['username'],TRUE,$allInputs['idusuario']);
   	if( $fUsuario ) {
@@ -182,8 +244,29 @@ class Usuario extends CI_Controller {
 			return;
 		}
   	$this->db->trans_start();
-		
+
 		if($this->model_usuario->m_editar($allInputs)) { // edicion de elemento
+
+			$arrSedes = array();
+			if (!empty($allInputs['checkHiguereta'])) {
+				array_push($arrSedes, $allInputs['checkHiguereta']);
+			}
+			if (!empty($allInputs['checkSanMiguel'])) {
+				array_push($arrSedes, $allInputs['checkSanMiguel']);
+			}
+			// eliminar usuarios sedes
+			$this->model_usuario->eliminar_usuarios_sede($allInputs['idusuario']);
+			$default = 1;
+			foreach ($arrSedes as $key => $value) {
+				$dataSedeUser = array(
+					'usuarioId' => $allInputs['idusuario'],
+					'sedeId' => $value,
+					'default' => $default
+				);
+				$this->model_usuario->m_registrar_sede_usuario($dataSedeUser);
+				$default = 0;
+			}
+
 			$arrData['message'] = 'Se editaron los datos correctamente';
 			$arrData['flag'] = 1;
 		}
