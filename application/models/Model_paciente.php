@@ -88,6 +88,7 @@ class Model_paciente extends CI_Model {
 		$this->db->from('paciente pa');
 		$this->db->join('distrito di', 'pa.distritoId = di.id','left');
 		$this->db->where('pa.estado', 1);
+		$this->db->where('pa.sedeId', $this->sessionFactur['idsede']);
 		$this->db->order_by('pa.id', 'DESC');
 		return $this->db->get()->result_array();
 	}
@@ -151,6 +152,7 @@ class Model_paciente extends CI_Model {
 			'razonSocial' => empty($datos['razonSocial']) ? NULL : $datos['razonSocial'],
 			'direccionFiscal' => empty($datos['direccionFiscal']) ? NULL : $datos['direccionFiscal'],
 			'direccionPersona' => empty($datos['direccionPersona']) ? NULL : $datos['direccionPersona'],
+			'sedeId' => $this->sessionFactur['idsede'],
 			'estado'=> 1,
 			'createdat' => date('Y-m-d H:i:s'),
 			'updatedat' => date('Y-m-d H:i:s')

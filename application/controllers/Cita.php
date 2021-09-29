@@ -617,28 +617,30 @@ class Cita extends CI_Controller {
 		foreach ($arrDetalleCita as $key => $row) {
 			// print_r($row['precio']);
 			$rowPrecio = floatval($row['precio']);
-			// print_r($rowPrecio);
-			$subtotal = round($rowPrecio / 1.18, 2);
-			$igvDetalle = round(($rowPrecio - $subtotal), 2);
-			// print_r($igvDetalle);
-			array_push($arrDetalle,
-				array(
-					"unidad_de_medida" 					=> 'ZZ',
-					"codigo" 										=> $row['idproducto'],
-					"descripcion" 							=> $row['producto'],
-					"cantidad" 									=> '1',
-					"valor_unitario" 						=> $subtotal,
-					"precio_unitario" 					=> $rowPrecio,
-					"descuento"                 => "",
-					"subtotal"                  => $subtotal, // "500",
-					"tipo_de_igv"               => "1",
-					"igv"                       => $igvDetalle, // 90
-					"total"                     => $rowPrecio, // 590
-					"anticipo_regularizacion"   => "false",
-					"anticipo_documento_serie"  => "",
-					"anticipo_documento_numero" => ""
-				)
-			);
+			if ($rowPrecio > 0) {
+				// print_r($rowPrecio);
+				$subtotal = round($rowPrecio / 1.18, 2);
+				$igvDetalle = round(($rowPrecio - $subtotal), 2);
+				// print_r($igvDetalle);
+				array_push($arrDetalle,
+					array(
+						"unidad_de_medida" 					=> 'ZZ',
+						"codigo" 										=> $row['idproducto'],
+						"descripcion" 							=> $row['producto'],
+						"cantidad" 									=> '1',
+						"valor_unitario" 						=> $subtotal,
+						"precio_unitario" 					=> $rowPrecio,
+						"descuento"                 => "",
+						"subtotal"                  => $subtotal, // "500",
+						"tipo_de_igv"               => "1",
+						"igv"                       => $igvDetalle, // 90
+						"total"                     => $rowPrecio, // 590
+						"anticipo_regularizacion"   => "false",
+						"anticipo_documento_serie"  => "",
+						"anticipo_documento_numero" => ""
+					)
+				);
+			}
 		}
 		$data = array(
 			"operacion"													=> "generar_comprobante",

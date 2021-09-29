@@ -290,7 +290,7 @@
 				</div>
 			</div>
 			<hr>
-			<div class="row" ng-if="fData.tipoCita == '3'">
+			<div class="row" ng-if="fData.tipoCita == '3' || fData.tipoCita == '2'">
 				<div class="col-sm-12">
 					<h3> Datos de Pago</h3>
 				</div>
@@ -363,7 +363,7 @@
 			</div>
 
 			<!-- FACTRACION ELECTRONICA -->
-			<div class="row" ng-if="fData.tipoCita == '3'">
+			<div class="row" ng-if="fData.tipoCita == '3' || fData.tipoCita == '2'">
 				<div class="col-sm-12">
 					<h3> Facturación Electrónica</h3>
 				</div>
@@ -376,7 +376,7 @@
 			</div>
 
 			<hr>
-			<div class="row" ng-if="fData.tipoCita == '3'">
+			<div class="row" ng-if="fData.tipoCita == '3' || fData.tipoCita == '2'">
 				<div class="col-sm-12">
 					<h3> Datos de atención</h3>
 				</div>

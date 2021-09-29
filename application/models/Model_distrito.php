@@ -11,7 +11,7 @@ class Model_distrito extends CI_Model {
       di.nombre,
     ", FALSE);
     $this->db->from('distrito di');
-    $this->db->where('di.provinciaCod', '150100');
+    $this->db->where_in('di.provinciaCod', array('150100','070100'));
 
     return $this->db->get()->result_array();
   }
