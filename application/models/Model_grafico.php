@@ -6,13 +6,13 @@ class Model_grafico extends CI_Model {
 	}
 
 	public function m_pacientes_por_distrito($paramDatos){
-		$sql = 'SELECT COUNT(*) AS contador, di.nombre  
+		$sql = 'SELECT COUNT(*) AS contador, di.nombre, di.abreviatura, di.posx, di.posy 
 					FROM paciente pa 
 					INNER JOIN distrito di ON pa.distritoId = di.id
 					WHERE pa.estado = 1 
 					AND pa.sedeId = ? 
 					AND DATE(pa.createdAt) BETWEEN ? AND ? 
-					GROUP BY di.nombre
+					GROUP BY di.nombre, di.abreviatura, di.posx, di.posy
 					ORDER BY COUNT(*) DESC
 					LIMIT ?';
 		$query = $this->db->query($sql, 

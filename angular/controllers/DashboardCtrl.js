@@ -66,6 +66,10 @@ app.controller('DashboardCtrl', [
     $scope.fBusquedaPPD.fin = moment().format('DD-MM-YYYY');
     $scope.fBusquedaPPD.ultimo = $scope.fArr.listaUltimosDist[0];
 
+    $scope.fBusquedaPDP = {};
+    $scope.fBusquedaPDP.inicio = moment().format('01-01-2020');
+    $scope.fBusquedaPDP.fin = moment().format('DD-MM-YYYY');
+
     $scope.fBusquedaEMB = {};
     $scope.fBusquedaEMB.inicio = moment().format('01-01-YYYY');
     $scope.fBusquedaEMB.fin = moment().format('DD-MM-YYYY');
@@ -385,6 +389,87 @@ app.controller('DashboardCtrl', [
       });
     };
     $scope.consultarPacientePorEmbTL();
+
+    // pacientes por distrito - panal
+    $scope.fData.chartPacienteDistPanel = {
+      chart: { 
+        type: 'tilemap',
+        inverted: true,
+        height: '80%'
+      },
+      title: {
+        text: 'Pacientes por distrito'
+      },
+      subtitle: {
+        text: 'Fuente: Cabicare'
+      },
+      xAxis: {
+        visible: false
+      },
+      yAxis: {
+        visible: false
+      },
+      colorAxis: {
+        dataClasses: [{
+          from: 0,
+          to: 10,
+          color: '#F9EDB3',
+          name: '< 10'
+        }, {
+          from: 10,
+          to: 50,
+          color: '#FFC428',
+          name: '10 - 50'
+        }, {
+          from: 50,
+          to: 150,
+          color: '#FF7987',
+          name: '50 - 150'
+        }, {
+          from: 150,
+          to: 250,
+          color: '#FF2371',
+          name: '150 - 250'
+        }, {
+          from: 250,
+          color: '#fb0000',
+          name: '> 250'
+        }]
+      },
+      tooltip: {
+        headerFormat: '',
+        pointFormat: 'Total de pacientes de <b> {point.name}</b> es <b>{point.value}</b>'
+      },
+      plotOptions: {
+        series: {
+          dataLabels: {
+            enabled: true,
+            format: '{point.hc-a2}',
+            color: '#000000',
+            style: {
+                textOutline: false
+            }
+          }
+        }
+      },
+      series: [{
+        name: '',
+        data: []
+      }]
+    };
+
+    $scope.consultarPacientePorDistPanel = function () {
+			blockUI.start('Procesando información...');
+			var arrParams = {
+				datos: $scope.fBusquedaPDP
+			};
+			GraficoServices.sListarPacPorDistPanel(arrParams).then(function (rpta) {
+        // $scope.fData.chartPacienteDistPanel.colorAxis.dataClasses = angular.copy(rpta.datos.colorAxis);
+        $scope.fData.chartPacienteDistPanel.series[0].data = angular.copy(rpta.datos.series);
+				blockUI.stop();
+      });
+    };
+    $scope.consultarPacientePorDistPanel();
 }]);
 
 app.service("GraficoServices",function($http, $q, handleBehavior) {
@@ -396,6 +481,7 @@ app.service("GraficoServices",function($http, $q, handleBehavior) {
     sListarProdMedicoTiempo: sListarProdMedicoTiempo,
     sListarPacPorEmb: sListarPacPorEmb,
     sListarPacPorEmbTL: sListarPacPorEmbTL,
+    sListarPacPorDistPanel: sListarPacPorDistPanel,
   });
   function sListarPacienteRecom(datos) {
     var request = $http({
@@ -449,6 +535,14 @@ app.service("GraficoServices",function($http, $q, handleBehavior) {
     var request = $http({
       method : "post",
       url: angular.patchURLCI +"Grafico/listar_pacientes_embarazo_timeline",
+      data : datos
+    });
+    return (request.then(handleBehavior.success,handleBehavior.error));
+  }
+  function sListarPacPorDistPanel(datos) {
+    var request = $http({
+      method : "post",
+      url: angular.patchURLCI +"Grafico/listar_pacientes_por_distrito_panel",
       data : datos
     });
     return (request.then(handleBehavior.success,handleBehavior.error));

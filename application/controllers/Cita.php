@@ -536,7 +536,7 @@ class Cita extends CI_Controller {
 			$client = new Client($account_sid, $auth_token);
 			$tokenOTP = random_int(10000, 99999);
 			$body = 'Codigo para aprobar generacion de factura. Paciente: '.$fCita['nombres'].'. Codigo: '.$tokenOTP;
-			$arrTelefonos = array('+51969464709', '+966562891080');
+			$arrTelefonos = array('+51932501903');
 			foreach($arrTelefonos as $value){
 				$client->messages->create(
 					$value,

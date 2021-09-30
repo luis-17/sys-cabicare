@@ -275,12 +275,6 @@ class Grafico extends CI_Controller {
 				$arrGroupMedicos[$row['medico']] = $row['medico'];
 			}
 		}
-		
-		// $indexParam = $allInputs['datos']['tipoTLE']['id'] === 'PC' ? 'contador' : 'suma'; gestando
-
-
-
-		
 		$arrGroupMeses = array_values($arrGroupMeses);
 		$arrGroupMedicos = array_values($arrGroupMedicos);
 		$arrDataSeries = array();
@@ -323,6 +317,40 @@ class Grafico extends CI_Controller {
 		}
 		$arrData['datos'] = array(
 			'categories' => $arrGroupMeses,
+			'series' => $arrDataSeries,
+		);
+		$arrData['message'] = '';
+		$arrData['flag'] = 1;
+		$this->output
+			->set_content_type('application/json')
+			->set_output(json_encode($arrData));
+	}
+
+	function listar_pacientes_por_distrito_panel()
+	{
+		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		// PACIENTES
+		$arrDataSeries = array();
+		$paramsData = array(
+			'inicio' => $allInputs['datos']['inicio'],
+			'fin' => $allInputs['datos']['fin'],
+			'ultimo' => array('id' => 100000 )
+		);
+		$lista = $this->model_grafico->m_pacientes_por_distrito($paramsData);
+		foreach ($lista as $key => $row) {
+			array_push($arrDataSeries, array(
+				'hc-a2' => $row['abreviatura'],
+				'name' => $row['nombre'],
+				'region' => 'nose',
+				'x' => (int)$row['posx'],
+				'y' => (int)$row['posy'],
+				'value' => (int)$row['contador'],
+			));
+		}
+		// $arrGroupMedicos[0] = 'GENERAL';
+
+		$arrData['datos'] = array(
+			// 'colorAxis' => $arrGroupMeses,
 			'series' => $arrDataSeries,
 		);
 		$arrData['message'] = '';
