@@ -395,7 +395,7 @@ app.controller('DashboardCtrl', [
       chart: { 
         type: 'tilemap',
         inverted: true,
-        height: '80%'
+        height: '150%'
       },
       title: {
         text: 'Pacientes por distrito'
@@ -413,26 +413,26 @@ app.controller('DashboardCtrl', [
         dataClasses: [{
           from: 0,
           to: 10,
-          color: '#F9EDB3',
+          color: '#fcfaaf',
           name: '< 10'
         }, {
           from: 10,
           to: 50,
-          color: '#FFC428',
+          color: '#bee391',
           name: '10 - 50'
         }, {
           from: 50,
-          to: 150,
-          color: '#FF7987',
-          name: '50 - 150'
+          to: 100,
+          color: '#81cb73',
+          name: '50 - 100'
         }, {
-          from: 150,
+          from: 100,
           to: 250,
-          color: '#FF2371',
-          name: '150 - 250'
+          color: '#43b455',
+          name: '100 - 250'
         }, {
           from: 250,
-          color: '#fb0000',
+          color: '#059c37',
           name: '> 250'
         }]
       },

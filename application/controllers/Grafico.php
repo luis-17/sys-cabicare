@@ -342,8 +342,8 @@ class Grafico extends CI_Controller {
 				'hc-a2' => $row['abreviatura'],
 				'name' => $row['nombre'],
 				'region' => 'nose',
-				'x' => (int)$row['posx'],
-				'y' => (int)$row['posy'],
+				'y' => (int)$row['posx'],
+				'x' => (int)$row['posy'],
 				'value' => (int)$row['contador'],
 			));
 		}
