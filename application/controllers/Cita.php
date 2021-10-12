@@ -588,7 +588,7 @@ class Cita extends CI_Controller {
 			if($fCita['tipoDocumento'] == 'DNI'){
 				$clienteTipoDoc = '1';
 			}
-			if($fCita['tipoDocumento'] == 'PTP'){
+			if($fCita['tipoDocumento'] == 'PTP' || $fCita['tipoDocumento'] == 'CED' || $fCita['tipoDocumento'] == 'CR'){
 				$clienteTipoDoc = '0';
 			}
 			$clienteNumDoc = $fCita['numeroDocumento'];
