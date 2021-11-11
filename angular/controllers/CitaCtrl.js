@@ -63,9 +63,10 @@ app.controller('CitaCtrl',
 			{ id: 'DNI', descripcion: 'DOCUMENTO NACIONAL DE IDENTIDAD' },
 			{ id: 'CEX', descripcion: 'CARNET DE EXTRANJERIA' },
 			{ id: 'PAS', descripcion: 'PASAPORTE' },
-			{ id: 'PTP', descripcion: 'PERMISO TEMPORAL DE PERMANENCIA' },
+			{ id: 'PTP', descripcion: 'CARNÉ DE PERMISO TEMPORAL DE PERMANENCIA' },
 			{id: 'CED', descripcion: 'CEDULA' },
-      {id: 'CR', descripcion: 'CARNET DE REFUGIO' }
+      		{id: 'CR', descripcion: 'CARNET DE REFUGIO' },
+      		{id: 'PN', descripcion: 'PARTIDA DE NACIMIENTO' }
 		];
 		$scope.fArr.listaSexo = [
 			{ id: '0', descripcion: '--Seleccione sexo--' },
@@ -79,6 +80,7 @@ app.controller('CitaCtrl',
 			{ id: 'POR FACEBOOK', descripcion: 'POR FACEBOOK' },
 			{ id: 'POR INSTAGRAM', descripcion: 'POR INSTAGRAM' },
 			{ id: 'POR OTRAS REDES SOCIALES', descripcion: 'POR OTRAS REDES SOCIALES' }
+			// { id: 'POR OTRAS REDES SOCIALES', descripcion: 'POR OTRAS REDES SOCIALES' }
     ];
     $scope.fArr.listaMetodoPago = [
 			{ id: '', descripcion: '--Seleccione método de pago--' },

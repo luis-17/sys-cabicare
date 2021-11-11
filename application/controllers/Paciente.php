@@ -33,6 +33,9 @@ class Paciente extends CI_Controller {
 				case 'DNI':
 					$strTipoDoc = 'DOCUMENTO NACIONAL DE IDENTIDAD';
 					break;
+				case 'PN':
+					$strTipoDoc = 'PARTIDA DE NACIMIENTO';
+					break;
 				case 'PAS':
 					$strTipoDoc = 'PASAPORTE';
 					break;
@@ -41,6 +44,9 @@ class Paciente extends CI_Controller {
 					break;
 				case 'PTP':
 					$strTipoDoc = 'PERMISO TEMPORAL DE PERMANENCIA';
+					break;
+				case 'CPP':
+					$strTipoDoc = 'CARNÉ DE PERMISO TEMPORAL DE PERMANENCIA';
 					break;
 				case 'CED':
 					$strTipoDoc = 'CÉDULA';

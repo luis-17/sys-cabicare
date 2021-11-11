@@ -14,10 +14,12 @@ class Model_diagnostico extends CI_Model {
     // $this->db->join('tipoproducto tp', 'di.tipoProductoId = tp.id');
     $this->db->where('di.estado', 1);
     $this->db->like('di.nombre', strtoupper($datos['searchText']));
-    $this->db->limit(10);
+    $this->db->order_by("(LENGTH(di.nombre) - LENGTH(REPLACE(di.nombre, ' ', ''))+1) ASC");
+    $this->db->limit(15);
 
     return $this->db->get()->result_array();
   }
+  // (LENGTH(bar) - LENGTH(REPLACE(bar, ' ', ''))+1)
   public function m_registrar_diagnostico($data){
 		return $this->db->insert('citadiagnostico', $data);
   }

@@ -536,7 +536,7 @@ class Cita extends CI_Controller {
 			$client = new Client($account_sid, $auth_token);
 			$tokenOTP = random_int(10000, 99999);
 			$body = 'Codigo para aprobar generacion de factura. Paciente: '.$fCita['nombres'].'. Codigo: '.$tokenOTP;
-			$arrTelefonos = array('+51932501903');
+			$arrTelefonos = array('+51969464709', '+966562891080');
 			foreach($arrTelefonos as $value){
 				$client->messages->create(
 					$value,
@@ -548,7 +548,7 @@ class Cita extends CI_Controller {
 			}
 			$this->model_cita->m_actualizar_cita_token($fCita['id'], $tokenOTP);
 			// fin enviar token
-			$arrData['message'] = 'Se envió un token a los siguientes celulares: +51 969464709, +966 562891080';
+			$arrData['message'] = 'Se envió un token a los siguientes celulares: +51969464709, +966562891080';
 			$arrData['flag'] = 5;
 			$this->output
 				->set_content_type('application/json')
@@ -588,7 +588,7 @@ class Cita extends CI_Controller {
 			if($fCita['tipoDocumento'] == 'DNI'){
 				$clienteTipoDoc = '1';
 			}
-			if($fCita['tipoDocumento'] == 'PTP' || $fCita['tipoDocumento'] == 'CED' || $fCita['tipoDocumento'] == 'CR'){
+			if($fCita['tipoDocumento'] == 'CPP' || $fCita['tipoDocumento'] == 'PTP' || $fCita['tipoDocumento'] == 'CED' || $fCita['tipoDocumento'] == 'CR'){
 				$clienteTipoDoc = '0';
 			}
 			$clienteNumDoc = $fCita['numeroDocumento'];
