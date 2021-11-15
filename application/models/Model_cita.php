@@ -441,7 +441,7 @@ class Model_cita extends CI_Model {
 		$this->db->where_in('ci.estado', $arrEstados);
 		$this->db->where('ci.fechaCita BETWEEN ' . $desde .' AND ' . $hasta);
 		$this->db->where('ci.sedeId', $this->sessionFactur['idsede']);
-		if (!($datos['consultorio'] == 'all')) {
+		if (!empty($datos['consultorio']) && !($datos['consultorio'] == 'all')) {
 			$this->db->where('ci.consultorioId', $datos['consultorio']);
 		}
 		$this->db->where('pa.estado', 1);
