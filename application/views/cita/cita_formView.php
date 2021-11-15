@@ -108,18 +108,20 @@
 						</span>
 					</div>
 				</div>
-				<div class="form-group col-md-3" ng-class="{'has-error': Form.formCita.tipoCita.$invalid}" style="display: none;">
-					<label for="tipoCita" class="control-label minotaur-label"> Medio de Contacto <span class="text-danger">*</span>: </label>
-					<select class="form-control input-sm" ng-model="fData.medioContacto" ng-options="item as item.descripcion for item in fArr.listaMedioContacto" required tabindex="90" ></select>
-	      </div>
-				<div class="form-group col-md-6">
+				
+				<div class="form-group col-md-3">
 	              <label for="name" class="control-label minotaur-label">Apuntes: </label>
 				  <textarea
 					class="form-control input-sm"
 					ng-model="fData.apuntesCita"
 					rows="3"
 				  ></textarea>
-	            </div>
+	      </div>
+				<div class="form-group col-md-3 mb-md">
+					<label class="control-label mb-n"> Consultorio </label>
+					<select class="form-control input-sm" ng-model="fData.consultorio" 
+						ng-options="item as item.descripcion for item in fArr.listaConsultorio" tabindex="60" ></select> 
+				</div>
 
 	            <div class="form-group col-md-3">
 	              	<label for="name" class="control-label minotaur-label">Hora inicio

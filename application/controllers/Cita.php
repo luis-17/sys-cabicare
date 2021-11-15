@@ -79,6 +79,10 @@ class Cita extends CI_Controller {
 						'id' => $row['medicoId'],
 						'medico' => $row['medico']
 					),
+					'consultorio' => array(
+						'id'=> $row['consultorioId'],
+						'descripcion'=> strtoupper($row['consultorio'])
+					),
 					'total' => $row['total'],
           'medioContacto'=> array(
 						'id'=> $row['medioContacto'],
@@ -324,6 +328,10 @@ class Cita extends CI_Controller {
 					'medico' => array(
 						'id' => $row['medicoId'],
 						'medico' => $row['medico']
+					),
+					'consultorio' => array(
+						'id'=> $row['consultorioId'],
+						'descripcion'=> strtoupper($row['consultorio'])
 					),
 					'tipoDocumentoCont'=> array(
 						'id'=> $row['tipoDocumentoCont'],
@@ -874,6 +882,7 @@ class Cita extends CI_Controller {
 			'tipoDocumentoCont' => empty($allInputs['tipoDocumentoCont']) ? NULL : $allInputs['tipoDocumentoCont']['id'],
 			'smsEnviadoCita'	=> 'POR_ENVIAR',
 			'metodoPago' => $allInputs['metodoPago']['id'],
+			'consultorioId' => $allInputs['consultorio']['id'],
 			'numSerie' => empty($allInputs['numSerie']) ? NULL : $allInputs['numSerie'],
 			'numDoc' => empty($allInputs['numDoc']) ? NULL : $allInputs['numDoc'],
 			'numOperacion' => empty($allInputs['numOperacion']) ? NULL : $allInputs['numOperacion'],
@@ -1007,6 +1016,7 @@ class Cita extends CI_Controller {
 			'observaciones'			=> empty($allInputs['observaciones']) ? NULL : $allInputs['observaciones'],
 			'estado'				=> $allInputs['tipoCita'],
 			'medioContacto'			=> empty($allInputs['medioContacto']) ? NULL : $allInputs['medioContacto']['id'],
+			'consultorioId' 		=> empty($allInputs['consultorio']) ? NULL : $allInputs['consultorio']['id'],
 			// 'metodoPago' => $allInputs['metodoPago']['id'],
 			'tipoDocumentoCont' => empty($allInputs['tipoDocumentoCont']) ? NULL : $allInputs['tipoDocumentoCont']['id'],
 			'numSerie' => empty($allInputs['numSerie']) ? NULL : $allInputs['numSerie'],

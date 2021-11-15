@@ -43,11 +43,14 @@ class Model_cita extends CI_Model {
 			ci.anotacionesPago,
 			ci.tipoDocumentoCont,
 			ci.numDoc,
-			ci.numSerie
+			ci.numSerie,
+			co.id AS consultorioId,
+			co.nombre AS consultorio
 		", FALSE);
 		$this->db->from('cita ci');
 		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
 		$this->db->join('usuario us', 'ci.medicoId = us.id','left');
+		$this->db->join('consultorio co', 'ci.consultorioId = co.id');
 		// $this->db->where('ci.estado <> ', 0);
 		$this->db->where('pa.estado', 1);
 		$this->db->where('ci.fechaCita BETWEEN ' . $desde .' AND ' . $hasta);
@@ -234,6 +237,7 @@ class Model_cita extends CI_Model {
 		$this->db->from('cita ci');
 		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
 		$this->db->join('usuario us', 'ci.medicoId = us.id','left');
+		$this->db->join('consultorio co', 'ci.consultorioId = co.id');
 		// $this->db->where('ci.estado <> ', 0);
 		$this->db->where('pa.estado', 1);
 		$this->db->where('ci.fechaCita BETWEEN ' . $desde .' AND ' . $hasta);
@@ -426,14 +430,20 @@ class Model_cita extends CI_Model {
 			ci.metodoPago,
 			ci.tipoDocumentoCont,
 			ci.numSerie,
-			ci.numDoc
+			ci.numDoc,
+			co.id AS consultorioId,
+			co.nombre AS consultorio
 		", FALSE);
 		$this->db->from('cita ci');
 		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
 		$this->db->join('usuario us', 'ci.medicoId = us.id','left');
+		$this->db->join('consultorio co', 'ci.consultorioId = co.id');
 		$this->db->where_in('ci.estado', $arrEstados);
 		$this->db->where('ci.fechaCita BETWEEN ' . $desde .' AND ' . $hasta);
 		$this->db->where('ci.sedeId', $this->sessionFactur['idsede']);
+		if (!($datos['consultorio'] == 'all')) {
+			$this->db->where('ci.consultorioId', $datos['consultorio']);
+		}
 		$this->db->where('pa.estado', 1);
 		return $this->db->get()->result_array();
 	}

@@ -94,6 +94,7 @@ angular.module('app')
               'angular/controllers/PacienteCtrl.js',
               'angular/controllers/UsuarioCtrl.js',
               'angular/controllers/DistritoCtrl.js',
+              'angular/controllers/ConsultorioCtrl.js',
             ])
           })
           .state('app.atencion-medica', {
