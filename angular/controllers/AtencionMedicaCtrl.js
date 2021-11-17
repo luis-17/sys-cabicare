@@ -13,7 +13,7 @@ app.controller('AtencionMedicaCtrl',
 	'AtencionServices',
 	// 'AtencionMedicaFactory',
 	'CitaServices',
-
+	'ConsultorioServices',
 	function (
 		$scope,
 		$filter,
@@ -28,11 +28,14 @@ app.controller('AtencionMedicaCtrl',
 		ModalReporteFactory,
 		AtencionServices,
 		// AtencionMedicaFactory,
-		CitaServices
+		CitaServices,
+		ConsultorioServices,
 
 	) {
 		$scope.metodos = {}; // contiene todas las funciones
 		$scope.fArr = {}; // contiene todos los arrays generados por las funciones
+		$scope.fFiltro = {}; // filtros
+		$scope.fFiltro.consultorio = { id: 'all' };
 		$scope.fBusqueda = {};
 
 		moment.tz.add('America/Lima|LMT -05 -04|58.A 50 40|0121212121212121|-2tyGP.o 1bDzP.o zX0 1aN0 1cL0 1cN0 1cL0 1PrB0 zX0 1O10 zX0 6Gp0 zX0 98p0 zX0|11e6');
@@ -68,7 +71,18 @@ app.controller('AtencionMedicaCtrl',
 			{ id: 'ENTEL', descripcion: 'ENTEL' },
 			{ id: 'BITEL', descripcion: 'BITEL' }
 		];
-
+		$scope.metodos.listaConsultorios = function(myCallback) {
+      var myCallback = myCallback || function() { };
+      ConsultorioServices.sListarCbo().then(function(rpta) {
+        $scope.fArr.listaConsultorio = rpta.datos;
+        myCallback();
+      });
+    };
+		var myCallBackCO = function() {
+			$scope.fArr.listaConsultorio.splice(0,0,{ id : 'all', descripcion:'--Todos--'});
+			$scope.fFiltro.consultorio = $scope.fArr.listaConsultorio[0];
+		}
+		$scope.metodos.listaConsultorios(myCallBackCO);
 
 		/* EVENTOS */
 		$scope.menu = angular.element('.menu-dropdown');
@@ -114,6 +128,12 @@ app.controller('AtencionMedicaCtrl',
 		$scope.alertOnResize = function (event, delta) {
 			angular.element('.calendar').fullCalendar('refetchEvents');
 		};
+
+		$scope.onChangeFiltroConsult = function () {
+			// console.log('consultorio ==', consultorio);
+			$scope.metodos.actualizarCalendario();
+			
+		}
 
 		$scope.selectCell = function (date, end, jsEvent, view) {
 			$scope.closeMenu();
@@ -222,6 +242,7 @@ app.controller('AtencionMedicaCtrl',
 			$scope.fBusqueda.desde = moment(start).tz('America/Lima').format('YYYY-MM-DD');
 			$scope.fBusqueda.hasta = moment(end).tz('America/Lima').format('YYYY-MM-DD');
 			$scope.fBusqueda.origen = 'ate';
+			$scope.fBusqueda.consultorio = angular.copy($scope.fFiltro.consultorio.id);
 			CitaServices.sListarCitaCalendario($scope.fBusqueda).then(function (rpta) {
 				if (rpta.flag == 1) {
 					angular.forEach(rpta.datos, function (row, key) {

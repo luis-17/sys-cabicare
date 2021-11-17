@@ -105,6 +105,7 @@ angular.module('app')
               // 'angular/controllers/ReservaCitaCtrl.js'
               'angular/controllers/AtencionMedicaCtrl.js',
               'angular/controllers/CitaCtrl.js',
+              'angular/controllers/ConsultorioCtrl.js',
               // 'angular/controllers/PaCtrl.js',
               // 'angular/controllers/UsuarioCtrl.js',
             ])

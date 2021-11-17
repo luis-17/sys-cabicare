@@ -60,6 +60,14 @@ app.controller('CitaCtrl',
 		}
 		$scope.metodos.listaConsultorios(myCallBackCO);
 
+		$scope.metodos.listaConsultoriosForm = function(myCallback) {
+      var myCallback = myCallback || function() { };
+      ConsultorioServices.sListarCbo().then(function(rpta) {
+        $scope.fArr.listaConsultorioForm = rpta.datos;
+        myCallback();
+      });
+    };
+
 		$scope.fArr.listaTipoCita = [
 			{ id: '1', descripcion: 'POR CONFIRMAR' },
 			{ id: '2', descripcion: 'CONFIRMADA' }
@@ -189,6 +197,7 @@ app.controller('CitaCtrl',
 				'end': end || null,
 				'fArr': $scope.fArr,
 				'metodos': $scope.metodos,
+				'fFiltro': $scope.fFiltro,
 				'fSessionCI': $scope.fSessionCI
 			};
 			ReservaCitasFactory.agregarCitaModal(arrParams);
@@ -200,6 +209,7 @@ app.controller('CitaCtrl',
 				'cita': cita,
 				'fArr': $scope.fArr,
 				'metodos': $scope.metodos,
+				'fFiltro': $scope.fFiltro,
 				'bool': bool,
 				'fSessionCI': $scope.fSessionCI
 			};
@@ -257,7 +267,8 @@ app.controller('CitaCtrl',
 			$scope.fBusqueda.desde = moment(start).tz('America/Lima').format('DD-MM-YYYY');
 			$scope.fBusqueda.hasta = moment(end).tz('America/Lima').format('DD-MM-YYYY');
 			$scope.fBusqueda.origen = 'cit';
-			$scope.fBusqueda.consultorio = $scope.fFiltro.consultorio.id;
+			console.log('$scope.fFiltro.consultorio == ', $scope.fFiltro.consultorio);
+			$scope.fBusqueda.consultorio = angular.copy($scope.fFiltro.consultorio.id);
 			CitaServices.sListarCitaCalendario($scope.fBusqueda).then(function (rpta) {
 				if (rpta.flag == 1) {
 					angular.forEach(rpta.datos, function (row, key) {
@@ -621,6 +632,7 @@ app.factory("ReservaCitasFactory",
 					$scope.Form = {}
 					$scope.fData.temporal = {};
 					$scope.fArr = arrParams.fArr;
+					$scope.fFiltro = arrParams.fFiltro;
 					$scope.metodos = arrParams.metodos;
 					$scope.fData.accion = 'reg';
 					$scope.fSessionCI = arrParams.fSessionCI;
@@ -774,10 +786,10 @@ app.factory("ReservaCitasFactory",
 					// $scope.fArr.listaTipoCita.splice(0, 0, { id: "", descripcion: '--Seleccione tipo cita--' });
 					// bindeo consultorio
           var myCallBackCO = function() {
-            $scope.fArr.listaConsultorio.splice(0,0,{ id : '0', descripcion:'--Seleccione consultorio--'});
-            $scope.fData.consultorio = $scope.fArr.listaConsultorio[0];
+            $scope.fArr.listaConsultorioForm.splice(0,0,{ id : '0', descripcion:'--Seleccione consultorio--'});
+            $scope.fData.consultorio = $scope.fArr.listaConsultorioForm[0];
           }
-          $scope.metodos.listaConsultorios(myCallBackCO);
+          $scope.metodos.listaConsultoriosForm(myCallBackCO);
 
 					$scope.fData.medioContacto = $scope.fArr.listaMedioContacto[0];
 					$scope.fData.metodoPago = $scope.fArr.listaMetodoPago[0];
@@ -1162,6 +1174,7 @@ app.factory("ReservaCitasFactory",
 					$scope.fData.temporalCont = {};
 
 					$scope.fArr = arrParams.fArr;
+					$scope.fFiltro = arrParams.fFiltro;
 					$scope.metodos = arrParams.metodos;
 					$scope.fData.eliminados = [];
 					$scope.fData.eliminadosCont = [];
@@ -1190,12 +1203,12 @@ app.factory("ReservaCitasFactory",
 					}
 					// BINDEO CONSULTORIO
 					var myCallBackCO = function() {
-            var objIndex = $scope.fArr.listaConsultorio.filter(function(obj) {
+            var objIndex = $scope.fArr.listaConsultorioForm.filter(function(obj) {
               return obj.id == $scope.fData.consultorio.id;
             }).shift();
             $scope.fData.consultorio = objIndex;
           }
-          $scope.metodos.listaConsultorios(myCallBackCO);
+          $scope.metodos.listaConsultoriosForm(myCallBackCO);
 
 
 					/* DATEPICKERS */

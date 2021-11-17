@@ -117,10 +117,10 @@
 					rows="3"
 				  ></textarea>
 	      </div>
-				<div class="form-group col-md-3 mb-md">
-					<label class="control-label mb-n"> Consultorio </label>
-					<select class="form-control input-sm" ng-model="fData.consultorio" 
-						ng-options="item as item.descripcion for item in fArr.listaConsultorio" tabindex="60" ></select> 
+				<div class="form-group col-md-3 mb-md" ng-class="{'has-error': Form.formCita.tipoCita.$invalid}">
+					<label class="control-label mb-n"> Consultorio <span class="text-danger">*</span> </label>
+					<select class="form-control input-sm" ng-model="fData.consultorio" required 
+						ng-options="item as item.descripcion for item in fArr.listaConsultorioForm" tabindex="60" ></select> 
 				</div>
 
 	            <div class="form-group col-md-3">

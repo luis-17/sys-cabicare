@@ -794,6 +794,14 @@ class Cita extends CI_Controller {
 				->set_output(json_encode($arrData));
 			return;
 		}
+		if(empty($allInputs['consultorio']['id']) || $allInputs['consultorio']['id'] == '0'){
+			$arrData['flag'] = 0;
+			$arrData['message'] = 'Debe seleccionar un consultorio.';
+			$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+		    return;
+		}
 
 		if(empty($allInputs['fecha'])){
 			$arrData['flag'] = 0;
@@ -953,6 +961,14 @@ class Cita extends CI_Controller {
 		if(empty($allInputs['fecha'])){
 			$arrData['flag'] = 0;
 			$arrData['message'] = 'Debe seleccionar una fecha.';
+			$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+		    return;
+		}
+		if(empty($allInputs['consultorio']['id']) || $allInputs['consultorio']['id'] == '0'){
+			$arrData['flag'] = 0;
+			$arrData['message'] = 'Debe seleccionar un consultorio.';
 			$this->output
 		    ->set_content_type('application/json')
 		    ->set_output(json_encode($arrData));
@@ -1130,6 +1146,16 @@ class Cita extends CI_Controller {
 		$arrData['flag'] = 0;
 		$arrData['message'] = 'Ha ocurrido un error actualizando la cita';
 
+		// validacion: no mover citas atendidas
+		$fCita = $this->model_cita->m_obtener_cita($allInputs['event']['id']);
+		if($fCita['estado'] == '3'){
+			$arrData['flag'] = 0;
+			$arrData['message'] = 'No se puede mover una cita atendida.';
+			$this->output
+		    ->set_content_type('application/json')
+		    ->set_output(json_encode($arrData));
+		    return;
+		}
 
 		$data = array(
 			'horaDesde' => date('H:i',strtotime($allInputs['event']['start'])),
