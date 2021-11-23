@@ -13,6 +13,10 @@
 								ng-if="fData.accion == 'reg'"
 								style="float: right;font-size: 10px;font-weight: 500;">¿Nuevo paciente?
 						</span>
+						<span ng-click="fData.pagadorBool = true;"
+								ng-if="fData.accion == 'edit'"
+								style="float: right;font-size: 10px;font-weight: 500;">¿Otro pagador?
+						</span>
 	              	</label>
 					<div class="input-group">
 						<span class="input-group-btn">
@@ -40,6 +44,31 @@
 						</span>
 	            	</div>
 	            </div>
+				<div class="form-group col-md-6" ng-if="fData.accion == 'edit' && (fData.pagador.num_documento || fData.pagadorBool)">
+	              	<label for="name" class="control-label minotaur-label" style="width: 100%;">Pagador</label>
+					<div class="input-group">
+						<span class="input-group-btn">
+							<input
+								type="text"
+								ng-model="fData.pagador.num_documento"
+								class="form-control input-sm"
+								style="width:140px;margin-right:4px;"
+								placeholder="DNI"
+								disabled
+								/>
+						</span>
+
+						<input type="text"
+							ng-model="fData.pagador.denominacion"
+							class="form-control input-sm"
+							placeholder="Pagador"
+							required
+							disabled>
+						<span class="input-group-btn">
+							<button class="btn btn-default btn-sm" type="button" ng-click="btnEditarPagador()"><i class="fa fa-edit"></i> </button>
+						</span>
+	            	</div>
+	            </div>
 
 				<div ng-if="!(fData.tipoCita == 3)" class="form-group col-md-3" ng-class="{'has-error': Form.formCita.tipoCita.$invalid}">
 					<label for="tipoCita" class="control-label minotaur-label">Tipo de Cita <span class="text-danger">*</span>: </label>
@@ -62,6 +91,8 @@
 						required
 					></select> -->
 	      </div>
+		  		
+
 				<div class="form-group col-md-3 mb-md">
 					<label class="control-label mb-n"> Tipo de Documento </label>
 					<select class="form-control input-sm" ng-change="onChangeTipoDoc(); $event.preventDefault();" ng-model="fData.tipoDocumentoCont" 

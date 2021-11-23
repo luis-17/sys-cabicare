@@ -105,6 +105,20 @@ class Cita extends CI_Controller {
 						'string' => $estado,
 						'clase' =>$clase,
 						'bool' =>$row['estado']
+					),
+					'emailPag' => $row['emailPag'],
+					'direccionPag' => $row['direccionPag'],
+					'denominacionPag' => $row['denominacionPag'],
+					'numDocPag' => $row['numDocPag'],
+					'tipoDocumentoPag' => $row['tipoDocumentoPag'],
+					'pagador' => array(
+						'tipo_documento' => array(
+							'id' => $row['tipoDocumentoPag']
+						),
+						'num_documento' => $row['numDocPag'],
+						'denominacion' => $row['denominacionPag'],
+						'direccionPersona' => $row['direccionPag'],
+						'email' => $row['emailPag']
 					)
 				)
 			);
@@ -357,8 +371,21 @@ class Cita extends CI_Controller {
 					'allDay' => FALSE,
 					'durationEditable' => FALSE,
 					'tipoCita' => $row['estado'],
-					'estado' => $row['estado']
-
+					'estado' => $row['estado'],
+					'emailPag' => $row['emailPag'],
+					'direccionPag' => $row['direccionPag'],
+					'denominacionPag' => $row['denominacionPag'],
+					'numDocPag' => $row['numDocPag'],
+					'tipoDocumentoPag' => $row['tipoDocumentoPag'],
+					'pagador' => array(
+						'tipo_documento' => array(
+							'id' => $row['tipoDocumentoPag']
+						),
+						'num_documento' => $row['numDocPag'],
+						'denominacion' => $row['denominacionPag'],
+						'direccionPersona' => $row['direccionPag'],
+						'email' => $row['emailPag']
+					)
 				)
 			);
 		}
@@ -576,6 +603,15 @@ class Cita extends CI_Controller {
 				return;
 			}
 		}
+		// validacion otro pagador
+		if (!empty($fCita['numDocPag']) && empty($fCita['tipoDocumentoPag']) || empty($fCita['numDocPag']) && !empty($fCita['tipoDocumentoPag']) ) {
+			$arrData['message'] = 'Pagador con datos incompletos, por favor complete los datos del pagador.';
+			$arrData['flag'] = 0;
+			$this->output
+				->set_content_type('application/json')
+				->set_output(json_encode($arrData));
+			return;
+		}
 
 		$clienteTipoDoc = '-';
 		$serie = null;
@@ -584,24 +620,41 @@ class Cita extends CI_Controller {
 			$tipoDocCont = '2';
 			$serie = $fCita['serieb'];
 			// doc cliente
-			if($fCita['tipoDocumento'] == 'DNI'){
+			$indexTipoDoc = 'tipoDocumento';
+			if (!empty($fCita['tipoDocumentoPag'])) {
+				$indexTipoDoc = 'tipoDocumentoPag';
+			}
+			$indexNumDoc = 'numeroDocumento';
+			if (!empty($fCita['numDocPag'])) {
+				$indexNumDoc = 'numDocPag';
+			}
+			$indexDireccion = 'direccionPersona';
+			if (!empty($fCita['direccionPag'])) {
+				$indexDireccion = 'direccionPag';
+			}
+			if($fCita[$indexTipoDoc] == 'DNI'){
 				$clienteTipoDoc = '1';
 			}
-			if($fCita['tipoDocumento'] == 'PAS'){
+			if($fCita[$indexTipoDoc] == 'PAS'){
 				$clienteTipoDoc = '7';
 			}
-			if($fCita['tipoDocumento'] == 'CEX'){
+			if($fCita[$indexTipoDoc] == 'CEX'){
 				$clienteTipoDoc = '4';
 			}
-			if($fCita['tipoDocumento'] == 'DNI'){
+			if($fCita[$indexTipoDoc] == 'DNI'){
 				$clienteTipoDoc = '1';
 			}
-			if($fCita['tipoDocumento'] == 'CPP' || $fCita['tipoDocumento'] == 'PTP' || $fCita['tipoDocumento'] == 'CED' || $fCita['tipoDocumento'] == 'CR'){
+			if($fCita[$indexTipoDoc] == 'CPP' || $fCita[$indexTipoDoc] == 'PTP' || $fCita[$indexTipoDoc] == 'CED' || $fCita[$indexTipoDoc] == 'CR'){
 				$clienteTipoDoc = '0';
 			}
-			$clienteNumDoc = $fCita['numeroDocumento'];
-			$clienteDenominacion = $fCita['nombres'].' '.$fCita['apellidoPaterno'].' '.$fCita['apellidoMaterno'];
-			$clienteDireccion = $fCita['direccionPersona'];
+			$clienteNumDoc = $fCita[$indexNumDoc];
+			if ( empty($fCita['denominacionPag']) ) {
+				$clienteDenominacion = $fCita['nombres'].' '.$fCita['apellidoPaterno'].' '.$fCita['apellidoMaterno'];
+			} else {
+				$clienteDenominacion = $fCita['denominacionPag'];
+			}
+			
+			$clienteDireccion = $fCita[$indexDireccion];
 		}
 		if($fCita['tipoDocumentoCont'] == 'FACTURA'){
 			$tipoDocCont = '1';
@@ -650,6 +703,10 @@ class Cita extends CI_Controller {
 				);
 			}
 		}
+		$indexEmail = 'email';
+		if (!empty($fCita['emailPag'])) {
+			$indexEmail = 'emailPag';
+		}
 		$data = array(
 			"operacion"													=> "generar_comprobante",
 			"tipo_de_comprobante"               => $tipoDocCont,
@@ -660,7 +717,7 @@ class Cita extends CI_Controller {
 			"cliente_numero_de_documento"				=> $clienteNumDoc, // "20600695771",
 			"cliente_denominacion"              => $clienteDenominacion,
 			"cliente_direccion"                 => $clienteDireccion, // "CALLE LIBERTAD 116 MIRAFLORES - LIMA - PERU",
-			"cliente_email"                     => $fCita['email'],
+			"cliente_email"                     => $fCita[$indexEmail],
 			"cliente_email_1"                   => "",
 			"cliente_email_2"                   => "",
 			"fecha_de_emision"                  => $fechaActual,
@@ -779,7 +836,10 @@ class Cita extends CI_Controller {
 	}
 	public function ver_popup_motivo_anulacion_cita_detalle(){
 		$this->load->view('cita/motivoAnulacionCitaDetalle_formView');
-}
+	}
+	public function ver_popup_pagador(){
+		$this->load->view('cita/pagadorCita_formView');
+	}
 	public function registrar()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
@@ -974,6 +1034,15 @@ class Cita extends CI_Controller {
 		    ->set_output(json_encode($arrData));
 		    return;
 		}
+		// VALIDAR PAGADOR
+		if ( $allInputs['pagadorBool'] && (empty($allInputs['pagador']['tipo_documento']['id']) || empty($allInputs['pagador']['num_documento'])) ) {
+			$arrData['flag'] = 0;
+			$arrData['message'] = 'Debe elegir al pagador.';
+			$this->output
+				->set_content_type('application/json')
+				->set_output(json_encode($arrData));
+				return;
+		}
 
 		if(empty($allInputs['hora_desde']) || empty($allInputs['hora_hasta'])){
 			$arrData['flag'] = 0;
@@ -1039,6 +1108,12 @@ class Cita extends CI_Controller {
 			'numDoc' => empty($allInputs['numDoc']) ? NULL : $allInputs['numDoc'],
 			'numOperacion' => empty($allInputs['numOperacion']) ? NULL : $allInputs['numOperacion'],
 			'anotacionesPago' => empty($allInputs['anotacionesPago']) ? NULL : $allInputs['anotacionesPago'],
+			//pagador
+			'tipoDocumentoPag' => empty($allInputs['pagador']['tipo_documento']) ? NULL : $allInputs['pagador']['tipo_documento']['id'],
+			'numDocPag' => empty($allInputs['pagador']['num_documento']) ? NULL : $allInputs['pagador']['num_documento'],
+			'denominacionPag' => empty($allInputs['pagador']['denominacion']) ? NULL : $allInputs['pagador']['denominacion'],
+			'direccionPag' => empty($allInputs['pagador']['direccionPersona']) ? NULL : $allInputs['pagador']['direccionPersona'],
+			'emailPag' => empty($allInputs['pagador']['email']) ? NULL : $allInputs['pagador']['email'],
 			'updatedAt'				=> date('Y-m-d H:i:s')
 		);
 

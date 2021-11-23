@@ -45,7 +45,12 @@ class Model_cita extends CI_Model {
 			ci.numDoc,
 			ci.numSerie,
 			co.id AS consultorioId,
-			co.nombre AS consultorio
+			co.nombre AS consultorio,
+			ci.tipoDocumentoPag,
+			ci.numDocPag,
+			ci.denominacionPag,
+			ci.direccionPag,
+			ci.emailPag
 		", FALSE);
 		$this->db->from('cita ci');
 		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
@@ -432,7 +437,12 @@ class Model_cita extends CI_Model {
 			ci.numSerie,
 			ci.numDoc,
 			co.id AS consultorioId,
-			co.nombre AS consultorio
+			co.nombre AS consultorio,
+			ci.tipoDocumentoPag,
+			ci.numDocPag,
+			ci.denominacionPag,
+			ci.direccionPag,
+			ci.emailPag
 		", FALSE);
 		$this->db->from('cita ci');
 		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
@@ -557,7 +567,8 @@ class Model_cita extends CI_Model {
 	public function m_obtener_cita($citaId) {
 		$this->db->select("ci.id, ci.estado, pa.celular, pa.tipoDocumento, pa.numeroDocumento, se.serief, se.serieb, se.token,
 			pa.nombres, pa.apellidoPaterno, pa.ruc, pa.direccionPersona, pa.direccionFiscal, pa.razonSocial, ci.numDoc, ci.fechaCita,
-			pa.apellidoMaterno, pa.email, ci.tipoDocumentoCont, ci.subtotal, ci.igv, ci.total, se.nombre AS sede, ci.tokenFactDestiempo", FALSE);
+			pa.apellidoMaterno, pa.email, ci.tipoDocumentoCont, ci.subtotal, ci.igv, ci.total, se.nombre AS sede, ci.tokenFactDestiempo,
+			ci.tipoDocumentoPag, ci.numDocPag, ci.denominacionPag, ci.direccionPag, ci.emailPag", FALSE);
 		$this->db->from('cita ci');
 		$this->db->join('paciente pa', 'ci.pacienteId = pa.id');
 		$this->db->join('sede se', 'ci.sedeId = se.id');

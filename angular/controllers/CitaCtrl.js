@@ -93,6 +93,16 @@ app.controller('CitaCtrl',
       		{id: 'CR', descripcion: 'CARNET DE REFUGIO' },
       		{id: 'PN', descripcion: 'PARTIDA DE NACIMIENTO' }
 		];
+		$scope.fArr.listaTipoDocumentoPag = [
+			{ id: '0', descripcion: '--Seleccione tipo--' },
+			{ id: 'DNI', descripcion: 'DOCUMENTO NACIONAL DE IDENTIDAD' },
+			{ id: 'CEX', descripcion: 'CARNET DE EXTRANJERIA' },
+			{ id: 'PAS', descripcion: 'PASAPORTE' },
+			{ id: 'PTP', descripcion: 'CARNÉ DE PERMISO TEMPORAL DE PERMANENCIA' },
+			{id: 'CED', descripcion: 'CEDULA' },
+      		{id: 'CR', descripcion: 'CARNET DE REFUGIO' },
+      		{id: 'PN', descripcion: 'PARTIDA DE NACIMIENTO' }
+		];
 		$scope.fArr.listaSexo = [
 			{ id: '0', descripcion: '--Seleccione sexo--' },
 			{ id: 'M', descripcion: 'MASCULINO' },
@@ -1169,9 +1179,14 @@ app.factory("ReservaCitasFactory",
 				controller: function ($scope, $uibModalInstance, arrParams, $bootbox) {
 					blockUI.stop();
 					$scope.fData = arrParams.cita;
+					$scope.fData.pagadorBool = false;
 					$scope.Form = {}
 					$scope.fData.temporal = {};
 					$scope.fData.temporalCont = {};
+					if (!$scope.fData.pagador) {
+						$scope.fData.pagador = {};
+					}
+					
 
 					$scope.fArr = arrParams.fArr;
 					$scope.fFiltro = arrParams.fFiltro;
@@ -1279,6 +1294,55 @@ app.factory("ReservaCitasFactory",
 					}
 					// listaTipoDocumentoCont
 
+					/* OTRO PAGADOR */
+					$scope.btnEditarPagador = function () {
+						
+						$uibModal.open({
+							templateUrl: angular.patchURLCI + 'Cita/ver_popup_pagador',
+							size: 'lg',
+							backdrop: 'static',
+							keyboard: false,
+							controller: function ($scope, $uibModalInstance, arrToModal) {
+								$scope.titleForm = 'Datos del Pagador';
+								console.log(arrToModal.fArr, 'arrToModal.fArr');
+								$scope.fArr = arrToModal.fArr;
+								$scope.fData = arrToModal.fData;
+								if (!$scope.fData.pagador.tipo_documento) {
+									console.log('entro 1');
+									$scope.fData.pagador.tipo_documento = $scope.fArr.listaTipoDocumentoPag[0];
+								} else {
+									console.log('entro 2');
+									console.log('$scope.fArr.listaTipoDocumentoPag, ', $scope.fArr.listaTipoDocumentoPag);
+									console.log('$scope.fData.pagador.tipo_documento, ', $scope.fData.pagador.tipo_documento);
+									var objIndexTpPag = $scope.fArr.listaTipoDocumentoPag.filter(function(obj) {
+										return obj.id == $scope.fData.pagador.tipo_documento.id;
+									}).shift();
+									console.log('objIndexTpPag', objIndexTpPag);
+									$scope.fData.pagador.tipo_documento = objIndexTpPag;
+								}
+								$scope.cancelPagador = function () {
+									$uibModalInstance.dismiss('cancel');
+								}
+
+
+								$scope.aceptarPagador = function(){
+									// $scope.fData.paciente = $scope.mySelectionGrid[0].nombres;
+									// $scope.fData.pacienteId = $scope.mySelectionGrid[0].idpaciente;
+									// $scope.fData.numeroDocumento = $scope.mySelectionGrid[0].num_documento;
+									$uibModalInstance.dismiss('cancel');
+								}
+							},
+							resolve: {
+								arrToModal: function () {
+									return {
+										fData: $scope.fData,
+										fArr: $scope.fArr
+									}
+								}
+							}
+						});
+					
+					}
 					/* AUTOCOMPLETADO */
 					/* MEDICOS */
 					$scope.getMedicoAutocomplete = function (value) {
