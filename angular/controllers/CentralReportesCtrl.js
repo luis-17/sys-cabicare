@@ -118,6 +118,11 @@ app.controller('CentralReportesCtrl', ['$scope', '$filter', '$uibModal', '$bootb
             id: 'CIT-ANUDET',
             tipoCuadro: 'report',
             name: 'REPORTE DE ANULADOS'
+          },
+          {
+            id: 'CIT-ACTPAS',
+            tipoCuadro: 'report',
+            name: 'REPORTE DE ACTIVOS Y PASIVOS'
           }
         ]
       }
@@ -250,6 +255,23 @@ app.controller('CentralReportesCtrl', ['$scope', '$filter', '$uibModal', '$bootb
                 },
                 titulo: 'REPORTE DE DOCUMENTOS',
                 tituloAbv: 'DOC-ALL'
+              }
+            };
+            ModalReporteFactory.getPopupReporte(arrParams); 
+            break;
+          case 'CIT-ACTPAS':
+            var arrParams = {
+              url: angular.patchURLCI+'Reportes/listado_activos_pasivos',
+              metodo: 'php',
+              salida: 'excel',
+              datos: {
+                paginate: {},
+                filtro: {
+                  fechaDesde: $scope.fBusqueda.desde,
+                  fechaHasta: $scope.fBusqueda.hasta
+                },
+                titulo: 'REPORTE DE ACTIVOS/PASIVOS',
+                tituloAbv: 'CIT-ACTPAS'
               }
             };
             ModalReporteFactory.getPopupReporte(arrParams); 
