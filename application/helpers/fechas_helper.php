@@ -577,7 +577,7 @@
 	}
 
 	function getNumeroMes($mesESP){
-		$numMes = null
+		$numMes = null;
 		$listaMeses = array(
 			'ENERO' => '01',
 			'FEBRERO' => '02',
