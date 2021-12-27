@@ -886,6 +886,7 @@ class Reportes extends CI_Controller {
 					$row['monto']
 				)
 			);
+			$totalActivos += $row['monto'];
 		}
 		foreach ($listaPasivos as $row) {
 			array_push($arrListadoPas,
@@ -896,6 +897,7 @@ class Reportes extends CI_Controller {
 					$row['monto']
 				)
 			);
+			$totalPasivos += $row['monto'];
 		}
 
 		// SETEO DE VARIABLES
@@ -911,13 +913,6 @@ class Reportes extends CI_Controller {
 			array( 'col' => "FECHA REGISTRO",	'ancho' => 15, 	'align' => 'R' ),
 			array( 'col' => 'MONTO',	'ancho' => 12, 	'align' => 'R' )
 		);
-
-		// $dataColumnsTPPas = array(
-		// 	array( 'col' => '#',                'ancho' =>  7, 	'align' => 'L' ),
-		// 	array( 'col' => 'N° COMPROBANTE',   'ancho' =>  12, 'align' => 'L' ),
-		// 	array( 'col' => "FECHA REGISTRO",	'ancho' => 14, 	'align' => 'R' ),
-		// 	array( 'col' => 'MONTO',	'ancho' => 12, 	'align' => 'R' )
-		// );
 
 		$titulo = 'LISTADO DE ACTIVOS Y PASIVOS';
 		$nombre_hoja = 'Citas';
@@ -953,22 +948,22 @@ class Reportes extends CI_Controller {
 				// 	'startcolor' => array( 'rgb' => '3A3838' )
 				// ),
 			);
-			// $styleArraySubTitle = array(
-			// 	'font'=>  array(
-			// 		'bold'  => false,
-			// 		'size'  => 12,
-			// 		'name'  => 'Microsoft Sans Serif',
-			// 		'color' => array('rgb' => 'FFFFFF')
-			// 	),
-			// 	'alignment' => array(
-			// 		'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
-			// 		'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
-			// 	),
-			// 	'fill' => array(
-			// 		'type' => PHPExcel_Style_Fill::FILL_SOLID,
-			// 		'startcolor' => array( 'rgb' => '3A3838' )
-			// 	),
-			// );
+			$styleFooter = array(
+				'font'=>  array(
+					'bold'  => true,
+					'size'  => 10,
+					'name'  => 'Microsoft Sans Serif',
+					'color' => array('rgb' => '000000')
+				),
+				'alignment' => array(
+					// 'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER
+					'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER
+				),
+				'fill' => array(
+					'type' => PHPExcel_Style_Fill::FILL_SOLID,
+					'startcolor' => array( 'rgb' => 'E6E6E6' )
+				),
+			);
 			$styleArrayHeader = array(
 				'borders' => array(
 					'allborders' => array(
@@ -1038,7 +1033,25 @@ class Reportes extends CI_Controller {
 			$this->excel->getActiveSheet()->fromArray($arrListadoAct, null, $arrColumns[0].$fila);
 			$this->excel->getActiveSheet()->fromArray($arrListadoPas, null, 'F8');
 			// $this->excel->getActiveSheet()->freezePane($arrColumns[0].$fila);
+		
+		// PIE DE TOTALES
+			$cantFilasAct = count($arrListadoAct);
+			$cantFilasPas = count($arrListadoPas);
+			$inicioFila = 8;
+			$filaFinalData = $inicioFila + ($cantFilasAct > $cantFilasPas ? $cantFilasAct : $cantFilasPas) + 4;
 
+			$this->excel->getActiveSheet()->getCell('H'.$filaFinalData)->setValue('TOTAL ACTIVOS:');
+			$this->excel->getActiveSheet()->getCell('I'.$filaFinalData)->setValue($totalActivos);
+
+			$this->excel->getActiveSheet()->getCell('H'.strval($filaFinalData+1))->setValue('TOTAL PASIVOS:');
+			$this->excel->getActiveSheet()->getCell('I'.strval($filaFinalData+1))->setValue($totalPasivos);
+
+			$diferenciaTotal = $totalActivos - $totalPasivos;
+			$this->excel->getActiveSheet()->getCell('H'.strval($filaFinalData+2))->setValue('DIFERENCIA:');
+			$this->excel->getActiveSheet()->getCell('I'.strval($filaFinalData+2))->setValue($diferenciaTotal);
+
+			$this->excel->getActiveSheet()->getStyle('H'.$filaFinalData.':I'.strval($filaFinalData+2))->applyFromArray($styleFooter);
+			$this->excel->getActiveSheet()->getStyle('H'.$filaFinalData.':I'.strval($filaFinalData+2))->getAlignment()->setWrapText(true);
 
 		$objWriter = new PHPExcel_Writer_Excel2007($this->excel);
 		$time = date('YmdHis_His');
