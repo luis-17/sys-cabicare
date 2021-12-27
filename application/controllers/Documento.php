@@ -141,6 +141,8 @@ class Documento extends CI_Controller {
 		$allInputs['ruc'] = $this->input->post('ruc');
 		$allInputs['razonSocial'] = $this->input->post('razonSocial');
 
+		$allInputs['fechaPago'] = $allInputs['anio'].'-'.getNumeroMes($mesPago).'-'.$allInputs['dia'];
+
 		// $allInputs['fechaSubida'] = date('Y-m-d H:i:s');
 		$this->db->trans_start();
 		if( !empty($_FILES['nombreArchivo_blob']) ){

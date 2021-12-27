@@ -575,4 +575,27 @@
 		$month = $longMonthArray[$m];
 		return $month; // Jue 4 Jun 2016 05:00 pm
 	}
+
+	function getNumeroMes($mesESP){
+		$numMes = null
+		$listaMeses = array(
+			'ENERO' => '01',
+			'FEBRERO' => '02',
+			'MARZO' => '03',
+			'ABRIL' => '04',
+			'MAYO' => '05',
+			'JUNIO' => '06',
+			'JULIO' => '07',
+			'AGOSTO' => '08',
+			'SEPTIEMBRE' => '09',
+			'OCTUBRE' => '10',
+			'NOVIEMBRE' => '11',
+			'DICIEMBRE' => '12'
+		);
+		if (!empty($mesESP)) {
+			$numMes = $listaMeses[$mesESP];
+		}
+
+		return $numMes;
+	}
 ?>

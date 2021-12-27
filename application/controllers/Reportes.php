@@ -890,7 +890,7 @@ class Reportes extends CI_Controller {
 		foreach ($listaPasivos as $row) {
 			array_push($arrListadoPas,
 				array(
-					$iAct++,
+					$iPas++,
 					$row['numSerie'].'-'.$row['numDoc'],
 					darFormatoDMY($row['fechaRegistro']),
 					$row['monto']
@@ -900,24 +900,31 @@ class Reportes extends CI_Controller {
 
 		// SETEO DE VARIABLES
 		$dataColumnsTPAct = array(
+			// activos
 			array( 'col' => '#',                'ancho' =>  7, 	'align' => 'L' ),
-			array( 'col' => 'N° COMPROBANTE',   'ancho' =>  12, 'align' => 'L' ),
-			array( 'col' => "FECHA REGISTRO",	'ancho' => 14, 	'align' => 'R' ),
+			array( 'col' => 'N° COMPROBANTE',   'ancho' =>  15, 'align' => 'L' ),
+			array( 'col' => "FECHA REGISTRO",	'ancho' => 15, 	'align' => 'R' ),
+			array( 'col' => 'MONTO',	'ancho' => 12, 	'align' => 'R' ),
+			// pasivos
+			array( 'col' => '#',                'ancho' =>  7, 	'align' => 'L' ),
+			array( 'col' => 'N° COMPROBANTE',   'ancho' =>  15, 'align' => 'L' ),
+			array( 'col' => "FECHA REGISTRO",	'ancho' => 15, 	'align' => 'R' ),
 			array( 'col' => 'MONTO',	'ancho' => 12, 	'align' => 'R' )
 		);
 
-		$dataColumnsTPPas = array(
-			array( 'col' => '#',                'ancho' =>  7, 	'align' => 'L' ),
-			array( 'col' => 'N° COMPROBANTE',   'ancho' =>  12, 'align' => 'L' ),
-			array( 'col' => "FECHA REGISTRO",	'ancho' => 14, 	'align' => 'R' ),
-			array( 'col' => 'MONTO',	'ancho' => 12, 	'align' => 'R' )
-		);
+		// $dataColumnsTPPas = array(
+		// 	array( 'col' => '#',                'ancho' =>  7, 	'align' => 'L' ),
+		// 	array( 'col' => 'N° COMPROBANTE',   'ancho' =>  12, 'align' => 'L' ),
+		// 	array( 'col' => "FECHA REGISTRO",	'ancho' => 14, 	'align' => 'R' ),
+		// 	array( 'col' => 'MONTO',	'ancho' => 12, 	'align' => 'R' )
+		// );
 
 		$titulo = 'LISTADO DE ACTIVOS Y PASIVOS';
 		$nombre_hoja = 'Citas';
 
 
 		$cantColumns = count($dataColumnsTPAct);
+		// $cantColumns = 8;
 		$arrColumns = array();
 		$this->excel->getActiveSheet()->getColumnDimension('A')->setWidth(2); // por defecto lo ponemos en 2 luego si se usa la columna se cambia
 		$a = 'B'; // INICIO DE COLUMNA
@@ -935,10 +942,10 @@ class Reportes extends CI_Controller {
 					'bold'  => false,
 					'size'  => 18,
 					'name'  => 'calibri',
-					'color' => array('rgb' => 'FFFFFF')
+					'color' => array('rgb' => '000000')
 			  	),
 				'alignment' => array(
-					'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+					// 'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
 					'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
 				),
 				// 'fill' => array(
@@ -946,22 +953,22 @@ class Reportes extends CI_Controller {
 				// 	'startcolor' => array( 'rgb' => '3A3838' )
 				// ),
 			);
-			$styleArraySubTitle = array(
-				'font'=>  array(
-					'bold'  => false,
-					'size'  => 12,
-					'name'  => 'Microsoft Sans Serif',
-					'color' => array('rgb' => 'FFFFFF')
-				),
-				'alignment' => array(
-					'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
-					'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
-				),
-				'fill' => array(
-					'type' => PHPExcel_Style_Fill::FILL_SOLID,
-					'startcolor' => array( 'rgb' => '3A3838' )
-				),
-			);
+			// $styleArraySubTitle = array(
+			// 	'font'=>  array(
+			// 		'bold'  => false,
+			// 		'size'  => 12,
+			// 		'name'  => 'Microsoft Sans Serif',
+			// 		'color' => array('rgb' => 'FFFFFF')
+			// 	),
+			// 	'alignment' => array(
+			// 		'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
+			// 		'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
+			// 	),
+			// 	'fill' => array(
+			// 		'type' => PHPExcel_Style_Fill::FILL_SOLID,
+			// 		'startcolor' => array( 'rgb' => '3A3838' )
+			// 	),
+			// );
 			$styleArrayHeader = array(
 				'borders' => array(
 					'allborders' => array(
@@ -976,19 +983,23 @@ class Reportes extends CI_Controller {
 				'font'=>  array(
 					'bold'  => false,
 					'size'  => 10,
-					'name'  => 'calibri',
-					'color' => array('rgb' => 'FFFFFF')
-				),
-				'fill' => array(
-					'type' => PHPExcel_Style_Fill::FILL_SOLID,
-					'startcolor' => array( 'rgb' => '5B9BD5' )
-				),
+					'name'  => 'calibri'
+					// 'color' => array('rgb' => 'FFFFFF')
+				)
+				// 'fill' => array(
+				// 	'type' => PHPExcel_Style_Fill::FILL_SOLID,
+				// 	'startcolor' => array( 'rgb' => '5B9BD5' )
+				// ),
 			);
 		// TITULO
 			$this->excel->getActiveSheet()->getCell($arrColumns[0].'1')->setValue($titulo);
 			$this->excel->getActiveSheet()->getStyle($arrColumns[0].'1')->applyFromArray($styleArrayTitle);
 			// $this->excel->getActiveSheet()->mergeCells($arrColumns[0].'1:'. $endColum .'1');
 
+			$this->excel->getActiveSheet()->getCell('B3')->setValue('DESDE:');
+			$this->excel->getActiveSheet()->getCell('C3')->setValue($paramDatos['fechaDesde']);
+			$this->excel->getActiveSheet()->getCell('B4')->setValue('HASTA:');
+			$this->excel->getActiveSheet()->getCell('C4')->setValue($paramDatos['fechaHasta']);
 
 			$currentCellEncabezado = 7; // donde inicia el encabezado del listado
 			$fila_mes = $currentCellEncabezado - 1;
@@ -999,10 +1010,12 @@ class Reportes extends CI_Controller {
 			// $currentCellEncabezado
 			$this->excel->getActiveSheet()->getColumnDimension('B')->setWidth(50);
 			$this->excel->getActiveSheet()->getCell('B6')->setValue('ACTIVOS');
-			$this->excel->getActiveSheet()->mergeCells('B6:D6');
+			$this->excel->getActiveSheet()->mergeCells('B6:E6');
 
-			$this->excel->getActiveSheet()->getCell('D6')->setValue('PASIVOS');
-			$this->excel->getActiveSheet()->mergeCells('D6:G6');
+			$this->excel->getActiveSheet()->getCell('F6')->setValue('PASIVOS');
+			$this->excel->getActiveSheet()->mergeCells('F6:I6');
+
+			$this->excel->getActiveSheet()->getStyle('B6:I6')->applyFromArray($styleArrayHeader);
 
 		// ENCABEZADO DE LA LISTA
 			$i=0;
@@ -1015,14 +1028,15 @@ class Reportes extends CI_Controller {
 
 				$i++;
 			}
-			$c1 = $i;
+			// $c1 = $i;
 			$this->excel->getActiveSheet()->getStyle($arrColumns[0].$currentCellEncabezado.':'.$endColum.$currentCellEncabezado)->getAlignment()->setWrapText(true);
 			$this->excel->getActiveSheet()->getStyle($arrColumns[0].($currentCellEncabezado).':'.$endColum.($currentCellEncabezado))->applyFromArray($styleArrayHeader);
-			$this->excel->getActiveSheet()->getRowDimension($currentCellEncabezado)->setRowHeight(45);
-			$this->excel->getActiveSheet()->setAutoFilter($arrColumns[0].$currentCellEncabezado.':'.$endColum.$currentCellEncabezado);
+			// $this->excel->getActiveSheet()->getRowDimension($currentCellEncabezado)->setRowHeight(45);
+			// $this->excel->getActiveSheet()->setAutoFilter($arrColumns[0].$currentCellEncabezado.':'.$endColum.$currentCellEncabezado);
 
 		// LISTA
-			// $this->excel->getActiveSheet()->fromArray($arrListadoProd, null, $arrColumns[0].$fila);
+			$this->excel->getActiveSheet()->fromArray($arrListadoAct, null, $arrColumns[0].$fila);
+			$this->excel->getActiveSheet()->fromArray($arrListadoPas, null, 'F8');
 			// $this->excel->getActiveSheet()->freezePane($arrColumns[0].$fila);
 
 

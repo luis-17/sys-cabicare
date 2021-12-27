@@ -102,6 +102,7 @@ class Model_documento extends CI_Model {
 			'mes' => $datos['mes'],
 			'anio'=> $datos['anio'],
 			'dia'=> $datos['dia'],
+			'fechaPago'=> $datos['fechaPago'],
 			'categoria'=> $datos['categoria'],
 			'codigoExterno'=> empty($datos['codigoExterno']) ? NULL : $datos['codigoExterno'],
 			'observaciones'=> empty($datos['observaciones']) ? NULL : $datos['observaciones'],
