@@ -871,107 +871,53 @@ class Reportes extends CI_Controller {
 		$listaActivos = $this->model_reporte->m_cargar_activos($paramDatos);
 		$listaPasivos = $this->model_reporte->m_cargar_pasivos($paramDatos);
 
-		$total = 0;
-		$arrListadoProd = array();
-		$i = 1;
-		foreach ($lista as $row) {
-			if ( $row['estado'] == 1 ){
-				$estado = 'POR CONFIRMAR';
-			}elseif ( $row['estado'] == 2 ){
-				$estado = 'CONFIRMADO';
-			}elseif ( $row['estado'] == 3 ) {
-				$estado = 'ATENDIDO';
-			}else {
-				$estado = '';
-			}
-			// $existRow = false;
-			// $filaHistTemp = array();
-			// foreach ($lista as $rowHist) {
-			// 	if ($rowHist['id'] == $row['id']) {
-			// 		$existRow = true;
-			// 		$filaHistTemp = $rowHist;
-			// 	}
-			// }
-			// if ($existRow === false) {
-			array_push($arrListadoProd,
+		$totalActivos = 0;
+		$totalPasivos = 0;
+		$arrListadoAct = array();
+		$arrListadoPas = array();
+		$iAct = 1;
+		$iPas = 1;
+		foreach ($listaActivos as $row) {
+			array_push($arrListadoAct,
 				array(
-					$i++,
-					$row['id'],
-					darFormatoDMY($row['fechaCita']),
-					darFormatoHora($row['horaHasta']),
-					$row['tipoDocumento'],
-					$row['numeroDocumento'],
-					$row['paciente'],
-					$row['celular'],
-					$row['medico'],
-					$row['subtotal'],
-					$row['igv'],
-					$row['total'],
-					$row['numSerie'],
-					$row['numDoc'],
-					$row['metodoPago'],
-					$row['numOperacion'],
-					$row['monto'],
-					$row['anotacionesPago'],
-					$estado
+					$iAct++,
+					$row['numSerie'].'-'.$row['numDoc'],
+					darFormatoDMY($row['fechaRegistro']),
+					$row['monto']
 				)
 			);
-			// }
-			// if ($existRow === true) {
-			// array_push($arrListadoProd,
-			// 	array(
-			// 		$i++,
-			// 		$filaHistTemp['id'],
-			// 		darFormatoDMY($filaHistTemp['fechaCita']),
-			// 		darFormatoHora($filaHistTemp['horaHasta']),
-			// 		$filaHistTemp['tipoDocumento'],
-			// 		$filaHistTemp['numeroDocumento'],
-			// 		$filaHistTemp['paciente'],
-			// 		$filaHistTemp['celular'],
-			// 		$filaHistTemp['medico'],
-			// 		$filaHistTemp['subtotal'],
-			// 		$filaHistTemp['igv'],
-			// 		$filaHistTemp['total'],
-			// 		$filaHistTemp['numSerie'],
-			// 		$filaHistTemp['numDoc'],
-			// 		$filaHistTemp['metodoPago'],
-			// 		$filaHistTemp['numOperacion'],
-			// 		$filaHistTemp['monto'],
-			// 		$filaHistTemp['anotacionesPago'],
-			// 		$estado
-			// 	)
-			// );
-			// }
+		}
+		foreach ($listaPasivos as $row) {
+			array_push($arrListadoPas,
+				array(
+					$iAct++,
+					$row['numSerie'].'-'.$row['numDoc'],
+					darFormatoDMY($row['fechaRegistro']),
+					$row['monto']
+				)
+			);
 		}
 
 		// SETEO DE VARIABLES
-		$dataColumnsTP = array(
+		$dataColumnsTPAct = array(
 			array( 'col' => '#',                'ancho' =>  7, 	'align' => 'L' ),
-			array( 'col' => 'COD CITA',			'ancho' => 10, 	'align' => 'C' ),
-			array( 'col' => "FECHA DE CITA",	'ancho' => 12, 	'align' => 'C' ),
-			array( 'col' => 'HORA CITA', 		'ancho' => 12, 	'align' => 'C' ),
-			array( 'col' => 'TIPO DOCUMENTO',	'ancho' => 12, 	'align' => 'C' ),
-			array( 'col' => 'Nº DOCUMENTO',		'ancho' => 15, 	'align' => 'C' ),
-			array( 'col' => 'PACIENTE',			'ancho' => 60, 	'align' => 'L' ),
-			array( 'col' => 'CELULAR',			'ancho' => 60, 	'align' => 'L' ),
-			array( 'col' => 'MEDICO',			'ancho' => 60, 	'align' => 'L' ),
-			array( 'col' => 'SUBTOTAL',			'ancho' => 15, 	'align' => 'R' ),
-			array( 'col' => 'IGV',			'ancho' => 15, 	'align' => 'R' ),
-			array( 'col' => 'TOTAL',			'ancho' => 15, 	'align' => 'R' ),
-			array( 'col' => 'N° SERIE',			'ancho' => 15, 	'align' => 'R' ),
-			array( 'col' => 'N° DOC.',			'ancho' => 15, 	'align' => 'R' ),
-			array( 'col' => 'METODO PAGO',			'ancho' => 15, 	'align' => 'L' ),
-			array( 'col' => 'N° OPERACION',			'ancho' => 15, 	'align' => 'R' ),
-			array( 'col' => 'MONTO DE PAGO',			'ancho' => 15, 	'align' => 'R' ),
-			array( 'col' => 'ANOTACIONES',			'ancho' => 15, 	'align' => 'L' ),
-			array( 'col' => 'ESTADO',			'ancho' => 20, 	'align' => 'C' ),
-
+			array( 'col' => 'N° COMPROBANTE',   'ancho' =>  12, 'align' => 'L' ),
+			array( 'col' => "FECHA REGISTRO",	'ancho' => 14, 	'align' => 'R' ),
+			array( 'col' => 'MONTO',	'ancho' => 12, 	'align' => 'R' )
 		);
+
+		$dataColumnsTPPas = array(
+			array( 'col' => '#',                'ancho' =>  7, 	'align' => 'L' ),
+			array( 'col' => 'N° COMPROBANTE',   'ancho' =>  12, 'align' => 'L' ),
+			array( 'col' => "FECHA REGISTRO",	'ancho' => 14, 	'align' => 'R' ),
+			array( 'col' => 'MONTO',	'ancho' => 12, 	'align' => 'R' )
+		);
+
 		$titulo = 'LISTADO DE ACTIVOS Y PASIVOS';
 		$nombre_hoja = 'Citas';
 
 
-		$cantColumns = count($dataColumnsTP);
+		$cantColumns = count($dataColumnsTPAct);
 		$arrColumns = array();
 		$this->excel->getActiveSheet()->getColumnDimension('A')->setWidth(2); // por defecto lo ponemos en 2 luego si se usa la columna se cambia
 		$a = 'B'; // INICIO DE COLUMNA
@@ -995,10 +941,10 @@ class Reportes extends CI_Controller {
 					'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
 					'vertical' => PHPExcel_Style_Alignment::VERTICAL_CENTER,
 				),
-				'fill' => array(
-					'type' => PHPExcel_Style_Fill::FILL_SOLID,
-					'startcolor' => array( 'rgb' => '3A3838' )
-				),
+				// 'fill' => array(
+				// 	'type' => PHPExcel_Style_Fill::FILL_SOLID,
+				// 	'startcolor' => array( 'rgb' => '3A3838' )
+				// ),
 			);
 			$styleArraySubTitle = array(
 				'font'=>  array(
@@ -1041,17 +987,26 @@ class Reportes extends CI_Controller {
 		// TITULO
 			$this->excel->getActiveSheet()->getCell($arrColumns[0].'1')->setValue($titulo);
 			$this->excel->getActiveSheet()->getStyle($arrColumns[0].'1')->applyFromArray($styleArrayTitle);
-			$this->excel->getActiveSheet()->mergeCells($arrColumns[0].'1:'. $endColum .'1');
+			// $this->excel->getActiveSheet()->mergeCells($arrColumns[0].'1:'. $endColum .'1');
 
 
-			$currentCellEncabezado = 4; // donde inicia el encabezado del listado
+			$currentCellEncabezado = 7; // donde inicia el encabezado del listado
 			$fila_mes = $currentCellEncabezado - 1;
 			$fila = $currentCellEncabezado + 1;
-			$pieListado = $fila + count($arrListadoProd);
+			$pieListado = $fila + count($arrListadoAct);
+		
+		// ANTE ENCABEZADO DE LISTA
+			// $currentCellEncabezado
+			$this->excel->getActiveSheet()->getColumnDimension('B')->setWidth(50);
+			$this->excel->getActiveSheet()->getCell('B6')->setValue('ACTIVOS');
+			$this->excel->getActiveSheet()->mergeCells('B6:D6');
+
+			$this->excel->getActiveSheet()->getCell('D6')->setValue('PASIVOS');
+			$this->excel->getActiveSheet()->mergeCells('D6:G6');
 
 		// ENCABEZADO DE LA LISTA
 			$i=0;
-			foreach ($dataColumnsTP as $key => $value) {
+			foreach ($dataColumnsTPAct as $key => $value) {
 				$this->excel->getActiveSheet()->getColumnDimension($arrColumns[$i])->setWidth($value['ancho']);
 				$this->excel->getActiveSheet()->getCell($arrColumns[$i].$currentCellEncabezado)->setValue($value['col']);
 				if( $value['align'] == 'C' ){
@@ -1067,8 +1022,8 @@ class Reportes extends CI_Controller {
 			$this->excel->getActiveSheet()->setAutoFilter($arrColumns[0].$currentCellEncabezado.':'.$endColum.$currentCellEncabezado);
 
 		// LISTA
-			$this->excel->getActiveSheet()->fromArray($arrListadoProd, null, $arrColumns[0].$fila);
-			$this->excel->getActiveSheet()->freezePane($arrColumns[0].$fila);
+			// $this->excel->getActiveSheet()->fromArray($arrListadoProd, null, $arrColumns[0].$fila);
+			// $this->excel->getActiveSheet()->freezePane($arrColumns[0].$fila);
 
 
 		$objWriter = new PHPExcel_Writer_Excel2007($this->excel);
