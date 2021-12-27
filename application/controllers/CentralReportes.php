@@ -50,7 +50,7 @@ class CentralReportes extends CI_Controller {
       }elseif($fAtencion['edad'] == '1' ){
         $edadEnAtencion = $fAtencion['edad'] . ' AÑO';
       }else{
-        $edadEnAtencion = strtoupper_total(devolverEdadAtencion($fAtencion['fecha_nacimiento'],$fAtencion['fecha_atencion']));
+        $edadEnAtencion = strtoupper_total(devolverEdadAtencion($fAtencion['fechaNacimiento'],$fAtencion['fechaAtencion']));
       }
       $this->pdf->AddPage('P','A4');
       $this->pdf->AliasNbPages();
