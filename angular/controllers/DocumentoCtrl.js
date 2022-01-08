@@ -155,6 +155,9 @@ app.controller('DocumentoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '
       multiSelect: false,
       columnDefs: [
         { field: 'documentoId', name: 'do.id', displayName: 'ID', width: '75',  sort: { direction: uiGridConstants.DESC} },
+        { field: 'numSerie', name: 'do.numSerie', displayName: 'N° Serie', width: 120, enableFiltering: false, visible: true },
+        { field: 'numDoc', name: 'do.numDoc', displayName: 'N° Doc', width: 120, enableFiltering: false, visible: true },
+        { field: 'razonSocial', name: 'do.razonSocial', displayName: 'Razón Social', width: 140, enableFiltering: false, visible: true },
         { field: 'fechaDocumento', name: 'fechaDocumento', displayName: 'Fecha documento', width: 140, enableFiltering: false, visible: true },
         { field: 'anio', name: 'do.anio', width: 120, visible: false,
 					cellTemplate:'<div class="ui-grid-cell-contents text-left ">'+ '{{ COL_FIELD.descripcion }}</div>',  displayName: 'Año' },
