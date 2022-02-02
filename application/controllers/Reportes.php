@@ -1009,12 +1009,12 @@ class Reportes extends CI_Controller {
 			// $currentCellEncabezado
 			$this->excel->getActiveSheet()->getColumnDimension('B')->setWidth(50);
 			$this->excel->getActiveSheet()->getCell('B6')->setValue('ACTIVOS');
-			$this->excel->getActiveSheet()->mergeCells('B6:E6');
+			$this->excel->getActiveSheet()->mergeCells('B6:F6');
 
-			$this->excel->getActiveSheet()->getCell('F6')->setValue('PASIVOS');
-			$this->excel->getActiveSheet()->mergeCells('F6:I6');
+			$this->excel->getActiveSheet()->getCell('G6')->setValue('PASIVOS');
+			$this->excel->getActiveSheet()->mergeCells('G6:K6');
 
-			$this->excel->getActiveSheet()->getStyle('B6:I6')->applyFromArray($styleArrayHeader);
+			$this->excel->getActiveSheet()->getStyle('B6:K6')->applyFromArray($styleArrayHeader);
 
 		// ENCABEZADO DE LA LISTA
 			$i=0;
@@ -1035,7 +1035,7 @@ class Reportes extends CI_Controller {
 
 		// LISTA
 			$this->excel->getActiveSheet()->fromArray($arrListadoAct, null, $arrColumns[0].$fila);
-			$this->excel->getActiveSheet()->fromArray($arrListadoPas, null, 'F8');
+			$this->excel->getActiveSheet()->fromArray($arrListadoPas, null, 'G8');
 			// $this->excel->getActiveSheet()->freezePane($arrColumns[0].$fila);
 		
 		// PIE DE TOTALES
