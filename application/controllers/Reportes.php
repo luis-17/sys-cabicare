@@ -882,6 +882,7 @@ class Reportes extends CI_Controller {
 				array(
 					$iAct++,
 					$row['numSerie'].'-'.$row['numDoc'],
+					$row['numOperacion'],
 					darFormatoDMY($row['fechaRegistro']),
 					$row['monto']
 				)
@@ -893,6 +894,7 @@ class Reportes extends CI_Controller {
 				array(
 					$iPas++,
 					$row['numSerie'].'-'.$row['numDoc'],
+					$row['numOperacion'],
 					darFormatoDMY($row['fechaRegistro']),
 					$row['monto']
 				)
@@ -905,11 +907,13 @@ class Reportes extends CI_Controller {
 			// activos
 			array( 'col' => '#',                'ancho' =>  7, 	'align' => 'L' ),
 			array( 'col' => 'N° COMPROBANTE',   'ancho' =>  15, 'align' => 'L' ),
+			array( 'col' => "NUM. OPE.",		'ancho' => 15, 	'align' => 'R' ),
 			array( 'col' => "FECHA REGISTRO",	'ancho' => 15, 	'align' => 'R' ),
 			array( 'col' => 'MONTO',	'ancho' => 12, 	'align' => 'R' ),
 			// pasivos
 			array( 'col' => '#',                'ancho' =>  7, 	'align' => 'L' ),
 			array( 'col' => 'N° COMPROBANTE',   'ancho' =>  15, 'align' => 'L' ),
+			array( 'col' => "NUM. OPE.",		'ancho' => 15, 	'align' => 'R' ),
 			array( 'col' => "FECHA REGISTRO",	'ancho' => 15, 	'align' => 'R' ),
 			array( 'col' => 'MONTO',	'ancho' => 12, 	'align' => 'R' )
 		);
@@ -1040,18 +1044,18 @@ class Reportes extends CI_Controller {
 			$inicioFila = 8;
 			$filaFinalData = $inicioFila + ($cantFilasAct > $cantFilasPas ? $cantFilasAct : $cantFilasPas) + 4;
 
-			$this->excel->getActiveSheet()->getCell('H'.$filaFinalData)->setValue('TOTAL ACTIVOS:');
-			$this->excel->getActiveSheet()->getCell('I'.$filaFinalData)->setValue($totalActivos);
+			$this->excel->getActiveSheet()->getCell('J'.$filaFinalData)->setValue('TOTAL ACTIVOS:');
+			$this->excel->getActiveSheet()->getCell('K'.$filaFinalData)->setValue($totalActivos);
 
-			$this->excel->getActiveSheet()->getCell('H'.strval($filaFinalData+1))->setValue('TOTAL PASIVOS:');
-			$this->excel->getActiveSheet()->getCell('I'.strval($filaFinalData+1))->setValue($totalPasivos);
+			$this->excel->getActiveSheet()->getCell('J'.strval($filaFinalData+1))->setValue('TOTAL PASIVOS:');
+			$this->excel->getActiveSheet()->getCell('K'.strval($filaFinalData+1))->setValue($totalPasivos);
 
 			$diferenciaTotal = $totalActivos - $totalPasivos;
-			$this->excel->getActiveSheet()->getCell('H'.strval($filaFinalData+2))->setValue('DIFERENCIA:');
-			$this->excel->getActiveSheet()->getCell('I'.strval($filaFinalData+2))->setValue($diferenciaTotal);
+			$this->excel->getActiveSheet()->getCell('J'.strval($filaFinalData+2))->setValue('DIFERENCIA:');
+			$this->excel->getActiveSheet()->getCell('K'.strval($filaFinalData+2))->setValue($diferenciaTotal);
 
-			$this->excel->getActiveSheet()->getStyle('H'.$filaFinalData.':I'.strval($filaFinalData+2))->applyFromArray($styleFooter);
-			$this->excel->getActiveSheet()->getStyle('H'.$filaFinalData.':I'.strval($filaFinalData+2))->getAlignment()->setWrapText(true);
+			$this->excel->getActiveSheet()->getStyle('J'.$filaFinalData.':K'.strval($filaFinalData+2))->applyFromArray($styleFooter);
+			$this->excel->getActiveSheet()->getStyle('J'.$filaFinalData.':K'.strval($filaFinalData+2))->getAlignment()->setWrapText(true);
 
 		$objWriter = new PHPExcel_Writer_Excel2007($this->excel);
 		$time = date('YmdHis_His');

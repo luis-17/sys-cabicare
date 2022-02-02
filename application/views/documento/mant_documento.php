@@ -45,6 +45,10 @@
 			<input type="text" class="form-control input-sm" ng-model="fDataDoc.codigoExterno" placeholder="Ingrese cod. externo" />
 		</div>
 		<div class="form-group col-md-6 mb-md">
+			<label class="control-label mb-n"> Num. Operación </label>
+			<input type="text" class="form-control input-sm" ng-model="fDataDoc.numOperacion" placeholder="Ingrese num. operación" />
+		</div>
+		<div class="form-group col-md-6 mb-md">
 			<label class="control-label mb-n"> Monto </label>
 			<input type="text" class="form-control input-sm" ng-model="fDataDoc.monto" placeholder="Ingrese monto" />
 		</div>

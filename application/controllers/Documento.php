@@ -59,6 +59,7 @@ class Documento extends CI_Controller {
 					'ruc' => $row['ruc'],
 					'razonSocial' => $row['razonSocial'],
 					'numDoc' => $row['numDoc'],
+					'numOperacion' => $row['numOperacion'],
 					'numSerie' => $row['numSerie'],
 					'codigoExterno' => $row['codigoExterno'],
 					'fechaCreacion' => formatoFechaReporte4($row['fechaCreacion']),
@@ -136,6 +137,7 @@ class Documento extends CI_Controller {
 		$allInputs['monto'] = $this->input->post('monto');
 
 		$allInputs['numDoc'] = $this->input->post('numDoc');
+		$allInputs['numOperacion'] = $this->input->post('numOperacion');
 		$allInputs['numSerie'] = $this->input->post('numSerie');
 		$allInputs['moneda'] = $this->input->post('moneda');
 		$allInputs['ruc'] = $this->input->post('ruc');
@@ -158,32 +160,32 @@ class Documento extends CI_Controller {
 			}
 		}
 		// ENVIO DE CORREO
-			$to = 'luisls1717@gmail.com';
-      $subject = strtoupper($this->sessionFactur['nombres']).' SUBIÓ UN NUEVO DOCUMENTO AL SISTEMA';
-      $headers = "MIME-Version: 1.0" . "\r\n";
-      $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-      $headers .= "From: Cabicare < notificaciones@cabicarela.com >\r\n";
-      $tipo="'Century Gothic'";
-      $message = '
-      <html>
-        <body style="font-size: 12px; width: 100%; font-family: '.$tipo.', CenturyGothic, AppleGothic, sans-serif;">
-          <div style="padding-top: 2%; text-align: right; padding-right: 15%;">
-            <img src="https://cabicarela.com/wp-content/uploads/2019/08/logo-png.png" width="17%" style="text-align: right;"></img>
-          </div>
-          <div style="padding-right: 15%; padding-left: 8%;"><b><label style="color: #000000;">
-            <p> '.strtoupper($this->sessionFactur['nombres']).'Subió un nuevo documento al sistema</p>
-          </div>
-					<br>
-					<br>
-					<br>
-					<div style="background-color: #BF3434; padding-top: 0.5%; padding-bottom: 0.5%">
-						<p> Entra al sistema para ver el documento</p>
-            <div style="text-align: center;"><b>
-              <a href="http://104.131.176.122/sys-cabicare" style="text-decoration-color: #FFFFFF; text-decoration: none; color:  #FFFFFF;"> ENTRAR AL SISTEMA </a></b>
-            </div>
-          </div>
-        </body>
-      </html>';
+		$to = 'luisls1717@gmail.com';
+		$subject = strtoupper($this->sessionFactur['nombres']).' SUBIÓ UN NUEVO DOCUMENTO AL SISTEMA';
+		$headers = "MIME-Version: 1.0" . "\r\n";
+		$headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+		$headers .= "From: Cabicare < notificaciones@cabicarela.com >\r\n";
+		$tipo="'Century Gothic'";
+		$message = '
+		<html>
+			<body style="font-size: 12px; width: 100%; font-family: '.$tipo.', CenturyGothic, AppleGothic, sans-serif;">
+			<div style="padding-top: 2%; text-align: right; padding-right: 15%;">
+				<img src="https://cabicarela.com/wp-content/uploads/2019/08/logo-png.png" width="17%" style="text-align: right;"></img>
+			</div>
+			<div style="padding-right: 15%; padding-left: 8%;"><b><label style="color: #000000;">
+				<p> '.strtoupper($this->sessionFactur['nombres']).'Subió un nuevo documento al sistema</p>
+			</div>
+						<br>
+						<br>
+						<br>
+						<div style="background-color: #BF3434; padding-top: 0.5%; padding-bottom: 0.5%">
+							<p> Entra al sistema para ver el documento</p>
+				<div style="text-align: center;"><b>
+				<a href="http://104.131.176.122/sys-cabicare" style="text-decoration-color: #FFFFFF; text-decoration: none; color:  #FFFFFF;"> ENTRAR AL SISTEMA </a></b>
+				</div>
+			</div>
+			</body>
+		</html>';
        
 		// mail($to, $subject, $message, $headers);
 			

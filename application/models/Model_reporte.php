@@ -5,7 +5,7 @@ class Model_reporte extends CI_Model {
 		parent::__construct();
 	}
 	public function m_cargar_activos($paramDatos){
-		$this->db->select("ci.numSerie, ci.numDoc, pg.fechaRegistro, pg.monto", FALSE);
+		$this->db->select("ci.numSerie, ci.numDoc, pg.fechaRegistro, pg.monto, pg.numOperacion", FALSE);
 		$this->db->from('cita ci');
 		$this->db->join('pago pg', 'ci.id = pg.citaId');
         $this->db->where_in('ci.estado', array(1, 2, 3));
@@ -17,7 +17,7 @@ class Model_reporte extends CI_Model {
 	}
 
     public function m_cargar_pasivos($paramDatos){
-        $this->db->select("do.numSerie, do.numDoc, do.mes, do.anio, do.dia, do.monto, do.fechaPago", FALSE);
+        $this->db->select("do.numSerie, do.numDoc, do.mes, do.anio, do.dia, do.monto, do.fechaPago, do.numOperacion", FALSE);
         $this->db->select("CONCAT_WS('-', do.anio, do.mes, do.dia) AS fechaRegistro", FALSE);
 		$this->db->from('documento do');
         $this->db->where_in('do.estado', array(1));
