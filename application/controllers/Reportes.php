@@ -895,7 +895,7 @@ class Reportes extends CI_Controller {
 					$iPas++,
 					$row['numSerie'].'-'.$row['numDoc'],
 					$row['numOperacion'],
-					darFormatoDMY($row['fechaRegistro']),
+					darFormatoDMY($row['fechaPago']),
 					$row['monto']
 				)
 			);
