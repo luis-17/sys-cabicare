@@ -257,16 +257,16 @@ app.controller('DocumentoCtrl', ['$scope', '$filter', '$uibModal', '$bootbox', '
       }
       DocumentoFactory.verDocumentoModal(arrParams);
     }
-    // $scope.btnEditar = function() {
-    //   var arrParams = {
-    //     'metodos': $scope.metodos,
-    //     'mySelectionGrid': $scope.mySelectionGrid,
-    //     'fArr': $scope.fArr,
-    //     callback: function() {
-    //     }
-    //   }
-    //   DocumentoFactory.editDocumentoModal(arrParams);
-    // }
+    $scope.btnEditar = function() {
+      var arrParams = {
+        'metodos': $scope.metodos,
+        'mySelectionGrid': $scope.mySelectionGrid,
+        'fArr': $scope.fArr,
+        callback: function() {
+        }
+      }
+      DocumentoFactory.editDocumentoModal(arrParams);
+    }
     // $scope.btnLaboratorio = function() {
     //   var arrParams = {
     //     'metodos': $scope.metodos,
@@ -321,6 +321,7 @@ app.service("DocumentoServices",function($http, $q, handleBehavior) {
 	return({
 		sListar: sListar,
 		sRegistrar: sRegistrar,
+    sEditar: sEditar,
 		sAnular: sAnular,
 	});
 	function sListar(datos) {
@@ -343,6 +344,16 @@ app.service("DocumentoServices",function($http, $q, handleBehavior) {
 		var request = $http({
 			method: "post",
 			url: angular.patchURLCI + "Documento/registrar",
+			data: datos,
+			transformRequest: angular.identity,
+			headers: { 'Content-Type': undefined }
+		});
+		return (request.then(handleBehavior.success, handleBehavior.error));
+	}
+  function sEditar(datos) {
+		var request = $http({
+			method: "post",
+			url: angular.patchURLCI + "Documento/editar",
 			data: datos,
 			transformRequest: angular.identity,
 			headers: { 'Content-Type': undefined }
@@ -382,17 +393,12 @@ app.factory("DocumentoFactory", function($uibModal, pinesNotifications, blockUI,
 							}
 							
 						});
-						// formData.append($scope.fDataDoc.mes.descripcion, 'mes');
-						// formData.append($scope.fDataDoc.anio.descripcion, 'anio');
-						// formData.append($scope.fDataDoc.categoria.descripcion, 'categoria');
 
             formData.append('moneda', $scope.fDataDoc.moneda.id);
             formData.append('mes', $scope.fDataDoc.mes.id);
 						formData.append('anio', $scope.fDataDoc.anio.id);
             formData.append('dia', $scope.fDataDoc.dia.id);
 						formData.append('categoria', $scope.fDataDoc.categoria.id);
-						
-						// console.log('formData ==>', formData);
 						DocumentoServices.sRegistrar(formData).then(function (rpta) {
 							if (rpta.flag === 1) {
 								var pTitle = 'OK!';
@@ -410,7 +416,6 @@ app.factory("DocumentoFactory", function($uibModal, pinesNotifications, blockUI,
 							});
 							$scope.metodos.getPaginationServerSide(true);
 							var linkBtn = document.getElementById('quitarImg');
-							// console.log('linkBtn ==>', linkBtn);
 							linkBtn.click();
 						});
 					}
@@ -426,6 +431,103 @@ app.factory("DocumentoFactory", function($uibModal, pinesNotifications, blockUI,
 				}
 			});
 		},
+    editDocumentoModal: function (arrParams) {
+      blockUI.start('Abriendo formulario...');
+      $uibModal.open({
+				templateUrl: angular.patchURLCI + 'Documento/ver_popup_formulario',
+				size: 'md',
+				backdrop: 'static',
+				keyboard: false,
+        controller: function ($scope, $uibModalInstance, arrParams) {
+          blockUI.stop(); 
+	      	$scope.fDataDoc = {};
+	      	$scope.metodos = arrParams.metodos;
+	      	$scope.fArr = arrParams.fArr;
+	      	if( arrParams.mySelectionGrid.length == 1 ){ 
+	          $scope.fDataDoc = arrParams.mySelectionGrid[0];
+	        }else{
+	          alert('Seleccione una sola fila');
+	        }
+	      	$scope.titleForm = 'Edición de Documento';
+	      	$scope.cancel = function () {
+	      	  $uibModalInstance.dismiss('cancel');
+	      	}
+
+					//BINDEO DE ANIO
+          var objIndexAnio = $scope.fArr.listaAnio.filter(function(obj) {
+            return obj.id == $scope.fDataDoc.anio.id;
+          }).shift();
+					console.log('objIndexAnio, ', objIndexAnio);
+          $scope.fDataDoc.anio = objIndexAnio;
+
+					//BINDEO DE MES
+          var objIndexMes = $scope.fArr.listaMes.filter(function(obj) {
+            return obj.id == $scope.fDataDoc.mes.id;
+          }).shift();
+					console.log('objIndexMes, ', objIndexMes);
+          $scope.fDataDoc.mes = objIndexMes;
+
+					//BINDEO DE DIA
+          var objIndexDia = $scope.fArr.listaDia.filter(function(obj) {
+            return obj.id == $scope.fDataDoc.dia.id;
+          }).shift();
+          $scope.fDataDoc.dia = objIndexDia;
+
+					//BINDEO DE CATEGORIA
+          var objIndexCat = $scope.fArr.listaCategoria.filter(function(obj) {
+            return obj.id == $scope.fDataDoc.categoria.id;
+          }).shift();
+          $scope.fDataDoc.categoria = objIndexCat;
+
+					//BINDEO DE MONEDA
+          var objIndexMoneda = $scope.fArr.listaMoneda.filter(function(obj) {
+            return obj.id == $scope.fDataDoc.moneda.id;
+          }).shift();
+          $scope.fDataDoc.moneda = objIndexMoneda;
+
+          $scope.aceptar = function(){
+						blockUI.start("Modificando documento...");
+						var formData = new FormData();
+						angular.forEach($scope.fDataDoc, function(index,val) {
+							if(index == 'mes' || index == 'anio' || index == 'categoria'){}else{
+								formData.append(val, index);
+							}
+							
+						});
+
+            formData.append('moneda', $scope.fDataDoc.moneda.id);
+            formData.append('mes', $scope.fDataDoc.mes.id);
+						formData.append('anio', $scope.fDataDoc.anio.id);
+            formData.append('dia', $scope.fDataDoc.dia.id);
+						formData.append('categoria', $scope.fDataDoc.categoria.id);
+						DocumentoServices.sEditar(formData).then(function (rpta) {
+							if (rpta.flag === 1) {
+								var pTitle = 'OK!';
+								var pType = 'success';
+							} else {
+								var pTitle = 'Advertencia!';
+								var pType = 'warning';
+							}
+							blockUI.stop();
+							pinesNotifications.notify({
+								title: pTitle,
+								text: rpta.message,
+								type: pType,
+								delay: 5000
+							});
+							$scope.metodos.getPaginationServerSide(true);
+							var linkBtn = document.getElementById('quitarImg');
+							linkBtn.click();
+						});
+					}
+        },
+        resolve: {
+					arrParams: function() {
+						return arrParams;
+					}
+				}
+      });
+    },
 		verDocumentoModal: function (arrParams) {
 			blockUI.start('Abriendo formulario...');
 			$uibModal.open({

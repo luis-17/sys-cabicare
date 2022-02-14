@@ -121,6 +121,32 @@ class Model_documento extends CI_Model {
 		return $this->db->insert_id();
 	}
 
+	public function m_editar($datos)
+	{
+		$data = array(
+			'mes' => $datos['mes'],
+			'anio'=> $datos['anio'],
+			'dia'=> $datos['dia'],
+			'fechaPago'=> $datos['fechaPago'],
+			'categoria'=> $datos['categoria'],
+			'codigoExterno'=> empty($datos['codigoExterno']) ? NULL : $datos['codigoExterno'],
+			'observaciones'=> empty($datos['observaciones']) ? NULL : $datos['observaciones'],
+			'monto'=> empty($datos['monto']) ? NULL : $datos['monto'],
+			'numDoc'=> empty($datos['numDoc']) ? NULL : $datos['numDoc'],
+			'numSerie'=> empty($datos['numSerie']) ? NULL : $datos['numSerie'],
+			'moneda'=> empty($datos['moneda']) ? NULL : $datos['moneda'],
+			'ruc'=> empty($datos['ruc']) ? NULL : $datos['ruc'],
+			'razonSocial'=> empty($datos['razonSocial']) ? NULL : $datos['razonSocial'],
+			'numOperacion'=> empty($datos['numOperacion']) ? NULL : $datos['numOperacion']
+			// 'nombreArchivo'=> $datos['nombreArchivo']
+		);
+		if( !empty($datos['nombreArchivo']) ){
+			$data['nombreArchivo'] = $datos['nombreArchivo'];
+		}
+		$this->db->where('id',$datos['documentoId']);
+		return $this->db->update('documento', $data);
+	}
+
 	public function m_anular($datos)
 	{
 		$data = array(

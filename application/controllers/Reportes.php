@@ -896,7 +896,9 @@ class Reportes extends CI_Controller {
 					$row['numSerie'].'-'.$row['numDoc'],
 					$row['numOperacion'],
 					darFormatoDMY($row['fechaPago']),
-					$row['monto']
+					$row['monto'],
+					$row['moneda'],
+					$row['observaciones']
 				)
 			);
 			$totalPasivos += $row['monto'];
@@ -915,7 +917,9 @@ class Reportes extends CI_Controller {
 			array( 'col' => 'N° COMPROBANTE',   'ancho' =>  15, 'align' => 'L' ),
 			array( 'col' => "NUM. OPE.",		'ancho' => 15, 	'align' => 'R' ),
 			array( 'col' => "FECHA REGISTRO",	'ancho' => 15, 	'align' => 'R' ),
-			array( 'col' => 'MONTO',	'ancho' => 12, 	'align' => 'R' )
+			array( 'col' => 'MONTO',	'ancho' => 12, 	'align' => 'R' ),
+			array( 'col' => 'MONEDA',	'ancho' => 12, 	'align' => 'R' ),
+			array( 'col' => 'DESCRIPCION',	'ancho' => 20, 	'align' => 'R' )
 		);
 
 		$titulo = 'LISTADO DE ACTIVOS Y PASIVOS';
@@ -1004,7 +1008,7 @@ class Reportes extends CI_Controller {
 			$fila_mes = $currentCellEncabezado - 1;
 			$fila = $currentCellEncabezado + 1;
 			$pieListado = $fila + count($arrListadoAct);
-		
+
 		// ANTE ENCABEZADO DE LISTA
 			// $currentCellEncabezado
 			$this->excel->getActiveSheet()->getColumnDimension('B')->setWidth(50);
@@ -1012,9 +1016,9 @@ class Reportes extends CI_Controller {
 			$this->excel->getActiveSheet()->mergeCells('B6:F6');
 
 			$this->excel->getActiveSheet()->getCell('G6')->setValue('PASIVOS');
-			$this->excel->getActiveSheet()->mergeCells('G6:K6');
+			$this->excel->getActiveSheet()->mergeCells('G6:M6');
 
-			$this->excel->getActiveSheet()->getStyle('B6:K6')->applyFromArray($styleArrayHeader);
+			$this->excel->getActiveSheet()->getStyle('B6:M6')->applyFromArray($styleArrayHeader);
 
 		// ENCABEZADO DE LA LISTA
 			$i=0;

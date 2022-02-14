@@ -56,7 +56,7 @@
 			<label class="control-label minotaur-label mb-xs"> Cargar Documento </label>
 			<div class="fileinput fileinput-new" data-provides="fileinput" style="width: 100%;">
 				<div class="fileinput-preview thumbnail mb20" data-trigger="fileinput" style="width: 100%; text-align: center;">
-					<img ng-if="fDataDoc.nombreArchivo" ng-src="{{ app.name + 'assets/dinamic/documentos/' + fDataDoc.nombreArchivo }}" />
+					<img ng-if="fDataDoc.nombreArchivoForm" ng-src="{{ app.name + 'assets/dinamic/documentos/' + fDataDoc.nombreArchivoForm }}" />
 				</div>
 				<div>
 					<a id="quitarImg" href="#" class="btn btn-default fileinput-exists" data-dismiss="fileinput">Quitar</a> 

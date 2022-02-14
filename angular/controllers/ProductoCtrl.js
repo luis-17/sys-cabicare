@@ -309,7 +309,7 @@ app.factory("ProductoFactory", function($uibModal, pinesNotifications, blockUI, 
           $scope.fData = {};
           $scope.metodos = arrParams.metodos;
           $scope.fArr = arrParams.fArr;
-            console.log(arrParams,'arrParams.mySelectionGrid');
+          console.log(arrParams,'arrParams.mySelectionGrid');
           if( arrParams.mySelectionGrid.length == 1 ){
             $scope.fData = arrParams.mySelectionGrid[0];
             console.log($scope.fData ,'$scope.fData ');
