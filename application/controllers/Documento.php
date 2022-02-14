@@ -230,14 +230,14 @@ class Documento extends CI_Controller {
 				->set_output(json_encode($arrData));
 			return;
 		}
-		if( empty($_FILES['nombreArchivo_blob']) ){
-			$arrData['message'] = 'No ha cargado un archivo para subir. Cargue el archivo para seguir con el proceso.';
-			$arrData['flag'] = 0;
-			$this->output
-				->set_content_type('application/json')
-				->set_output(json_encode($arrData));
-			return;
-		}
+		// if( empty($_FILES['nombreArchivo_blob']) ){
+		// 	$arrData['message'] = 'No ha cargado un archivo para subir. Cargue el archivo para seguir con el proceso.';
+		// 	$arrData['flag'] = 0;
+		// 	$this->output
+		// 		->set_content_type('application/json')
+		// 		->set_output(json_encode($arrData));
+		// 	return;
+		// }
 
 		// $allInputs['citaId'] = $this->input->post('citaId');
 		$allInputs['mes'] = $this->input->post('mes');

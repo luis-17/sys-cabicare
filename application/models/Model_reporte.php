@@ -17,7 +17,7 @@ class Model_reporte extends CI_Model {
 	}
 
     public function m_cargar_pasivos($paramDatos){
-        $this->db->select("do.numSerie, do.numDoc, do.mes, do.anio, do.dia, do.monto, do.fechaPago, do.numOperacion", FALSE);
+        $this->db->select("do.numSerie, do.numDoc, do.mes, do.anio, do.dia, do.monto, do.fechaPago, do.numOperacion, do.moneda, do.observaciones", FALSE);
         $this->db->select("CONCAT_WS('-', do.anio, do.mes, do.dia) AS fechaRegistro", FALSE);
 		$this->db->from('documento do');
         $this->db->where_in('do.estado', array(1));
