@@ -504,6 +504,7 @@ app.factory("DocumentoFactory", function($uibModal, pinesNotifications, blockUI,
 							if (rpta.flag === 1) {
 								var pTitle = 'OK!';
 								var pType = 'success';
+								$uibModalInstance.dismiss('cancel');
 							} else {
 								var pTitle = 'Advertencia!';
 								var pType = 'warning';
