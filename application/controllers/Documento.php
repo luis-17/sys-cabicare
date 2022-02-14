@@ -254,6 +254,7 @@ class Documento extends CI_Controller {
 		$allInputs['moneda'] = $this->input->post('moneda');
 		$allInputs['ruc'] = $this->input->post('ruc');
 		$allInputs['razonSocial'] = $this->input->post('razonSocial');
+		$allInputs['documentoId'] = $this->input->post('documentoId');
 
 		$allInputs['fechaPago'] = $allInputs['anio'].'-'.getNumeroMes($allInputs['mes']).'-'.$allInputs['dia'];
 
