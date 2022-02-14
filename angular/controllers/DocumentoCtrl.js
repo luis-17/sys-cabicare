@@ -516,8 +516,8 @@ app.factory("DocumentoFactory", function($uibModal, pinesNotifications, blockUI,
 								delay: 5000
 							});
 							$scope.metodos.getPaginationServerSide(true);
-							var linkBtn = document.getElementById('quitarImg');
-							linkBtn.click();
+							// var linkBtn = document.getElementById('quitarImg');
+							// linkBtn.click();
 						});
 					}
         },

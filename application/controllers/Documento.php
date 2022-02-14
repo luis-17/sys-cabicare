@@ -269,7 +269,7 @@ class Documento extends CI_Controller {
 			}
 		}
 		if($this->model_documento->m_editar($allInputs) ){
-			$arrData['message'] = 'Se registraron los datos correctamente.';
+			$arrData['message'] = 'Se modificaron los datos correctamente.';
 			$arrData['flag'] = 1;
 		}
 
