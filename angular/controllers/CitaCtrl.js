@@ -108,15 +108,29 @@ app.controller('CitaCtrl',
 			{ id: 'M', descripcion: 'MASCULINO' },
 			{ id: 'F', descripcion: 'FEMENINO' }
     ];
-    $scope.fArr.listaMedioContacto = [
-			{ id: '', descripcion: '--Seleccione medio de contacto--' },
-			{ id: 'POR UN AMIGO', descripcion: 'POR UN AMIGO' },
-			{ id: 'POR GOOGLE', descripcion: 'POR GOOGLE' },
-			{ id: 'POR FACEBOOK', descripcion: 'POR FACEBOOK' },
-			{ id: 'POR INSTAGRAM', descripcion: 'POR INSTAGRAM' },
-			{ id: 'POR OTRAS REDES SOCIALES', descripcion: 'POR OTRAS REDES SOCIALES' }
-			// { id: 'POR OTRAS REDES SOCIALES', descripcion: 'POR OTRAS REDES SOCIALES' }
-    ];
+
+	$scope.fArr.listaMedioContacto = [
+		{ id: '', descripcion: '--Seleccione medio de contacto--' },
+		{ id: 'POR UN AMIGO', descripcion: 'POR UN AMIGO' },
+		{ id: 'POR GOOGLE', descripcion: 'POR GOOGLE' },
+		{ id: 'POR FACEBOOK', descripcion: 'POR FACEBOOK' },
+		{ id: 'POR INSTAGRAM', descripcion: 'POR INSTAGRAM' },
+		{ id: 'POR OTRAS REDES SOCIALES', descripcion: 'POR OTRAS REDES SOCIALES' },
+		{ id: 'RECOMENDACION DR. EMERSON', descripcion: 'RECOMENDACION DR. EMERSON' },
+		{ id: 'RECOMENDACION LAB. DIAGTE', descripcion: 'RECOMENDACION LAB. DIAGTE' },
+		{ id: 'RECOMENDACION DRA. MARITHE', descripcion: 'RECOMENDACION DRA. MARITHE' },
+		{ id: 'RECOMENDACION DR ENRIQUE PEREZ', descripcion: 'RECOMENDACION DR ENRIQUE PEREZ' },
+		{ id: 'RECOMENDACION DRA MARCELA', descripcion: 'RECOMENDACION DRA MARCELA' },
+		{ id: 'RECOMENDACION DRA MARBELYS', descripcion: 'RECOMENDACION DRA MARBELYS' },
+		{ id: 'RECOMENDACION FRANCISCO', descripcion: 'RECOMENDACION FRANCISCO' },
+		{ id: 'RECOMENDACION MIGUEL LEVEL', descripcion: 'RECOMENDACION MIGUEL LEVEL' },
+		{ id: 'INSTAGRAM DRA. MARBELYS', descripcion: 'INSTAGRAM DRA. MARBELYS' },
+		{ id: 'INSTAGRAM DRA BERGICA', descripcion: 'INSTAGRAM DRA BERGICA' },
+		{ id: 'INSTAGRAM DR ENRIQUE', descripcion: 'INSTAGRAM DR ENRIQUE' },
+		{ id: 'INSTAGRAM DRA LISETTE', descripcion: 'INSTAGRAM DRA LISETTE' },
+		{ id: 'INSTAGRAM DRA MARCELA', descripcion: 'INSTAGRAM DRA MARCELA' },
+	];
+	
     $scope.fArr.listaMetodoPago = [
 			{ id: '', descripcion: '--Seleccione método de pago--' },
 			{ id: 'EFECTIVO', descripcion: 'EFECTIVO' },

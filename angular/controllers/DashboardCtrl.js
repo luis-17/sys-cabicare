@@ -129,32 +129,48 @@ app.controller('DashboardCtrl', [
 
     $scope.fData.chartPacPorMes = { 
       chart: { 
-        type: 'pie',
-        height: 350,
+        type: 'column',
+        // height: 350,
       },
       title: {
-        text: 'CONSOLIDADOS POR MES'
+        text: 'COMPARATIVO DE CONSOLIDADOS POR MES'
       },
-      tooltip: {
-        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>' 
+      xAxis: {
+        categories: [],
+        // categories: ['A','B','C','D','E'],
+        crosshair: true
       },
-      plotOptions: {
-        pie: {
-          allowPointSelect: true,
-          cursor: 'pointer',
-          dataLabels: {
-            enabled: false
-          },
-          showInLegend: true
+      yAxis: {
+        min: 0,
+        title: {
+            text: 'Cantidad'
         }
       },
-      legend: {
-        labelFormat: '{name} ( {y} )' 
+      // tooltip: {
+        // pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>' 
+      // },
+      plotOptions: {
+        column: {
+          pointPadding: 0.2,
+          borderWidth: 0
+        }
+        // pie: {
+        //   allowPointSelect: true,
+        //   cursor: 'pointer',
+        //   dataLabels: {
+        //     enabled: false
+        //   },
+        //   showInLegend: true
+        // }
       },
+      // legend: {
+
+      //   labelFormat: '{name} ( {y} )'
+      // },
       series: [{ 
         name: '',
-        colorByPoint: true,
         data: [],
+        // data: [178, 194, 162, 198, 62],
       }]
     };
     $scope.consultarPacientePorMes = function () {
@@ -163,9 +179,12 @@ app.controller('DashboardCtrl', [
 				datos: $scope.fBusquedaPPM
 			};
 			GraficoServices.sListarPacPorMes(arrParams).then(function (rpta) {
-				if (rpta.datos.length > 0) {
-					$scope.fData.chartPacPorMes.series[0].data = angular.copy(rpta.datos);
-				}
+        console.log('rpta.datos:: ', rpta.datos);
+				// if (rpta.datos.length > 0) {
+        $scope.fData.chartPacPorMes.series[0].data = angular.copy(rpta.datos.series);
+        $scope.fData.chartPacPorMes.xAxis.categories = angular.copy(rpta.datos.categories);
+        console.log('$scope.fData.chartPacPorMes::', $scope.fData.chartPacPorMes);
+				// }
 				blockUI.stop();
 			});
 		};

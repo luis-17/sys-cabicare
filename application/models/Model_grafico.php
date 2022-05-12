@@ -45,16 +45,16 @@ class Model_grafico extends CI_Model {
 	}
 
 	public function m_pacientes_por_mes($paramDatos){
-		$sql = 'SELECT COUNT(*) AS contador, MONTHNAME(ci.fechaCita) AS mes, MONTH(ci.fechaCita) AS numMes
+		$sql = 'SELECT COUNT(*) AS contador, CONCAT( MONTHNAME(ci.fechaCita),"-",YEAR(ci.fechaCita) ) AS anio_mes
 					FROM paciente pa 
 					INNER JOIN cita ci ON pa.id = ci.pacienteId
 					WHERE pa.estado = 1 
 					AND pa.sedeId = ? 
 					AND ci.estado IN (3)
 					AND DATE(ci.fechaCita) BETWEEN ? AND ? 
-					GROUP BY MONTHNAME(ci.fechaCita), MONTH (ci.fechaCita)
-					ORDER BY MONTH(ci.fechaCita)'; 
-		$query = $this->db->query($sql, 
+					GROUP BY CONCAT( MONTHNAME(ci.fechaCita),"-",YEAR(ci.fechaCita) )
+					ORDER BY CONCAT( MONTHNAME(ci.fechaCita),"-",YEAR(ci.fechaCita) )';
+		$query = $this->db->query($sql,
 			array(
 				$this->sessionFactur['idsede'],
 				darFormatoYMD($paramDatos['inicio']), 
@@ -65,13 +65,13 @@ class Model_grafico extends CI_Model {
 	}
 
 	public function m_pacientes_nuevos_por_mes($paramDatos){
-		$sql = 'SELECT COUNT(*) AS contador, MONTHNAME(pa.createdAt) AS mes, MONTH(pa.createdAt) AS numMes
+		$sql = 'SELECT COUNT(*) AS contador, CONCAT( MONTHNAME(pa.createdAt),"-",YEAR(pa.createdAt) ) AS anio_mes
 					FROM paciente pa 
 					WHERE pa.estado = 1 
 					AND pa.sedeId = ? 
 					AND DATE(pa.createdAt) BETWEEN ? AND ? 
-					GROUP BY MONTHNAME(pa.createdAt), MONTH (pa.createdAt)
-					ORDER BY MONTH(pa.createdAt)'; 
+					GROUP BY CONCAT( MONTHNAME(pa.createdAt),"-",YEAR(pa.createdAt) )
+					ORDER BY CONCAT( MONTHNAME(pa.createdAt),"-",YEAR(pa.createdAt) )'; 
 		$query = $this->db->query($sql, 
 			array(
 				$this->sessionFactur['idsede'],

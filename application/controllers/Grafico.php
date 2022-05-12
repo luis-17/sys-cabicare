@@ -83,23 +83,32 @@ class Grafico extends CI_Controller {
 		if($allInputs['datos']['tg']['id'] == 'PNPM'){
 			$lista = $this->model_grafico->m_pacientes_nuevos_por_mes($allInputs['datos']);
 		}
-		foreach ($lista as $key => $row) { 
-			$rowSliced = FALSE;
-			$rowSelected = FALSE;
-			if($key === 0){ 
-				$rowSliced = TRUE;
-				$rowSelected = TRUE;
-			}
-			$arrResult[] = array( 
-				'name'=> $row['mes'],
-				'y'=> (float)$row['contador'],
-				'sliced'=> $rowSliced,
-				'selected'=> $rowSelected
-			);
+		$arrSeries = array();
+		$arrCategories = array();
+		foreach ($lista as $key => $row) {
+			// $arrSeries.push($row['anio_mes']);
+			// $arrCategories.push($row['contador']);
+
+			array_push($arrSeries, (int)$row['contador']);
+			array_push($arrCategories, $row['anio_mes']);
 		}
-		
-		
-		$arrData['datos'] = $arrResult;
+		// foreach ($lista as $key => $row) { 
+		// 	$rowSliced = FALSE;
+		// 	$rowSelected = FALSE;
+		// 	if($key === 0){ 
+		// 		$rowSliced = TRUE;
+		// 		$rowSelected = TRUE;
+		// 	}
+		// 	$arrResult[] = array( 
+		// 		'name'=> $row['anio_mes'],
+		// 		'y'=> (float)$row['contador'],
+		// 		'sliced'=> $rowSliced,
+		// 		'selected'=> $rowSelected
+		// 	);
+		// }
+
+		$arrData['datos']['series'] = $arrSeries;
+		$arrData['datos']['categories'] = $arrCategories;
 		$arrData['message'] = '';
 		$arrData['flag'] = 1;
 		$this->output
