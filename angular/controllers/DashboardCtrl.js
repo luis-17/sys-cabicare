@@ -10,6 +10,7 @@ app.controller('DashboardCtrl', [
     'uiGridConstants',
     'blockUI',
     'GraficoServices',
+    'DistritoServices',
   function( $scope,
     $filter,
     $state,
@@ -20,8 +21,10 @@ app.controller('DashboardCtrl', [
     pinesNotifications,
     uiGridConstants,
     blockUI,
-    GraficoServices
+    GraficoServices,
+    DistritoServices
   ) {
+    $scope.metodos = {}; // contiene todas las funciones
     $scope.fArr = {};
     $scope.fArr.listaUltimosDist = [
       { id: 5, descripcion: 'TOP 5' },
@@ -56,6 +59,20 @@ app.controller('DashboardCtrl', [
     $scope.fBusquedaPPM.inicio = moment().format('01-01-YYYY');
     $scope.fBusquedaPPM.fin = moment().format('DD-MM-YYYY');
     $scope.fBusquedaPPM.tg = $scope.fArr.listaTG[0];
+    // distritos
+    $scope.metodos.listaDistritos = function(myCallback) {
+      var myCallback = myCallback || function() { };
+      DistritoServices.sListarCbo().then(function(rpta) {
+        $scope.fArr.listaDistrito = rpta.datos;
+        myCallback();
+      });
+		};
+    var myCallBackDT = function() {
+      $scope.fArr.listaDistrito.splice(0,0,{ id : 'all', descripcion:'Todos los distritos'});
+      $scope.fBusquedaPPM.distrito = $scope.fArr.listaDistrito[0];
+      $scope.consultarPacientePorMes();
+    }
+    $scope.metodos.listaDistritos(myCallBackDT);
 
     $scope.fBusquedaPMM = {};
     $scope.fBusquedaPMM.anio = $scope.fArr.listaAnio[0];
@@ -81,6 +98,9 @@ app.controller('DashboardCtrl', [
     $scope.fBusquedaTLE = {};
     $scope.fBusquedaTLE.anio = $scope.fArr.listaAnio[0];
     $scope.fBusquedaTLE.tipoTLE = $scope.fArr.listaTLE[0];
+
+    
+    
 
     $scope.fData = {};
     $scope.fData.chartMedioContacto = { 
@@ -133,11 +153,10 @@ app.controller('DashboardCtrl', [
         // height: 350,
       },
       title: {
-        text: 'COMPARATIVO DE CONSOLIDADOS POR MES'
+        text: ''
       },
       xAxis: {
         categories: [],
-        // categories: ['A','B','C','D','E'],
         crosshair: true
       },
       yAxis: {
@@ -146,31 +165,15 @@ app.controller('DashboardCtrl', [
             text: 'Cantidad'
         }
       },
-      // tooltip: {
-        // pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>' 
-      // },
       plotOptions: {
         column: {
           pointPadding: 0.2,
           borderWidth: 0
         }
-        // pie: {
-        //   allowPointSelect: true,
-        //   cursor: 'pointer',
-        //   dataLabels: {
-        //     enabled: false
-        //   },
-        //   showInLegend: true
-        // }
       },
-      // legend: {
-
-      //   labelFormat: '{name} ( {y} )'
-      // },
       series: [{ 
         name: '',
         data: [],
-        // data: [178, 194, 162, 198, 62],
       }]
     };
     $scope.consultarPacientePorMes = function () {
@@ -183,12 +186,13 @@ app.controller('DashboardCtrl', [
 				// if (rpta.datos.length > 0) {
         $scope.fData.chartPacPorMes.series[0].data = angular.copy(rpta.datos.series);
         $scope.fData.chartPacPorMes.xAxis.categories = angular.copy(rpta.datos.categories);
+        $scope.fData.chartPacPorMes.title.text = angular.copy(rpta.datos.titulo);
         console.log('$scope.fData.chartPacPorMes::', $scope.fData.chartPacPorMes);
 				// }
 				blockUI.stop();
 			});
 		};
-    $scope.consultarPacientePorMes();
+    // $scope.consultarPacientePorMes();
 
     $scope.fData.chartPacPorDist = { 
       chart: { 

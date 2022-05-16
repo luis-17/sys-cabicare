@@ -57,6 +57,11 @@
                 ng-options="item as item.descripcion for item in fArr.listaTG"> </select>
               </div>
               <div class="form-group inline">
+                <label> Distrito </label>
+                <select class="form-control input-xs" ng-model="fBusquedaPPM.distrito" ng-options="item as item.descripcion for item in fArr.listaDistrito" 
+            	    required tabindex="90" ></select>
+              </div>
+              <div class="form-group inline">
                 <button type="button" class="btn btn-info btn-xs" ng-click="consultarPacientePorMes();">
                   <i class="fa fa-refresh"></i> PROCESAR
                 </button>

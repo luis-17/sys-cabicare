@@ -47,7 +47,8 @@ angular.module('app')
             templateUrl: 'tpl/app_dashboard.html',
             resolve: load([
               'angular/controllers/DashboardCtrl.js',
-              'angular/controllers/PacienteCtrl.js'
+              'angular/controllers/PacienteCtrl.js',
+              'angular/controllers/DistritoCtrl.js'
             ])
           })
           .state('app.usuario', {

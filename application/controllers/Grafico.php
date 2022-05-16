@@ -75,40 +75,33 @@ class Grafico extends CI_Controller {
 	public function listar_paciente_mes()
 	{
 		$allInputs = json_decode(trim($this->input->raw_input_stream),true);
+		$vieneDistrito = 'si';
+		$distritoText = ' | '.$allInputs['datos']['distrito']['descripcion'];
+		if ($allInputs['datos']['distrito']['id'] === 'all') {
+			$vieneDistrito = 'no';
+			$distritoText = '';
+		}
 		// PACIENTES POR MES
 		$arrResult = array();
+		$graphTitulo = '';
 		if($allInputs['datos']['tg']['id'] == 'CPM'){
-			$lista = $this->model_grafico->m_pacientes_por_mes($allInputs['datos']);
+			$lista = $this->model_grafico->m_pacientes_por_mes($allInputs['datos'], $vieneDistrito);
+			$graphTitulo = 'COMPARATIVO DE CITAS POR MES'.$distritoText;
 		}
 		if($allInputs['datos']['tg']['id'] == 'PNPM'){
-			$lista = $this->model_grafico->m_pacientes_nuevos_por_mes($allInputs['datos']);
+			$lista = $this->model_grafico->m_pacientes_nuevos_por_mes($allInputs['datos'], $vieneDistrito);
+			$graphTitulo = 'COMPARATIVO DE PACIENTES NUEVOS POR MES'.$distritoText;
 		}
 		$arrSeries = array();
 		$arrCategories = array();
 		foreach ($lista as $key => $row) {
-			// $arrSeries.push($row['anio_mes']);
-			// $arrCategories.push($row['contador']);
-
 			array_push($arrSeries, (int)$row['contador']);
 			array_push($arrCategories, $row['anio_mes']);
 		}
-		// foreach ($lista as $key => $row) { 
-		// 	$rowSliced = FALSE;
-		// 	$rowSelected = FALSE;
-		// 	if($key === 0){ 
-		// 		$rowSliced = TRUE;
-		// 		$rowSelected = TRUE;
-		// 	}
-		// 	$arrResult[] = array( 
-		// 		'name'=> $row['anio_mes'],
-		// 		'y'=> (float)$row['contador'],
-		// 		'sliced'=> $rowSliced,
-		// 		'selected'=> $rowSelected
-		// 	);
-		// }
 
 		$arrData['datos']['series'] = $arrSeries;
 		$arrData['datos']['categories'] = $arrCategories;
+		$arrData['datos']['titulo'] = $graphTitulo;
 		$arrData['message'] = '';
 		$arrData['flag'] = 1;
 		$this->output

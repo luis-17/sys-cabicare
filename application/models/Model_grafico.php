@@ -44,41 +44,85 @@ class Model_grafico extends CI_Model {
 		return $query->result_array();
 	}
 
-	public function m_pacientes_por_mes($paramDatos){
-		$sql = 'SELECT COUNT(*) AS contador, CONCAT( MONTHNAME(ci.fechaCita),"-",YEAR(ci.fechaCita) ) AS anio_mes
+	public function m_pacientes_por_mes($paramDatos, $vieneDistrito){
+		if ($vieneDistrito === 'si') {
+			$sql = 'SELECT COUNT(*) AS contador, CONCAT( MONTHNAME(ci.fechaCita),"-",YEAR(ci.fechaCita) ) AS anio_mes, YEAR(ci.fechaCita), MONTH(ci.fechaCita), di.nombre AS distrito
+					FROM paciente pa 
+					INNER JOIN cita ci ON pa.id = ci.pacienteId
+					INNER JOIN distrito di ON pa.distritoId = di.id AND pa.distritoId = ? 
+					WHERE pa.estado = 1 
+					AND pa.sedeId = ? 
+					AND ci.estado IN (3)
+					AND DATE(ci.fechaCita) BETWEEN ? AND ? 
+					GROUP BY CONCAT( MONTHNAME(ci.fechaCita),"-",YEAR(ci.fechaCita) ), YEAR(ci.fechaCita), MONTH(ci.fechaCita), di.nombre
+					ORDER BY YEAR(ci.fechaCita), MONTH(ci.fechaCita), di.nombre';
+			$query = $this->db->query($sql, 
+				array(
+					$paramDatos['distrito']['id'],
+					$this->sessionFactur['idsede'],
+					darFormatoYMD($paramDatos['inicio']), 
+					darFormatoYMD($paramDatos['fin'])
+				)
+			);
+		}
+		if ($vieneDistrito === 'no') {
+			$sql = 'SELECT COUNT(*) AS contador, CONCAT( MONTHNAME(ci.fechaCita),"-",YEAR(ci.fechaCita) ) AS anio_mes, YEAR(ci.fechaCita), MONTH(ci.fechaCita)
 					FROM paciente pa 
 					INNER JOIN cita ci ON pa.id = ci.pacienteId
 					WHERE pa.estado = 1 
 					AND pa.sedeId = ? 
 					AND ci.estado IN (3)
 					AND DATE(ci.fechaCita) BETWEEN ? AND ? 
-					GROUP BY CONCAT( MONTHNAME(ci.fechaCita),"-",YEAR(ci.fechaCita) )
-					ORDER BY CONCAT( MONTHNAME(ci.fechaCita),"-",YEAR(ci.fechaCita) )';
-		$query = $this->db->query($sql,
-			array(
-				$this->sessionFactur['idsede'],
-				darFormatoYMD($paramDatos['inicio']), 
-				darFormatoYMD($paramDatos['fin'])
-			) 
-		); 
+					GROUP BY CONCAT( MONTHNAME(ci.fechaCita),"-",YEAR(ci.fechaCita) ), YEAR(ci.fechaCita), MONTH(ci.fechaCita)
+					ORDER BY YEAR(ci.fechaCita), MONTH(ci.fechaCita)';
+			$query = $this->db->query($sql,
+				array(
+					$this->sessionFactur['idsede'],
+					darFormatoYMD($paramDatos['inicio']), 
+					darFormatoYMD($paramDatos['fin'])
+				) 
+			); 
+		}
+		
 		return $query->result_array();
 	}
 
-	public function m_pacientes_nuevos_por_mes($paramDatos){
-		$sql = 'SELECT COUNT(*) AS contador, CONCAT( MONTHNAME(pa.createdAt),"-",YEAR(pa.createdAt) ) AS anio_mes
-					FROM paciente pa 
+	public function m_pacientes_nuevos_por_mes($paramDatos, $vieneDistrito){
+		if ($vieneDistrito === 'si') {
+			$sql = 'SELECT COUNT(*) AS contador, CONCAT( MONTHNAME(pa.createdAt),"-",YEAR(pa.createdAt) ) AS anio_mes, YEAR(pa.createdAt), MONTH(pa.createdAt), di.nombre AS distrito
+					FROM paciente pa
+					INNER JOIN distrito di ON pa.distritoId = di.id AND pa.distritoId = ? 
 					WHERE pa.estado = 1 
 					AND pa.sedeId = ? 
-					AND DATE(pa.createdAt) BETWEEN ? AND ? 
-					GROUP BY CONCAT( MONTHNAME(pa.createdAt),"-",YEAR(pa.createdAt) )
-					ORDER BY CONCAT( MONTHNAME(pa.createdAt),"-",YEAR(pa.createdAt) )'; 
-		$query = $this->db->query($sql, 
-			array(
-				$this->sessionFactur['idsede'],
-				darFormatoYMD($paramDatos['inicio']), 
-				darFormatoYMD($paramDatos['fin'])
-			) 
-		); 
+					AND DATE(pa.createdAt) BETWEEN ? AND ?
+					GROUP BY CONCAT( MONTHNAME(pa.createdAt),"-",YEAR(pa.createdAt) ), YEAR(pa.createdAt), MONTH(pa.createdAt), di.nombre
+					ORDER BY YEAR(pa.createdAt), MONTH(pa.createdAt), di.nombre';
+			$query = $this->db->query($sql, 
+				array(
+					$paramDatos['distrito']['id'],
+					$this->sessionFactur['idsede'],
+					darFormatoYMD($paramDatos['inicio']), 
+					darFormatoYMD($paramDatos['fin'])
+				)
+			);
+		}
+		if ($vieneDistrito === 'no') {
+			$sql = 'SELECT COUNT(*) AS contador, CONCAT( MONTHNAME(pa.createdAt),"-",YEAR(pa.createdAt) ) AS anio_mes, YEAR(pa.createdAt), MONTH(pa.createdAt)
+					FROM paciente pa
+					WHERE pa.estado = 1 
+					AND pa.sedeId = ? 
+					AND DATE(pa.createdAt) BETWEEN ? AND ?
+					GROUP BY CONCAT( MONTHNAME(pa.createdAt),"-",YEAR(pa.createdAt) ), YEAR(pa.createdAt), MONTH(pa.createdAt)
+					ORDER BY YEAR(pa.createdAt), MONTH(pa.createdAt)';
+			$query = $this->db->query($sql, 
+				array(
+					$this->sessionFactur['idsede'],
+					darFormatoYMD($paramDatos['inicio']), 
+					darFormatoYMD($paramDatos['fin'])
+				)
+			);
+		}
+		
 		return $query->result_array();
 	}
 
