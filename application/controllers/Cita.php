@@ -516,7 +516,12 @@ class Cita extends CI_Controller {
 		foreach($arrPagos as $key => $row) {
 			$totalPagos += floatval($row['monto']);
 		}
-		if (!($totalPagos == floatval($fCita['total']))) {
+		// if ($allInputs['idcita'] == '8231') {
+		// 	var_dump($fCita['total']);
+		// 	var_dump('---');
+		// 	var_dump($totalPagos);
+		// }
+		if (!(number_format($totalPagos, 2) === number_format($fCita['total'], 2))) {
 			$arrData['flag'] = 0;
 			$arrData['message'] = 'Debe registrar el pago completo en el sistema, para poder emitir la facturación';
 			$this->output
